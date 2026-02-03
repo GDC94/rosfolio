@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Pastel Color Palette */
+  --color-background: #F5F0EB;
+  --color-background-dark: #EBE6E1;
+  --color-text: #2D2D2D;
+  --color-text-muted: #6B6B6B;
+  --color-text-light: #9A9A9A;
+  --color-accent: #D4A5A5;
+  --color-accent-blue: #A5B9D4;
+  --color-accent-mint: #A5D4C4;
+  --color-border: #E0DBD6;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: "PP Neue Montreal", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background-color: var(--color-background);
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply antialiased font-sans;
+    font-family: "PP Neue Montreal", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--color-text);
+    overflow-x: hidden;
+  }
+}
+
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  font-weight: 200;
+  font-style: normal;
+  src: url(./assets/fonts/PPNeueMontreal-Thin.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  font-weight: 300;
+  font-style: normal;
+  src: url(./assets/fonts/PPNeueMontreal-Light.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  font-weight: 400;
+  font-style: normal;
+  src: url(./assets/fonts/PPNeueMontreal-Book.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  font-weight: 500;
+  font-style: normal;
+  src: url(./assets/fonts/PPNeueMontreal-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  font-weight: 600;
+  font-style: normal;
+  src: url(./assets/fonts/PPNeueMontreal-Medium.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  font-weight: 700;
+  font-style: normal;
+  src: url(./assets/fonts/PPNeueMontreal-Bold.ttf) format("truetype");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: "PP Neue Montreal";
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-light);
+}
+
+/* Para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-background);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
