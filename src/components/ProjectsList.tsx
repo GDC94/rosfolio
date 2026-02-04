@@ -221,12 +221,20 @@ function ProjectsList() {
   );
 
   const nextSlide = useCallback(() => {
-    goToIndex(currentIndex + 1);
-  }, [currentIndex, goToIndex]);
+    if (currentIndex >= maxIndex) {
+      goToIndex(0); // Loop al principio
+    } else {
+      goToIndex(currentIndex + 1);
+    }
+  }, [currentIndex, maxIndex, goToIndex]);
 
   const prevSlide = useCallback(() => {
-    goToIndex(currentIndex - 1);
-  }, [currentIndex, goToIndex]);
+    if (currentIndex <= 0) {
+      goToIndex(maxIndex); // Loop al final
+    } else {
+      goToIndex(currentIndex - 1);
+    }
+  }, [currentIndex, maxIndex, goToIndex]);
 
   // Handle drag end
   const handleDragEnd = (
@@ -336,8 +344,7 @@ function ProjectsList() {
               <div className="flex gap-2">
                 <button
                   onClick={prevSlide}
-                  disabled={currentIndex === 0}
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 hover:border-[rgb(201,188,63)] hover:text-[rgb(201,188,63)] hover:bg-[rgb(201,188,63)]/5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[#E0DBD6] disabled:hover:text-[#6B6B6B] disabled:hover:bg-transparent"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 hover:border-[rgb(201,188,63)] hover:text-[rgb(201,188,63)] hover:bg-[rgb(201,188,63)]/5"
                   aria-label="Anterior"
                 >
                   <svg
@@ -355,8 +362,7 @@ function ProjectsList() {
                 </button>
                 <button
                   onClick={nextSlide}
-                  disabled={currentIndex === maxIndex}
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 hover:border-[rgb(201,188,63)] hover:text-[rgb(201,188,63)] hover:bg-[rgb(201,188,63)]/5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-[#E0DBD6] disabled:hover:text-[#6B6B6B] disabled:hover:bg-transparent"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 hover:border-[rgb(201,188,63)] hover:text-[rgb(201,188,63)] hover:bg-[rgb(201,188,63)]/5"
                   aria-label="Siguiente"
                 >
                   <svg
@@ -379,13 +385,15 @@ function ProjectsList() {
 
         {/* Carousel */}
         <div className="relative -mx-4 sm:-mx-6 px-4 sm:px-6 overflow-hidden">
-          <div ref={containerRef} className="touch-pan-y">
+          <div ref={containerRef}>
             <motion.div
-              className="flex py-5"
-              style={{ x, gap }}
+              className="flex py-5 cursor-grab active:cursor-grabbing"
+              style={{ x, gap, touchAction: "none" }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.1}
+              dragElastic={0.2}
+              dragMomentum={false}
+              onDrag={(_, info) => dragX.set(info.offset.x)}
               onDragEnd={handleDragEnd}
               onDragStart={() => dragX.set(0)}
             >
@@ -415,8 +423,7 @@ function ProjectsList() {
           <div className="flex justify-center items-center gap-3 mt-8 sm:hidden">
             <button
               onClick={prevSlide}
-              disabled={currentIndex === 0}
-              className="w-9 h-9 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-9 h-9 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 hover:border-[rgb(201,188,63)] hover:text-[rgb(201,188,63)]"
               aria-label="Anterior"
             >
               <svg
@@ -450,8 +457,7 @@ function ProjectsList() {
 
             <button
               onClick={nextSlide}
-              disabled={currentIndex === maxIndex}
-              className="w-9 h-9 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-9 h-9 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] transition-all duration-300 hover:border-[rgb(201,188,63)] hover:text-[rgb(201,188,63)]"
               aria-label="Siguiente"
             >
               <svg

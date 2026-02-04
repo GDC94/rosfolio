@@ -208,7 +208,7 @@ export function UserPersonas() {
                   Contexto
                 </h4>
               </div>
-              <p className="text-[15px] text-[#4A4A4A] leading-relaxed">
+              <p className="text-sm text-[#4A4A4A] leading-relaxed">
                 {persona.contexto}
               </p>
             </div>

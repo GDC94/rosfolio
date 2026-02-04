@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { jodifyImages } from "../data/projects";
 
 interface CompetitorData {
@@ -57,41 +58,88 @@ const competitors: CompetitorData[] = [
 ];
 
 const criteria = [
-  {
-    key: "ocupacion",
-    label: "Ocupación del Espacio",
-  },
-  {
-    key: "personalizacion",
-    label: "Personalización Visual",
-  },
-  {
-    key: "navegacion",
-    label: "Navegación",
-  },
-  {
-    key: "consistencia",
-    label: "Consistencia Visual",
-  },
-  {
-    key: "accesibilidad",
-    label: "Accesibilidad",
-  },
-  {
-    key: "fortalezas",
-    label: "Fortalezas",
-    isHighlight: "strength" as const,
-  },
-  {
-    key: "debilidades",
-    label: "Debilidades",
-    isHighlight: "weakness" as const,
-  },
+  { key: "ocupacion", label: "Ocupación del Espacio" },
+  { key: "personalizacion", label: "Personalización Visual" },
+  { key: "navegacion", label: "Navegación" },
+  { key: "consistencia", label: "Consistencia Visual" },
+  { key: "accesibilidad", label: "Accesibilidad" },
+  { key: "fortalezas", label: "Fortalezas", isHighlight: "strength" as const },
+  { key: "debilidades", label: "Debilidades", isHighlight: "weakness" as const },
 ];
 
-export function JodifyBenchmarkTable() {
+// Mobile: Card-based layout per competitor
+function MobileView() {
+  const [activeCompetitor, setActiveCompetitor] = useState(0);
+
   return (
-    <div className="w-full">
+    <div className="md:hidden">
+      {/* Competitor Tabs */}
+      <div className="flex gap-2 mb-4">
+        {competitors.map((competitor, idx) => (
+          <button
+            key={competitor.name}
+            onClick={() => setActiveCompetitor(idx)}
+            className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-300 ${
+              activeCompetitor === idx
+                ? "bg-[#7C16F5] border-[#7C16F5] shadow-md"
+                : "bg-[#7C16F5]/20 border-[#7C16F5]/30"
+            }`}
+          >
+            <img
+              src={competitor.logo}
+              alt={competitor.name}
+              className={`h-5 w-auto object-contain mx-auto ${
+                activeCompetitor === idx ? "brightness-0 invert" : ""
+              }`}
+            />
+          </button>
+        ))}
+      </div>
+
+      {/* Active Competitor Content */}
+      <motion.div
+        key={activeCompetitor}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-3"
+      >
+        {criteria.map((criterion) => (
+          <div
+            key={criterion.key}
+            className={`p-4 rounded-lg border ${
+              criterion.isHighlight === "strength"
+                ? "bg-[#7C16F5]/10 border-[#7C16F5]/20"
+                : criterion.isHighlight === "weakness"
+                ? "bg-[#1B1C20]/10 border-[#1B1C20]/20"
+                : "bg-white border-[#1B1C20]/10"
+            }`}
+          >
+            <h4
+              className={`text-xs font-semibold uppercase tracking-wide mb-2 ${
+                criterion.isHighlight === "strength"
+                  ? "text-[#7C16F5]"
+                  : criterion.isHighlight === "weakness"
+                  ? "text-[#1B1C20]"
+                  : "text-[#6B6B6B]"
+              }`}
+            >
+              {criterion.label}
+            </h4>
+            <p className="text-sm text-[#1B1C20] leading-relaxed">
+              {competitors[activeCompetitor].data[criterion.key]}
+            </p>
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+// Desktop: Table layout
+function DesktopView() {
+  return (
+    <div className="hidden md:block">
       {/* Header con logos de competidores */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -100,14 +148,12 @@ export function JodifyBenchmarkTable() {
         viewport={{ once: true }}
         className="grid grid-cols-[140px_1fr_1fr] gap-3 mb-4"
       >
-        {/* Header de criterios */}
         <div className="flex items-center">
           <span className="text-xs uppercase tracking-[0.12em] text-[#1B1C20] font-medium">
             Criterios
           </span>
         </div>
 
-        {/* Headers de competidores */}
         {competitors.map((competitor, idx) => (
           <motion.div
             key={competitor.name}
@@ -116,7 +162,7 @@ export function JodifyBenchmarkTable() {
             transition={{ delay: idx * 0.1 + 0.2, duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <div className="rounded-lg px-4 py-3 text-center bg-[#0C0C0C]">
+            <div className="rounded-lg px-4 py-3 text-center bg-[#7C16F5]">
               <img
                 src={competitor.logo}
                 alt={competitor.name}
@@ -142,7 +188,6 @@ export function JodifyBenchmarkTable() {
             viewport={{ once: true, margin: "-30px" }}
             className="grid grid-cols-[140px_1fr_1fr] gap-3"
           >
-            {/* Nombre del criterio - compact */}
             <div
               className={`flex items-center px-3 py-2 rounded-lg border ${
                 criterion.isHighlight === "strength"
@@ -157,7 +202,6 @@ export function JodifyBenchmarkTable() {
               </span>
             </div>
 
-            {/* Datos de cada competidor */}
             {competitors.map((competitor) => (
               <div
                 key={`${criterion.key}-${competitor.name}`}
@@ -177,7 +221,6 @@ export function JodifyBenchmarkTable() {
                   {competitor.data[criterion.key]}
                 </p>
 
-                {/* Visual indicator for strengths/weaknesses */}
                 {criterion.isHighlight && (
                   <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-dashed border-[#1B1C20]/10">
                     <div className="flex gap-0.5">
@@ -202,7 +245,7 @@ export function JodifyBenchmarkTable() {
                         />
                       ))}
                     </div>
-                    <span className="text-[10px] text-[#1B1C20]">
+                    <span className="text-xs text-[#1B1C20]">
                       {criterion.isHighlight === "strength"
                         ? competitor.name === "Ticketek"
                           ? "Fuerte"
@@ -218,6 +261,15 @@ export function JodifyBenchmarkTable() {
           </motion.div>
         ))}
       </div>
+    </div>
+  );
+}
+
+export function JodifyBenchmarkTable() {
+  return (
+    <div className="w-full">
+      <MobileView />
+      <DesktopView />
 
       {/* Footer con insight */}
       <motion.div

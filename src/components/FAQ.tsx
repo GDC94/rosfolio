@@ -30,28 +30,28 @@ interface FAQItem {
 
 const faqItems: FAQItem[] = [
   {
-    question: "¿Qué tipo de proyectos me interesan?",
-    answer: "Me interesan proyectos full time, part time o por proyecto. Puedo sumarme a equipos o trabajar de forma independiente según las necesidades del proyecto.",
+    question: "¿Con qué tipo de proyectos trabajás?",
+    answer: "Trabajo en proyectos full time, part time o por proyecto.\nPuedo sumarme a equipos existentes o trabajar de forma independiente, según las necesidades de cada caso.",
   },
   {
-    question: "¿Cómo es tu proceso de trabajo?",
-    answer: "Mi proceso se adapta a cada proyecto, pero generalmente incluye: Entendimiento del problema y objetivos, investigación rápida y análisis de contexto utilizando inteligencia artificial, definición de flujos y wireframes, prototipado inicial con Figma Make para validar ideas de forma ágil, diseño visual en alta fidelidad en Figma, prototipo navegable, y handoff a desarrollo con documentación clara. Este enfoque me permite acelerar las primeras etapas del proyecto sin perder calidad en las decisiones de diseño.",
+    question: "¿Cómo es tu proceso de diseño?",
+    answer: "Mi proceso se adapta a cada proyecto, pero generalmente incluye:\n\n• Entendimiento del problema y objetivos.\n• Investigación rápida y análisis de contexto.\n• Definición de flujos y wireframes.\n• Prototipado inicial para validar ideas de forma ágil.\n• Diseño visual en alta fidelidad en Figma.\n• Prototipo navegable.\n• Handoff a desarrollo con documentación clara.\n\nEste enfoque me permite acelerar las primeras etapas sin perder calidad en las decisiones de diseño.",
   },
   {
     question: "¿Trabajás sola o tenés un equipo?",
-    answer: "Trabajo de forma individual o junto a un desarrollador fullstack según el proyecto. Esto permite ofrecer soluciones completas: desde el diseño hasta la implementación final del sitio o producto.",
+    answer: "Trabajo de forma individual o junto a un desarrollador fullstack, según el proyecto.\n\nEsto permite ofrecer soluciones completas: desde el diseño hasta la implementación final del sitio o producto.",
   },
   {
-    question: "¿Qué entregables recibe el cliente?",
-    answer: "Dependiendo del proyecto, entrego: Diseño en Figma (organizado por componentes y pantallas), prototipo interactivo, design system básico (colores, tipografías, botones, estados), assets exportables y documentación para desarrollo. Todo preparado para que el equipo técnico pueda construir sin ambigüedades.",
+    question: "¿Qué entregables voy a recibir?",
+    answer: "Dependiendo del proyecto, los entregables pueden incluir:\n\n• Diseño en Figma organizado por componentes y pantallas.\n• Prototipo interactivo.\n• Design system básico (colores, tipografías, botones, estados).\n• Assets exportables.\n• Documentación para desarrollo.\n\nTodo preparado para que el equipo técnico pueda construir sin ambigüedades.",
   },
   {
-    question: "¿Cómo se definen los presupuestos y tiempos?",
-    answer: "El presupuesto y los tiempos se definen según: alcance del proyecto, cantidad de pantallas, nivel de complejidad, si mi rol es solo de diseño de interfaces o si incluye definición y análisis de producto (flujos, casos de uso y decisiones funcionales), y si el proyecto contempla solo diseño o diseño + desarrollo. Antes de comenzar, se acuerda una propuesta clara con etapas, entregables y plazos.",
+    question: "¿Cómo definís presupuestos y tiempos?",
+    answer: "El presupuesto y los tiempos se definen según:\n\n• Alcance del proyecto y cantidad de pantallas.\n• Nivel de complejidad.\n• Si el rol incluye solo diseño de interfaces o también definición y análisis de producto.\n• Si el proyecto contempla solo diseño o diseño + desarrollo.\n\nAntes de comenzar, se acuerda una propuesta clara con etapas, entregables y plazos.",
   },
   {
-    question: "¿Qué modalidades de pago ofrecés para trabajos freelance?",
-    answer: "Trabajo con tres modalidades de pago según el tipo de proyecto:\n\n• Por hora: Ideal cuando el alcance no está completamente definido o requiere exploración inicial y ajustes frecuentes.\n\n• Por proyecto: Cuando los requerimientos están claros desde el comienzo, con alcance y entregables bien definidos.\n\n• Pago mensual fijo (retainer): Recomendado para proyectos que necesitan trabajo continuo, muchas iteraciones y evolución progresiva.\n\nCada modalidad se define en función de la complejidad, duración y nivel de involucramiento requerido.",
+    question: "¿Qué modalidades de pago ofrecés?",
+    answer: "Trabajo con tres modalidades según el tipo de proyecto:\n\n• Por hora: Ideal cuando el alcance no está definido o requiere ajustes frecuentes.\n• Por proyecto: Cuando los requerimientos están claros, con alcance y entregables bien definidos.\n• Pago mensual fijo (retainer): Para proyectos que necesitan trabajo continuo y evolución progresiva.\n\nCada modalidad se define en función de la complejidad, duración y nivel de involucramiento.",
   },
 ];
 

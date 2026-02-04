@@ -169,7 +169,7 @@ function Project() {
         <HeroSection project={project} />
 
         {/* 01 Project Brief */}
-        <ProjectBriefSection project={project} fadeIn={fadeIn} staggerContainer={staggerContainer} isXCONS={isXCONS} />
+        <ProjectBriefSection project={project} fadeIn={fadeIn} staggerContainer={staggerContainer} isXCONS={isXCONS} isJodify={isJodify} />
 
         {/* 02 Challenges */}
         <ChallengesSection project={project} fadeIn={fadeIn} staggerContainer={staggerContainer} isXCONS={isXCONS} isJodify={isJodify} />
@@ -302,7 +302,7 @@ function HeroSection({ project }: { project: NonNullable<ReturnType<typeof getPr
 
         {/* Title */}
         <motion.h1
-          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light text-[#2D2D2D] leading-[1.1] tracking-tight mb-4 sm:mb-6 max-w-4xl"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-light text-[#2D2D2D] leading-[1.1] tracking-tight mb-4 sm:mb-6 max-w-4xl"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -318,25 +318,25 @@ function HeroSection({ project }: { project: NonNullable<ReturnType<typeof getPr
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           <div>
-            <h3 className="text-[10px] sm:text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
+            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
               Cronograma
             </h3>
             <p className="text-sm sm:text-base text-[#2D2D2D] font-normal">{project.timeline}</p>
           </div>
           <div>
-            <h3 className="text-[10px] sm:text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
+            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
               Tipo de Proyecto
             </h3>
             <p className="text-sm sm:text-base text-[#2D2D2D] font-normal">{project.projectType}</p>
           </div>
           <div>
-            <h3 className="text-[10px] sm:text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
+            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
               Rol
             </h3>
             <p className="text-sm sm:text-base text-[#2D2D2D] font-normal">Diseñadora UX/UI</p>
           </div>
           <div>
-            <h3 className="text-[10px] sm:text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
+            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
               Contribución
             </h3>
             <p className="text-xs sm:text-sm text-[#2D2D2D] font-normal">{project.contribution?.join(", ")}</p>
@@ -377,9 +377,10 @@ interface SectionProps {
   isXCONS?: boolean;
 }
 
-function ProjectBriefSection({ project, fadeIn, staggerContainer, isXCONS }: SectionProps) {
+function ProjectBriefSection({ project, fadeIn, staggerContainer, isXCONS, isJodify }: SectionProps & { isJodify?: boolean }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const accentColor = isJodify ? "#7C16F5" : "rgb(201,188,63)";
 
   const briefHighlights = isXCONS ? [
     "Comercio Consultivo",
@@ -408,7 +409,7 @@ function ProjectBriefSection({ project, fadeIn, staggerContainer, isXCONS }: Sec
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          <SectionHeader number="01" title="Resumen del Proyecto" fadeIn={fadeIn} />
+          <SectionHeader number="01" title="Resumen del Proyecto" fadeIn={fadeIn} accentColor={accentColor} />
 
           {/* XCONS: Text and image side by side */}
           {isXCONS ? (
@@ -511,7 +512,7 @@ function ChallengesSection({ project, fadeIn, staggerContainer, isXCONS, isJodif
 
                   <div className="space-y-3">
                     <div>
-                      <span className="text-[10px] uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
+                      <span className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
                         El Problema
                       </span>
                       <p className="text-sm text-[#6B6B6B] leading-relaxed mt-1">
@@ -520,7 +521,7 @@ function ChallengesSection({ project, fadeIn, staggerContainer, isXCONS, isJodif
                     </div>
 
                     <div>
-                      <span className="text-[10px] uppercase tracking-[0.15em] text-[rgb(201,188,63)] font-medium">
+                      <span className="text-xs uppercase tracking-[0.15em] text-[rgb(201,188,63)] font-medium">
                         El Reto
                       </span>
                       <p className="text-sm text-[#2D2D2D] font-medium leading-relaxed mt-1">
@@ -529,7 +530,7 @@ function ChallengesSection({ project, fadeIn, staggerContainer, isXCONS, isJodif
                     </div>
 
                     <div>
-                      <span className="text-[10px] uppercase tracking-[0.15em] text-[rgb(111,141,181)] font-medium">
+                      <span className="text-xs uppercase tracking-[0.15em] text-[rgb(111,141,181)] font-medium">
                         La Solución
                       </span>
                       <p className="text-sm text-[#2D2D2D] leading-relaxed mt-1">
@@ -595,7 +596,7 @@ function KeyFindingsSection({ project, fadeIn }: Omit<SectionProps, "staggerCont
 
           {/* Competitors - Compact inline layout */}
           <motion.div variants={fadeIn} className="mb-8">
-            <h4 className="text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] mb-4 font-medium">
+            <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-4 font-medium">
               Competidores Analizados
             </h4>
             <div className="flex flex-wrap gap-3">
@@ -626,7 +627,7 @@ function KeyFindingsSection({ project, fadeIn }: Omit<SectionProps, "staggerCont
             <motion.div variants={fadeIn}>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h4 className="text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
+                <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
                   Necesidad del Usuario
                 </h4>
               </div>
@@ -641,7 +642,7 @@ function KeyFindingsSection({ project, fadeIn }: Omit<SectionProps, "staggerCont
             <motion.div variants={fadeIn}>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h4 className="text-[11px] uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
+                <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
                   Tendencia
                 </h4>
               </div>
@@ -752,10 +753,10 @@ function XCONSKeyFindingsSection({ fadeIn }: Omit<SectionProps, "staggerContaine
           <div className="space-y-8 sm:space-y-12 md:space-y-16" role="list" aria-label="Soluciones de diseño">
             {designSolutions.map((solution, solutionIndex) => {
               const imageSrc = solutionIndex === 0
-                ? "/src/assets/xcons/detail-3.png"
+                ? xconsImages.detail3
                 : solutionIndex === 1
-                  ? "/src/assets/xcons/detail-3-2.2.png"
-                  : "/src/assets/xcons/contacto.png";
+                  ? xconsImages.detail322
+                  : xconsImages.contacto;
 
               return (
                 <motion.article
@@ -895,7 +896,7 @@ function XCONSLogicSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "
                   </div>
                   <div className="mt-3 sm:mt-4">
                     <h4 className="text-xs sm:text-sm font-medium text-[#2D2D2D] mb-1">{pricingLayers[0].name}</h4>
-                    <p className="text-[10px] sm:text-xs text-[#6B6B6B]">{pricingLayers[0].description}</p>
+                    <p className="text-xs text-[#6B6B6B]">{pricingLayers[0].description}</p>
                   </div>
                 </motion.div>
 
@@ -979,7 +980,7 @@ function XCONSLogicSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "
                   </div>
                   <div className="mt-3 sm:mt-4">
                     <h4 className="text-xs sm:text-sm font-medium text-[#2D2D2D] mb-1">Precio Final</h4>
-                    <p className="text-[10px] sm:text-xs text-[#6B6B6B]">Calculado dinámicamente</p>
+                    <p className="text-xs text-[#6B6B6B]">Calculado dinámicamente</p>
                   </div>
                 </motion.div>
               </div>
@@ -1016,7 +1017,7 @@ function XCONSLogicSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "
                   </div>
                   <div className="mt-3 sm:mt-4">
                     <h4 className="text-xs sm:text-sm font-medium text-[#2D2D2D] mb-1">Precio Final</h4>
-                    <p className="text-[10px] sm:text-xs text-[#6B6B6B]">Calculado dinámicamente</p>
+                    <p className="text-xs text-[#6B6B6B]">Calculado dinámicamente</p>
                   </div>
                 </motion.div>
               </div>
@@ -1143,14 +1144,14 @@ function ScreensCarousel({ screens }: { screens: Screen[] }) {
         {/* Current slide info */}
         <div className="absolute bottom-3 left-3 z-10">
           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/90 rounded-md border border-[#E0DBD6] shadow-sm">
-            <span className="text-[10px] font-medium text-[rgb(201,188,63)]">
+            <span className="text-xs font-medium text-[rgb(201,188,63)]">
               {String(currentIndex + 1).padStart(2, "0")}
             </span>
-            <span className="text-[10px] text-[#9A9A9A]">/</span>
-            <span className="text-[10px] text-[#9A9A9A]">
+            <span className="text-xs text-[#9A9A9A]">/</span>
+            <span className="text-xs text-[#9A9A9A]">
               {String(totalScreens).padStart(2, "0")}
             </span>
-            <span className="text-[10px] text-[#2D2D2D] ml-1 font-medium">
+            <span className="text-xs text-[#2D2D2D] ml-1 font-medium">
               {screens[currentIndex].title}
             </span>
           </div>
@@ -1440,7 +1441,7 @@ function NextProjectSection({ nextProject, nextProjectId, fadeIn }: NextProjectS
               {/* Thumbnail */}
               <div className="w-full sm:w-32 h-40 sm:h-20 md:w-40 md:h-24 rounded-xl overflow-hidden flex-shrink-0">
                 <img
-                  src={nextProject?.image}
+                  src={nextProject?.homeImage || nextProject?.image}
                   alt=""
                   width={160}
                   height={96}
@@ -1452,7 +1453,7 @@ function NextProjectSection({ nextProject, nextProjectId, fadeIn }: NextProjectS
               {/* Content */}
               <div className="flex-1 w-full text-center md:text-left">
                 <p 
-                  className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium mb-1 sm:mb-2"
+                  className="text-xs uppercase tracking-[0.15em] font-medium mb-1 sm:mb-2"
                   style={{ color: accentColor }}
                 >
                   {nextProject?.company}
@@ -1565,9 +1566,85 @@ function JodifyPersonaSection({ fadeIn }: Omit<SectionProps, "staggerContainer" 
             </h2>
           </div>
 
-          {/* User Persona Card */}
+          {/* User Persona Card - Mobile */}
           <motion.div
-            className="bg-white rounded-2xl border border-[#1B1C20]/10 overflow-hidden mb-10 sm:mb-12"
+            className="md:hidden bg-white rounded-2xl border border-[#1B1C20]/10 overflow-hidden mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {/* Photo Header */}
+            <div className="bg-gradient-to-b from-[#7C16F5]/15 to-[#7C16F5]/5 p-6 flex flex-col items-center text-center">
+              <div className="relative mb-4">
+                <img
+                  src={jodifyImages.persona}
+                  alt="Martina Rodríguez"
+                  className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg"
+                  loading="lazy"
+                />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-[#7C16F5] text-white text-xs font-medium rounded-full whitespace-nowrap">
+                  28 años
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-[#0C0C0C]">Martina Rodríguez</h3>
+              <p className="text-sm text-[#7C16F5] font-medium">Diseñadora Gráfica</p>
+            </div>
+
+            {/* Quick Info Pills */}
+            <div className="px-5 py-4 border-b border-[#1B1C20]/5 flex flex-wrap justify-center gap-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F1EF] rounded-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span className="text-xs text-[#1B1C20]">La Plata, Argentina</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F1EF] rounded-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                <span className="text-xs text-[#1B1C20]">iPhone, Macbook</span>
+              </div>
+            </div>
+
+            {/* Bio */}
+            <div className="px-5 py-4">
+              <p className="text-sm text-[#1B1C20] leading-relaxed text-center">
+                Enérgica amante de la música electrónica, Martina disfruta de eventos como festivales de techno y fiestas underground. Busca experiencias vibrantes y vanguardistas en la escena de música electrónica local e internacional.
+              </p>
+            </div>
+
+            {/* Interests, Needs, Frustrations - Stacked */}
+            <div className="px-5 pb-5 space-y-3">
+              <div className="p-4 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
+                <h4 className="text-xs font-semibold text-[#7C16F5] uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5]" />
+                  Intereses
+                </h4>
+                <p className="text-xs text-[#1B1C20] leading-relaxed">Creativa, con un enfoque moderno y contemporáneo. Le gusta la estética minimalista y busca plataformas que resalten la innovación.</p>
+              </div>
+              <div className="p-4 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
+                <h4 className="text-xs font-semibold text-[#7C16F5] uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5]" />
+                  Necesidades
+                </h4>
+                <p className="text-xs text-[#1B1C20] leading-relaxed">Amplia oferta de eventos, desde festivales masivos hasta fiestas underground. Recomendaciones personalizadas basadas en preferencias.</p>
+              </div>
+              <div className="p-4 bg-[#1B1C20]/5 rounded-xl border border-[#1B1C20]/10">
+                <h4 className="text-xs font-semibold text-[#1B1C20] uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1B1C20]" />
+                  Frustraciones
+                </h4>
+                <p className="text-xs text-[#1B1C20] leading-relaxed">No encontrar eventos de su interés. Preocupación por costos ocultos o falta de claridad en el proceso de compra.</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* User Persona Card - Desktop */}
+          <motion.div
+            className="hidden md:block bg-white rounded-2xl border border-[#1B1C20]/10 overflow-hidden mb-10 sm:mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -1576,9 +1653,9 @@ function JodifyPersonaSection({ fadeIn }: Omit<SectionProps, "staggerContainer" 
               {/* Photo */}
               <div className="md:col-span-1 bg-[#7C16F5]/10 p-6 sm:p-8 flex items-center justify-center">
                 <div className="relative">
-                  <img 
-                    src={jodifyImages.persona} 
-                    alt="Martina Rodríguez" 
+                  <img
+                    src={jodifyImages.persona}
+                    alt="Martina Rodríguez"
                     className="w-40 h-40 sm:w-48 sm:h-48 rounded-full object-cover border-4 border-white shadow-lg"
                     loading="lazy"
                   />
@@ -1593,16 +1670,24 @@ function JodifyPersonaSection({ fadeIn }: Omit<SectionProps, "staggerContainer" 
                 <h3 className="text-xl sm:text-2xl font-medium text-[#0C0C0C] mb-1">Martina Rodríguez</h3>
                 <p className="text-sm text-[#7C16F5] font-medium mb-4">Diseñadora Gráfica</p>
 
-                <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="flex flex-wrap gap-4 mb-6">
                   <div className="flex items-center gap-2">
-                    {LocationIcon}
+                    <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                    </div>
                     <span className="text-sm text-[#1B1C20]">La Plata, Argentina</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#1B1C20]">
-                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                      <line x1="12" y1="18" x2="12.01" y2="18" />
-                    </svg>
+                    <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                      </svg>
+                    </div>
                     <span className="text-sm text-[#1B1C20]">iPhone, Macbook</span>
                   </div>
                 </div>
@@ -1613,15 +1698,15 @@ function JodifyPersonaSection({ fadeIn }: Omit<SectionProps, "staggerContainer" 
 
                 {/* Interests, Needs, Frustrations */}
                 <div className="grid sm:grid-cols-3 gap-4">
-                  <div className="p-3 bg-[#F2F1EF] rounded-xl">
+                  <div className="p-3 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
                     <h4 className="text-xs font-medium text-[#7C16F5] uppercase tracking-wider mb-2">Intereses</h4>
                     <p className="text-xs text-[#1B1C20]">Creativa, con un enfoque moderno y contemporáneo. Le gusta la estética minimalista y busca plataformas que resalten la innovación.</p>
                   </div>
-                  <div className="p-3 bg-[#F2F1EF] rounded-xl">
+                  <div className="p-3 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
                     <h4 className="text-xs font-medium text-[#7C16F5] uppercase tracking-wider mb-2">Necesidades</h4>
                     <p className="text-xs text-[#1B1C20]">Amplia oferta de eventos, desde festivales masivos hasta fiestas underground. Recomendaciones personalizadas basadas en preferencias.</p>
                   </div>
-                  <div className="p-3 bg-[#F2F1EF] rounded-xl">
+                  <div className="p-3 bg-[#1B1C20]/5 rounded-xl border border-[#1B1C20]/10">
                     <h4 className="text-xs font-medium text-[#1B1C20] uppercase tracking-wider mb-2">Frustraciones</h4>
                     <p className="text-xs text-[#1B1C20]">No encontrar eventos de su interés. Preocupación por costos ocultos o falta de claridad en el proceso de compra.</p>
                   </div>
@@ -1661,8 +1746,8 @@ function JodifyPersonaSection({ fadeIn }: Omit<SectionProps, "staggerContainer" 
               {/* Frustra */}
               <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#1B1C20]/10">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-[#1B1C20]/10 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B1C20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" />
                       <line x1="15" y1="9" x2="9" y2="15" />
                       <line x1="9" y1="9" x2="15" y2="15" />
@@ -1673,7 +1758,7 @@ function JodifyPersonaSection({ fadeIn }: Omit<SectionProps, "staggerContainer" 
                 <ul className="space-y-2">
                   {empathyMap.frustra.map((item, i) => (
                     <li key={i} className="text-xs sm:text-sm text-[#1B1C20] flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#1B1C20] mt-1.5 flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5] mt-1.5 flex-shrink-0" />
                       {item}
                     </li>
                   ))}

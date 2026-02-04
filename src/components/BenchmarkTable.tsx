@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import peopleforceLogo from "../assets/hr/peopleforce.svg";
 import hibobLogo from "../assets/hr/hibob.svg";
 
@@ -58,97 +59,89 @@ const competitors: CompetitorData[] = [
 ];
 
 const criteria = [
-  {
-    key: "usabilidad",
-    label: "Usabilidad",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-        <path
-          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-  },
-  {
-    key: "flujos",
-    label: "Flujos y Funciones",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-        <path
-          d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-  },
-  {
-    key: "espacio",
-    label: "Gestión del Espacio",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-        <path
-          d="M3 3v18h18V3H3zm8 16H5v-6h6v6zm0-8H5V5h6v6zm8 8h-6v-6h6v6zm0-8h-6V5h6v6z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-  },
-  {
-    key: "vocabulario",
-    label: "Vocabulario y Tono",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-        <path
-          d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-  },
-  {
-    key: "flexibilidad",
-    label: "Flexibilidad",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-        <path
-          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-  },
-  {
-    key: "fortalezas",
-    label: "Fortalezas",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-        <path
-          d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-    isHighlight: "strength",
-  },
-  {
-    key: "debilidades",
-    label: "Debilidades",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-        <path
-          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
-          fill="currentColor"
-        />
-      </svg>
-    ),
-    isHighlight: "weakness",
-  },
+  { key: "usabilidad", label: "Usabilidad" },
+  { key: "flujos", label: "Flujos y Funciones" },
+  { key: "espacio", label: "Gestión del Espacio" },
+  { key: "vocabulario", label: "Vocabulario y Tono" },
+  { key: "flexibilidad", label: "Flexibilidad" },
+  { key: "fortalezas", label: "Fortalezas", isHighlight: "strength" },
+  { key: "debilidades", label: "Debilidades", isHighlight: "weakness" },
 ];
 
-export function BenchmarkTable() {
+// Mobile: Card-based layout per competitor
+function MobileView() {
+  const [activeCompetitor, setActiveCompetitor] = useState(0);
+
   return (
-    <div className="w-full">
+    <div className="md:hidden">
+      {/* Competitor Tabs */}
+      <div className="flex gap-2 mb-4">
+        {competitors.map((competitor, idx) => (
+          <button
+            key={competitor.name}
+            onClick={() => setActiveCompetitor(idx)}
+            className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all duration-300 ${
+              activeCompetitor === idx
+                ? "border-current bg-white shadow-md"
+                : "border-[#E0DBD6] bg-white/50"
+            }`}
+            style={{
+              borderColor: activeCompetitor === idx ? competitor.color : undefined,
+            }}
+          >
+            <img
+              src={competitor.logo}
+              alt={competitor.name}
+              className="h-5 w-auto object-contain mx-auto"
+            />
+          </button>
+        ))}
+      </div>
+
+      {/* Active Competitor Content */}
+      <motion.div
+        key={activeCompetitor}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-3"
+      >
+        {criteria.map((criterion) => (
+          <div
+            key={criterion.key}
+            className={`p-4 rounded-lg border ${
+              criterion.isHighlight === "strength"
+                ? "bg-emerald-50/50 border-emerald-200"
+                : criterion.isHighlight === "weakness"
+                ? "bg-amber-50/50 border-amber-200"
+                : "bg-white border-[#E0DBD6]"
+            }`}
+          >
+            <h4
+              className={`text-xs font-semibold uppercase tracking-wide mb-2 ${
+                criterion.isHighlight === "strength"
+                  ? "text-emerald-600"
+                  : criterion.isHighlight === "weakness"
+                  ? "text-amber-600"
+                  : "text-[#6B6B6B]"
+              }`}
+            >
+              {criterion.label}
+            </h4>
+            <p className="text-sm text-[#4A4A4A] leading-relaxed">
+              {competitors[activeCompetitor].data[criterion.key]}
+            </p>
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+// Desktop: Table layout
+function DesktopView() {
+  return (
+    <div className="hidden md:block">
       {/* Header con logos de competidores */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -157,14 +150,12 @@ export function BenchmarkTable() {
         viewport={{ once: true }}
         className="grid grid-cols-[140px_1fr_1fr] gap-3 mb-4"
       >
-        {/* Header de criterios */}
         <div className="flex items-center">
           <span className="text-xs uppercase tracking-[0.12em] text-[#9A9A9A] font-medium">
             Criterios
           </span>
         </div>
 
-        {/* Headers de competidores */}
         {competitors.map((competitor, idx) => (
           <motion.div
             key={competitor.name}
@@ -199,7 +190,6 @@ export function BenchmarkTable() {
             viewport={{ once: true, margin: "-30px" }}
             className="grid grid-cols-[140px_1fr_1fr] gap-3"
           >
-            {/* Nombre del criterio - compact */}
             <div
               className={`flex items-center px-3 py-2 rounded-lg border border-[#E0DBD6]/50 ${
                 criterion.isHighlight === "strength"
@@ -214,7 +204,6 @@ export function BenchmarkTable() {
               </span>
             </div>
 
-            {/* Datos de cada competidor */}
             {competitors.map((competitor, compIdx) => (
               <div
                 key={`${criterion.key}-${competitor.name}`}
@@ -234,7 +223,6 @@ export function BenchmarkTable() {
                   {competitor.data[criterion.key]}
                 </p>
 
-                {/* Visual indicator for strengths/weaknesses */}
                 {criterion.isHighlight && (
                   <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-dashed border-[#E0DBD6]/40">
                     <div className="flex gap-0.5">
@@ -259,7 +247,7 @@ export function BenchmarkTable() {
                         />
                       ))}
                     </div>
-                    <span className="text-[10px] text-[#9A9A9A]">
+                    <span className="text-xs text-[#9A9A9A]">
                       {criterion.isHighlight === "strength"
                         ? compIdx === 0
                           ? "Muy fuerte"
@@ -275,8 +263,17 @@ export function BenchmarkTable() {
           </motion.div>
         ))}
       </div>
+    </div>
+  );
+}
 
-      {/* Footer con insight - más compacto */}
+export function BenchmarkTable() {
+  return (
+    <div className="w-full">
+      <MobileView />
+      <DesktopView />
+
+      {/* Footer con insight */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

@@ -25,6 +25,7 @@ import xconsDetail333 from "../assets/xcons/detail-3-3.3.png";
 import xconsDetail342 from "../assets/xcons/detail-3-4.2.png";
 import xconsPedidos from "../assets/xcons/table de pedidos.png";
 import xconsFlujoCompra from "../assets/xcons/flujo-de-compra.png";
+import xconsContacto from "../assets/xcons/contacto.png";
 
 // Export XCONS images for use in Project.tsx
 export const xconsImages = {
@@ -34,6 +35,7 @@ export const xconsImages = {
   detail333: xconsDetail333,
   detail342: xconsDetail342,
   pedidos: xconsPedidos,
+  contacto: xconsContacto,
 };
 
 import hrCover from "../assets/hr/cover.png";

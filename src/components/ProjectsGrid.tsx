@@ -221,7 +221,7 @@ function ProjectsGrid({ projects }: ProjectsGridProps) {
 
               {/* Text */}
               <motion.span
-                className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] text-[#9A9A9A] font-medium mb-3 px-3 py-1.5 rounded-full border border-[#D0CBC6]/60 text-center"
+                className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium mb-3 px-3 py-1.5 rounded-full border border-[#D0CBC6]/60 text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}

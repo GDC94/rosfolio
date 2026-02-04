@@ -36,6 +36,25 @@ const ScrollArrow = (
   </svg>
 );
 
+const ContactArrowIcon = (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 14 14"
+    fill="none"
+    aria-hidden="true"
+    className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+  >
+    <path
+      d="M3 11L11 3M11 3H5M11 3V9"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 function Hero() {
   return (
     <section
@@ -193,12 +212,14 @@ function Hero() {
             role="contentinfo"
             aria-label="Información de ubicación y disponibilidad"
           >
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/60 backdrop-blur-sm border border-[#E0DBD6]/60 text-sm text-[#6B6B6B]">
+            <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
               {LocationIcon}
               <span>Tandil, Argentina</span>
             </div>
 
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/60 backdrop-blur-sm border border-emerald-200/60 text-sm text-[#6B6B6B]">
+            <span className="hidden sm:inline text-[#D0CBC6]" aria-hidden="true">·</span>
+
+            <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
               <span className="relative flex h-2 w-2" aria-hidden="true">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -209,6 +230,18 @@ function Hero() {
               </span>
             </div>
           </motion.div>
+
+          {/* Mobile Contact Button */}
+          <motion.a
+            href="mailto:rosarioalzueta@gmail.com"
+            className="group mt-10 sm:hidden flex items-center gap-2 px-5 py-2.5 bg-[rgb(201,188,63)] hover:bg-[rgb(161,148,23)] text-[#2D2D2D] text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[rgb(201,188,63)]/25 ring-1 ring-transparent hover:ring-[rgb(201,188,63)] ring-offset-[4px] ring-offset-[#F5F0EB]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
+          >
+            Contactar
+            {ContactArrowIcon}
+          </motion.a>
         </div>
       </div>
 
