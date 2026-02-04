@@ -383,7 +383,7 @@ function ProjectBriefSection({ project, fadeIn, staggerContainer, isXCONS, isJod
   const accentColor = isJodify ? "#7C16F5" : "rgb(201,188,63)";
 
   const briefHighlights = isXCONS ? [
-    "Comercio Consultivo",
+    "ecosistema e-commerce",
     "industria de la construcción",
     "experiencia de compra de materiales",
     "flujo digital unificado",
@@ -415,17 +415,17 @@ function ProjectBriefSection({ project, fadeIn, staggerContainer, isXCONS, isJod
           {isXCONS ? (
             <motion.div
               variants={fadeIn}
-              className="flex flex-col md:flex-row items-start gap-6"
+              className="flex flex-col md:flex-row items-start gap-8"
             >
-              <p className="text-base md:text-lg text-[#5A5A5A] leading-relaxed md:flex-1 pt-1">
+              <p className="text-base md:text-lg text-[#5A5A5A] leading-relaxed max-w-xl pt-1">
                 {renderHighlightedText(project.conceptSummary, briefHighlights)}
               </p>
-              <div className="w-full md:w-[360px] flex-shrink-0 pt-1">
+              <div className="w-full md:w-[180px] flex-shrink-0">
                 <img
                   src={xconsImages.flujoCompra}
                   alt="Flujo de compra - XCONS"
-                  width={360}
-                  height={220}
+                  width={180}
+                  height={110}
                   loading="lazy"
                   className="w-full rounded-lg"
                 />
@@ -607,15 +607,9 @@ function KeyFindingsSection({ project, fadeIn }: Omit<SectionProps, "staggerCont
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05, duration: 0.4 }}
                   viewport={{ once: true }}
-                  className="group relative"
                 >
-                  <div className="px-4 py-2 bg-[#FAFAF8] rounded-lg border border-[#E8E4DF] hover:border-[rgb(201,188,63)]/40 transition-all duration-300 cursor-default">
+                  <div className="px-4 py-2 bg-[#FAFAF8] rounded-lg border border-[#E8E4DF]">
                     <span className="text-sm font-medium text-[#2D2D2D]">{competitor.name}</span>
-                  </div>
-                  {/* Tooltip on hover */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#2D2D2D] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap max-w-[200px] text-center z-10">
-                    {competitor.insight}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#2D2D2D]" />
                   </div>
                 </motion.div>
               ))}
@@ -1100,7 +1094,7 @@ function ScreensCarousel({ screens }: { screens: Screen[] }) {
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
       {/* Main carousel container */}
-      <div className="relative overflow-hidden rounded-xl bg-[#FAFAF8] border border-[#E8E4DF]">
+      <div className="relative overflow-hidden rounded-xl">
         {/* Slides */}
         <div className="relative aspect-[16/9]">
           {screens.map((screen, index) => (
@@ -1357,14 +1351,14 @@ function ResultsSection({ project, fadeIn, staggerContainer, isXCONS }: SectionP
             </motion.div>
 
             {/* Metrics */}
-            <motion.div variants={fadeIn} className="text-right">
-              <div className="flex items-center gap-3 mb-6 justify-end">
+            <motion.div variants={fadeIn}>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
                 <h3 className="text-sm uppercase tracking-[0.15em] text-[#2D2D2D] font-medium">
                   Métricas a Evaluar
                 </h3>
-                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
               </div>
-              <ul className="space-y-4 inline-block">
+              <ul className="space-y-4">
                 {project.results?.metrics?.map((metric, index) => (
                   <li
                     key={index}
@@ -1373,7 +1367,7 @@ function ResultsSection({ project, fadeIn, staggerContainer, isXCONS }: SectionP
                     <span className="text-2xl font-extralight text-[rgb(201,188,63)] tabular-nums">
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span className="text-[#4A4A4A] leading-relaxed border-b border-transparent group-hover:border-[rgb(201,188,63)]/30 transition-colors pb-1 text-right w-full">
+                    <span className="text-[#4A4A4A] leading-relaxed border-b border-transparent group-hover:border-[rgb(201,188,63)]/30 transition-colors pb-1">
                       {metric}
                     </span>
                   </li>
@@ -1405,23 +1399,12 @@ interface NextProjectSectionProps {
   fadeIn: Variants;
 }
 
-// Get accent color for each project
-function getProjectAccentColor(projectId: string): string {
-  switch (projectId) {
-    case "1": return "rgb(201,188,63)"; // HR - dorado
-    case "2": return "rgb(111,141,181)"; // XCONS - azul
-    case "3": return "#7C16F5"; // Jodify - violeta
-    default: return "rgb(201,188,63)";
-  }
-}
-
 function NextProjectSection({ nextProject, nextProjectId, fadeIn }: NextProjectSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const accentColor = getProjectAccentColor(nextProjectId);
 
   return (
-    <section ref={ref} className="py-12 sm:py-16 md:py-20 lg:py-24 border-t border-[#E8E4DF]">
+    <section ref={ref} className="py-12 sm:py-16 md:py-20 lg:py-24 border-t border-[#E8E4DF] bg-[#F5F0EB]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"}>
           {/* Title */}
@@ -1452,10 +1435,7 @@ function NextProjectSection({ nextProject, nextProjectId, fadeIn }: NextProjectS
 
               {/* Content */}
               <div className="flex-1 w-full text-center md:text-left">
-                <p 
-                  className="text-xs uppercase tracking-[0.15em] font-medium mb-1 sm:mb-2"
-                  style={{ color: accentColor }}
-                >
+                <p className="text-xs uppercase tracking-[0.15em] font-medium mb-1 sm:mb-2 text-[rgb(201,188,63)]">
                   {nextProject?.company}
                 </p>
                 <h4 className="text-lg sm:text-xl md:text-2xl font-medium text-[#2D2D2D] transition-colors duration-300">
@@ -1467,10 +1447,8 @@ function NextProjectSection({ nextProject, nextProjectId, fadeIn }: NextProjectS
               </div>
 
               {/* Arrow */}
-              <motion.div 
-                className="w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 flex-shrink-0"
-                style={{ borderColor: accentColor, color: accentColor }}
-                whileHover={{ backgroundColor: accentColor, color: "#ffffff" }}
+              <motion.div
+                className="w-12 h-12 rounded-full border-2 border-[rgb(201,188,63)] text-[rgb(201,188,63)] flex items-center justify-center transition-all duration-300 flex-shrink-0 group-hover:bg-[rgb(201,188,63)] group-hover:text-white"
               >
                 {NextArrowIcon}
               </motion.div>

@@ -665,7 +665,7 @@ function Acerca() {
           <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start">
             {[
               "Figma",
-              "Figma Sites",
+              "Figma Make",
               "Canva",
               "Sketchup",
               "Marvel",
@@ -677,12 +677,7 @@ function Acerca() {
               "Maze",
               "Optimal Workshop",
               "Deep Research",
-              "User Research",
-              "Prototyping",
               "Design Systems",
-              "UI Design",
-              "UX Design",
-              "Product Design",
             ].map((skill, index) => (
               <motion.span
                 key={skill}

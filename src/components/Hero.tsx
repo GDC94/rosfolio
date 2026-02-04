@@ -247,12 +247,11 @@ function Hero() {
 
       {/* Scroll indicator - hidden on very small screens */}
       <motion.div
-        className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-[#9A9A9A] hidden sm:flex"
+        className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex-col items-center text-[#9A9A9A] hidden sm:flex"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 1.5 }}
       >
-        <span className="text-xs uppercase tracking-[0.2em]">Scroll</span>
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}

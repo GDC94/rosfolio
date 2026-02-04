@@ -1,16 +1,15 @@
 import hrImage from "../assets/hr.png";
 import xconsCard from "../assets/xcons.png";
-import xconsCover from "../assets/xcons/portada-xcons.png";
+import xconsCover from "../assets/xcons/portada-xcons.webp";
 
 // Jodify Project assets
-import jodifyCard from "../assets/jodify/portada-project.png";
+import jodifyCard from "../assets/jodify/portada-project.webp";
 import jodifyHomeCard from "../assets/jodify/portada.png";
 import jodifyUiKit from "../assets/jodify/UI-kit.svg";
 import jodifyPersona from "../assets/jodify/retrato.png";
 import jodifyLogoTicketek from "../assets/jodify/Logo Ticketek.png";
 import jodifyLogoPassline from "../assets/jodify/Logo Passline.png";
 
-// Export Jodify images for use in Project.tsx
 export const jodifyImages = {
   uiKit: jodifyUiKit,
   persona: jodifyPersona,
@@ -18,13 +17,12 @@ export const jodifyImages = {
   logoPassline: jodifyLogoPassline,
 };
 
-// XCONS Project assets
 import xconsDetail3 from "../assets/xcons/detail-3.png";
 import xconsDetail322 from "../assets/xcons/detail-3-2.2.png";
 import xconsDetail333 from "../assets/xcons/detail-3-3.3.png";
 import xconsDetail342 from "../assets/xcons/detail-3-4.2.png";
 import xconsPedidos from "../assets/xcons/table de pedidos.png";
-import xconsFlujoCompra from "../assets/xcons/flujo-de-compra.png";
+import xconsFlujoCompra from "../assets/xcons/flujo-de-compra.webp";
 import xconsContacto from "../assets/xcons/contacto.png";
 
 // Export XCONS images for use in Project.tsx
@@ -38,12 +36,11 @@ export const xconsImages = {
   contacto: xconsContacto,
 };
 
-import hrCover from "../assets/hr/cover.png";
+import hrCover from "../assets/hr/cover.webp";
 import hrScreen1 from "../assets/hr/screen-1.png";
 import hrScreen2 from "../assets/hr/screen-2.png";
 import hrScreen3 from "../assets/hr/screen-3.png";
 import hrScreen4 from "../assets/hr/screen-4.png";
-import hrScreen5 from "../assets/hr/screen-5.png";
 import hrWireframe from "../assets/hr/low-frame.png";
 import hrUiKit from "../assets/hr/UI KIT.png";
 import hrBenchmark from "../assets/hr/benchmark.svg";
@@ -57,7 +54,7 @@ export interface Challenge {
 
 export interface Competitor {
   name: string;
-  insight: string;
+  insight?: string;
 }
 
 export interface ProcessStep {
@@ -157,17 +154,10 @@ export const projects: ProjectData[] = [
     keyFindings: {
       competitors: [
         {
-          name: "Factorial",
-          insight: "Buena organización, pero difícil de aprender para novatos.",
-        },
-        {
           name: "PeopleForce",
-          insight: "Muy potente, pero visualmente densa.",
         },
         {
           name: "HiBob",
-          insight:
-            "Muy intuitiva y limpia, pero carece de profundidad en jerarquías complejas.",
         },
       ],
       userNeed:
@@ -233,11 +223,10 @@ export const projects: ProjectData[] = [
       uiKit: hrUiKit,
       mvp: hrMvp,
       screens: [
-        { url: hrScreen1, title: "Dashboard Principal" },
-        { url: hrScreen2, title: "Gestión de Empleados" },
-        { url: hrScreen3, title: "Perfil de Empleado" },
-        { url: hrScreen4, title: "Gestión de Permisos" },
-        { url: hrScreen5, title: "Reportes y Análisis" },
+        { url: hrScreen1, title: "Filtro de tablas" },
+        { url: hrScreen2, title: "Formulario carga de empleado" },
+        { url: hrScreen4, title: "Información personal del empleado" },
+        { url: hrScreen3, title: "Vista de licencias del empleado" },
       ],
     },
   },
@@ -245,12 +234,12 @@ export const projects: ProjectData[] = [
     id: "2",
     title: "XCONS Ecosystem",
     category: "Professional",
-    company: "Plataforma de Comercio Consultivo",
+    company: "Ecosistema E-commerce",
     year: "2024 - Actualidad",
-    description: "Plataforma de Comercio Consultivo para la industria de la construcción",
+    description: "Ecosistema E-commerce para la industria de la construcción",
     image: xconsCard,
     projectName: "XCONS Ecosystem",
-    projectType: "Plataforma B2B / Comercio Consultivo",
+    projectType: "Ecosistema E-commerce B2B",
     timeline: "2024",
     contribution: [
       "Product Design",
@@ -259,7 +248,7 @@ export const projects: ProjectData[] = [
       "Information Architecture",
     ],
     conceptSummary:
-      "Diseñar una plataforma de \"Comercio Consultivo\" para la industria de la construcción. El objetivo fue transformar la experiencia de compra de materiales —que tradicionalmente es lenta, asistida y compleja— en un flujo digital unificado, sin perder la flexibilidad que requieren las obras reales (negociación, acopio y múltiples entregas).",
+      "Diseñar un ecosistema e-commerce para la industria de la construcción. El objetivo fue transformar la experiencia de compra de materiales —que tradicionalmente es lenta, asistida y compleja— en un flujo digital unificado, sin perder la flexibilidad que requieren las obras reales (negociación, acopio y múltiples entregas).",
 
     challenges: [
       {
@@ -342,7 +331,7 @@ export const projects: ProjectData[] = [
     image: jodifyCard,
     homeImage: jodifyHomeCard,
     projectName: "Jodify",
-    projectType: "Plataforma de Eventos / Agregador B2C",
+    projectType: "Aplicación de Eventos",
     timeline: "2023",
     contribution: [
       "UX Research",

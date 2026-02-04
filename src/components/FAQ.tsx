@@ -107,7 +107,7 @@ function FAQ() {
 
   return (
     <section
-      className="relative py-16 sm:py-20 md:py-24"
+      className="relative py-16 sm:pt-3 sm:pb-24 md:py-18"
       aria-labelledby="faq-title"
     >
       <Grid12Background />
