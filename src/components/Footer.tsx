@@ -237,10 +237,6 @@ function Footer() {
               © 2026 Rosario Alzueta
             </span>
             
-            <span className="hidden sm:inline text-white/40">
-              Diseñado con dedicación
-            </span>
-            
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="flex items-center gap-2 text-white/60 hover:text-white transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#2D2D2D] rounded px-2 py-1 -mx-2"
