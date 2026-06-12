@@ -1,12 +1,5 @@
-import {
-  motion,
-  useInView,
-  AnimatePresence,
-  useMotionValue,
-  useTransform,
-  animate,
-} from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useRef, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Grid12Background } from "../components/Background";
@@ -24,72 +17,64 @@ import xConsLogo from "../assets/companys/xcons.png";
 import contextoLogo from "../assets/companys/contexto.png";
 import sciLogo from "../assets/companys/sci.png";
 
-// Evolución en XCONS
-const xConsEvolution = {
-  company: "XCONS",
-  current: true,
-  logo: xConsLogo,
-  roles: [
-    {
-      year: "Dic 2025 - Actualidad",
-      role: "Product Owner",
-      description: [
-        "Construcción y seguimiento del roadmap, alineando negocio, diseño y desarrollo para ordenar prioridades y minimizar cambios.",
-        "Priorización del backlog y definición de milestones y releases, logrando entregas predecibles y alineadas con clientes.",
-        "Creación y gestión de tickets funcionales con criterios de aceptación claros, reduciendo bugs y correcciones repetitivas.",
-        "Toma de decisiones de producto de forma transversal con el equipo de desarrollo, compartiendo la complejidad del producto y considerando impacto y viabilidad técnica.",
-        "Diseño de interfaces del e-commerce y del administrador, asegurando coherencia end-to-end.",
-        "Validación de casos de uso, soporte a QA y seguimiento de releases, reduciendo tiempos de implementación y llegando a demos con margen para optimizaciones.",
-      ],
-      skills: [
-        "Product Strategy",
-        "Backlog Management",
-        "Stakeholder Management",
-      ],
-    },
-    {
-      year: "Dic 2024 - Nov 2025",
-      role: "Product Designer",
-      description: [
-        "Diseño end-to-end del panel administrador de XCONS, desarrollado desde cero como alternativa al backoffice estándar de Magento, mejorando la experiencia operativa y reduciendo fricción.",
-        "Diseño de flujos, wireframes y prototipos de alta fidelidad en Figma, simplificando flujos complejos para usuarios no técnicos.",
-        "Definición de una arquitectura de interfaz escalable basada en Ant Design, asegurando consistencia visual y funcional entre módulos.",
-        "Diseño y evolución de módulos clave (presupuestos, pedidos, entregas, contactos, catálogo, pagos y envíos) junto con integraciones, automatizaciones y templates, logrando una mejoría en la eficiencia operativa y menor dependencia del soporte.",
-        "Documentación funcional y clara (casos de uso, estados y validaciones) para reducir ambigüedades y acelerar la implementación.",
-        "Seguimiento a la implementación y QA visual y funcional, para asegurar la coherencia diseño–producto y una salida a producción estable.",
-      ],
-      skills: ["Figma", "Ant Design", "Prototyping", "Documentation"],
-    },
-  ],
-};
-
-// Timeline data - otras experiencias
+// Timeline data - experiencias (orden cronológico, más reciente primero)
 const experiencias = [
   {
     year: "2024",
-    role: "UX/UI Designer",
-    company: "Contexto - BBVA México",
-    logo: contextoLogo,
+    period: "Dic 2024 - Actualidad",
+    role: "Product Designer",
+    company: "XCONS",
+    logo: xConsLogo,
+    current: true,
     description: [
-      "Diseño de herramientas digitales para productos educativos de finanzas personales, enfocadas en simplificar conceptos complejos mediante interfaces claras y accesibles.",
-      "Diseño de simuladores de inversión, calculadoras interactivas y revistas digitales, adaptando flujos, reglas de negocio y jerarquía de información a distintos perfiles de usuario (niños, adolescentes, adultos y adultos mayores).",
-      "Trabajo colaborativo con equipos de contenido, diseño gráfico y desarrollo, facilitando una implementación consistente y eficiente.",
-      "Implementación de la nueva identidad visual de la marca en todos los recursos digitales, mejorando la coherencia, accesibilidad y percepción de calidad del producto.",
+      "Lideré el diseño end-to-end del ecosistema de comercio unificado para la industria de la construcción, convirtiendo un proceso de compra lento y asistido en un flujo digital completo, con impacto directo en el cierre de presupuestos y la expansión del producto al rubro de insumos agropecuarios.",
+      "Diseñé los módulos core de la plataforma: presupuestos colaborativos en tiempo real, gestión de pedidos (OMS), perfil de usuario unificado (CRM) y arquitectura de precios dinámicos multi-variable.",
+      "Evoluciono el producto de forma continua incorporando nuevas funcionalidades, incluyendo autogestión de entregas y cancelaciones para el cliente final, y actualmente la integración de un asistente conversacional con IA para asistencia de venta omnicanal.",
+      "Mantengo el design system del producto: componentes documentados en Figma, tokens de diseño y guías de uso para el equipo de desarrollo.",
+      "Trabajo con un flujo de diseño potenciado por IA: genero propuestas exploratorias en Figma Make y Claude previo al handoff, y documento cada feature en un archivo design.md (contexto de interfaces, definiciones funcionales y criterios de aceptación) que se publica como issue estructurado en GitLab vía Open Specs.",
+      "Dirijo pruebas de usabilidad en entorno de desarrollo, ejecuto QA visual y funcional, analizo reportes de atención al cliente para detectar fricciones, y colaboro con el Product Manager en la definición funcional del producto.",
     ],
-    skills: ["Fintech UX", "Design Systems", "Accessibility"],
+    skills: ["Design Systems", "E-commerce B2B/B2C", "OMS · CRM", "AI Workflow"],
   },
   {
     year: "2024",
-    role: "UX/UI Designer",
-    logo: sciLogo,
-    company: "SCI - Supply Chain Institute",
+    period: "Sep 2024 - Actualidad",
+    role: "UX/UI Designer · Freelance",
+    company: "Contexto - BBVA México",
+    logo: contextoLogo,
+    current: true,
     description: [
-      "Diseño de herramientas digitales para productos educativos de finanzas personales, enfocadas en simplificar conceptos complejos mediante interfaces claras y accesibles.",
-      "Diseño de simuladores de inversión, calculadoras interactivas y revistas digitales, adaptando flujos, reglas de negocio y jerarquía de información a distintos perfiles de usuario (niños, adolescentes, adultos y adultos mayores).",
-      "Trabajo colaborativo con equipos de contenido, diseño gráfico y desarrollo, facilitando una implementación consistente y eficiente.",
-      "Implementación de la nueva identidad visual de la marca en todos los recursos digitales, mejorando la coherencia, accesibilidad y percepción de calidad del producto.",
+      "Diseño de herramientas digitales para productos educativos de finanzas personales, enfocadas en simplificar conceptos complejos.",
+      "Diseño de simuladores de inversión, calculadoras interactivas y revistas digitales, adaptando flujos y jerarquía de información a distintos perfiles de usuario (niños, adolescentes, adultos y adultos mayores).",
+      "Trabajo colaborativo con equipos de contenido, diseño gráfico y desarrollo para facilitar la implementación.",
+      "Implemento la nueva identidad visual de la marca en todos los recursos digitales, mejorando la coherencia y accesibilidad.",
     ],
-    skills: ["Enterprise UX", "Dashboard Design", "Data Visualization"],
+    skills: ["Fintech UX", "Accessibility", "Design Systems"],
+  },
+  {
+    year: "2024",
+    period: "Ene 2024 - Dic 2024",
+    role: "UX/UI Designer",
+    company: "SCI - Supply Chain Institute",
+    logo: sciLogo,
+    description: [
+      "Diseño end-to-end de una aplicación web y mobile para gestión sindical (Proyecto SNAC), desarrollada desde cero, incluyendo dashboard, agenda, plan de trabajo y carga de datos, con el objetivo de mejorar la organización y seguimiento de la información interna del sindicato.",
+      "Creación de wireframes, UI Kit, arquitectura de información y animaciones, alineando diseño y estructura técnica para facilitar la implementación y escalabilidad del producto.",
+      "Investigación cualitativa con usuarios para definir objetivos y flujos clave, logrando una adopción efectiva de la herramienta desde sus primeras versiones.",
+    ],
+    skills: ["UX Research", "UI Kit", "Information Architecture"],
+  },
+  {
+    year: "2016 - 2023",
+    period: "2016 - 2023",
+    role: "Arquitecta · Project Manager · Líder de proyectos",
+    company: "Arquitectura & Gestión de Proyectos",
+    description: [
+      "Como Project Manager en Intermepro, lideré equipos coordinando la planificación y ejecución de proyectos de parques solares.",
+      "En el Ministerio de Obras Públicas de la Nación, coordiné proyectos de gran escala en todo el país, liderando un equipo amplio de arquitectos y garantizando el cumplimiento de plazos y estándares de calidad constructiva.",
+      "Como Jefa de Obra y líder de proyectos en las constructoras Pose SA y Choix, diseñé y ejecuté proyectos residenciales y públicos de gran escala, coordinando equipos interdisciplinarios y gestionando el proceso completo de ejecución.",
+    ],
+    skills: ["Project Management", "Team Leadership", "Construcción & Obra Pública"],
   },
 ];
 
@@ -292,7 +277,8 @@ function Acerca() {
                         ease: [0.22, 1, 0.36, 1],
                       }}
                     >
-                      Rosario Alzueta<span className="text-[rgb(201,188,63)]">.</span>
+                      Rosario Alzueta
+                      <span className="text-[rgb(201,188,63)]">.</span>
                     </motion.h1>
                   </div>
 
@@ -345,7 +331,10 @@ function Acerca() {
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
-                      <span className="relative flex h-2 w-2" aria-hidden="true">
+                      <span
+                        className="relative flex h-2 w-2"
+                        aria-hidden="true"
+                      >
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
@@ -445,44 +434,6 @@ function Acerca() {
             </div>
 
             {/* Stats Section - Minimalista y centrado */}
-            <motion.div
-              className="mt-8 sm:mt-12 pt-6 sm:pt-10 border-t border-[#E0DBD6]/50"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 1.1 }}
-            >
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-12 max-w-3xl mx-auto text-center">
-                <StatItem
-                  number={3}
-                  suffix="+"
-                  label="Años de experiencia"
-                  delay={1.2}
-                  isInView={isHeroInView}
-                />
-                <StatItem
-                  number={4}
-                  suffix="+"
-                  label="Empresas"
-                  delay={1.3}
-                  isInView={isHeroInView}
-                />
-                <StatItem
-                  number={5}
-                  suffix="+"
-                  label="Certificaciones"
-                  delay={1.4}
-                  isInView={isHeroInView}
-                />
-                <StatItem
-                  number={15}
-                  suffix="+"
-                  label="Clientes"
-                  delay={1.5}
-                  isInView={isHeroInView}
-                  highlight
-                />
-              </div>
-            </motion.div>
           </div>
         </motion.section>
 
@@ -501,16 +452,12 @@ function Acerca() {
           {/* Timeline */}
           <div className="relative">
             {/* Vertical line */}
-            <div className="absolute left-1/2 md:left-24 -translate-x-1/2 md:translate-x-0 top-0 bottom-0 w-px bg-gradient-to-b from-[rgb(201,188,63)] via-[#E0DBD6] to-transparent opacity-40 z-0" />
+            <div className="hidden md:block absolute left-1/2 md:left-24 -translate-x-1/2 md:translate-x-0 top-0 bottom-0 w-px bg-gradient-to-b from-[rgb(201,188,63)] via-[#E0DBD6] to-transparent opacity-40 z-0" />
 
             {/* Timeline items */}
             <div className="space-y-4 sm:space-y-8 md:space-y-12">
-              {/* XCONS Evolution Card */}
-              <EvolutionCard data={xConsEvolution} />
-
-              {/* Otras experiencias */}
               {experiencias.map((exp, index) => (
-                <TimelineItem key={index} {...exp} index={index + 1} />
+                <TimelineItem key={index} {...exp} index={index} />
               ))}
             </div>
           </div>
@@ -553,9 +500,7 @@ function Acerca() {
                 <p className="text-xs sm:text-sm text-[rgb(111,141,181)] mb-1">
                   {edu.institution}
                 </p>
-                <p className="text-xs text-[#9A9A9A]">
-                  {edu.period}
-                </p>
+                <p className="text-xs text-[#9A9A9A]">{edu.period}</p>
 
                 {/* Icons for certificates */}
                 {edu.certificate && (
@@ -787,62 +732,10 @@ function Acerca() {
   );
 }
 
-// Stat Item Component - Minimalista
-const StatItem = ({
-  number,
-  suffix = "",
-  label,
-  delay = 0,
-  highlight = false,
-  isInView,
-}: {
-  number: number;
-  suffix?: string;
-  label: string;
-  delay?: number;
-  highlight?: boolean;
-  isInView: boolean;
-}) => {
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => Math.round(latest));
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    if (isInView) {
-      const controls = animate(count, number, {
-        duration: 2,
-        delay: delay,
-        ease: [0.16, 1, 0.3, 1],
-      });
-      return controls.stop;
-    }
-  }, [isInView, number, delay, count]);
-
-  useEffect(() => {
-    const unsubscribe = rounded.on("change", (latest) => {
-      setDisplayValue(latest);
-    });
-    return unsubscribe;
-  }, [rounded]);
-
-  return (
-    <div className="text-center">
-      <div
-        className={`text-3xl sm:text-4xl md:text-5xl font-light tracking-tight mb-1 sm:mb-2 ${
-          highlight ? "text-[rgb(201,188,63)]" : "text-[#2D2D2D]"
-        }`}
-      >
-        <span className="text-[rgb(201,188,63)]">{suffix}</span>
-        {displayValue}
-      </div>
-      <div className="text-xs sm:text-sm text-[#9A9A9A]">{label}</div>
-    </div>
-  );
-};
-
 // Timeline Item Component
 const TimelineItem = ({
   year,
+  period,
   role,
   company,
   logo,
@@ -852,6 +745,7 @@ const TimelineItem = ({
   index,
 }: {
   year: string;
+  period?: string;
   role: string;
   company: string;
   logo?: string;
@@ -872,7 +766,7 @@ const TimelineItem = ({
       transition={{ duration: 0.6, delay: index * 0.1 }}
     >
       {/* Year badge - positioned on the line */}
-      <div className="absolute left-1/2 md:left-24 -translate-x-1/2 top-6 md:top-0 flex items-center justify-center z-10">
+      <div className="hidden md:flex absolute left-1/2 md:left-24 -translate-x-1/2 top-6 md:top-0 items-center justify-center z-10">
         <div
           className={`w-4 h-4 rounded-full border-2 ${current ? "bg-[rgb(201,188,63)] border-[rgb(201,188,63)]" : "bg-white border-[#E0DBD6]"}`}
         >
@@ -896,8 +790,8 @@ const TimelineItem = ({
         )}
       </div>
 
-      {/* Mobile year - with proper spacing below the badge */}
-      <div className="md:hidden mb-3 text-center w-full pt-12">
+      {/* Mobile year */}
+      <div className="md:hidden mb-3 text-center w-full">
         <span
           className={`text-sm font-medium ${current ? "text-[rgb(201,188,63)]" : "text-[#9A9A9A]"}`}
         >
@@ -908,7 +802,7 @@ const TimelineItem = ({
         </span>
       </div>
 
-      {/* Content card - Same format as EvolutionCard */}
+      {/* Content card */}
       <div className="bg-white/50 backdrop-blur-sm rounded-xl border border-[#E0DBD6]/50 hover:border-[rgb(201,188,63)]/30 overflow-hidden hover:shadow-lg hover:shadow-black/5 transition-all duration-300 w-full sm:w-fit mx-auto lg:mx-0">
         {/* Header with company name and logo */}
         <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-[rgb(201,188,63)]/10 to-transparent border-b border-[rgb(201,188,63)]/20 flex items-center">
@@ -922,23 +816,27 @@ const TimelineItem = ({
               />
             </div>
           )}
-          <h3 className="text-base sm:text-lg font-medium text-[#2D2D2D]">{company}</h3>
+          <h3 className="text-base sm:text-lg font-medium text-[#2D2D2D]">
+            {company}
+          </h3>
         </div>
 
         {/* Role content */}
         <div className="p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
             <span className="text-sm sm:text-base font-medium text-[#2D2D2D]">
               {role}
             </span>
-            <span className="text-xs text-[#9A9A9A]">{year}</span>
+            <span className="text-xs text-[#9A9A9A]">{period ?? year}</span>
           </div>
 
           {Array.isArray(description) ? (
             <ul className="text-xs sm:text-sm text-[#6B6B6B] leading-relaxed mb-3 sm:mb-4 space-y-1.5">
               {description.map((item, i) => (
                 <li key={i} className="flex gap-2">
-                  <span className="text-[rgb(201,188,63)] mt-1 flex-shrink-0">•</span>
+                  <span className="text-[rgb(201,188,63)] mt-1 flex-shrink-0">
+                    •
+                  </span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -959,145 +857,6 @@ const TimelineItem = ({
                 {skill}
               </span>
             ))}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Evolution Card Component - Para mostrar crecimiento dentro de una empresa
-const EvolutionCard = ({
-  data,
-}: {
-  data: {
-    company: string;
-    current: boolean;
-    logo?: string;
-    roles: {
-      year: string;
-      role: string;
-      description: string | string[];
-      skills: string[];
-    }[];
-  };
-}) => {
-  const itemRef = useRef(null);
-  const isInView = useInView(itemRef, { once: true, margin: "-50px" });
-
-  return (
-    <motion.div
-      ref={itemRef}
-      className="relative pl-0 md:pl-40 flex flex-col items-center lg:items-start"
-      initial={{ opacity: 0, x: -20 }}
-      animate={isInView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.6 }}
-    >
-      {/* Dot on the line with ping */}
-      <div className="absolute left-1/2 md:left-24 -translate-x-1/2 top-6 md:top-0 flex items-center justify-center z-10">
-        <div className="w-4 h-4 rounded-full border-2 bg-[rgb(201,188,63)] border-[rgb(201,188,63)]">
-          <div className="absolute inset-0 rounded-full bg-[rgb(201,188,63)] animate-ping opacity-50" />
-        </div>
-      </div>
-
-      {/* Year range label - Desktop */}
-      <div className="absolute left-0 md:left-0 top-0 md:w-24 text-right hidden md:block">
-        <span className="text-xs font-medium text-[rgb(201,188,63)]">
-          Dic 2024
-        </span>
-        <span className="block text-xs text-[rgb(111,141,181)]">Actualidad</span>
-      </div>
-
-      {/* Mobile year - with proper spacing below the badge */}
-      <div className="md:hidden mb-3 text-center w-full pt-12">
-        <span className="text-sm font-medium text-[rgb(201,188,63)]">
-          Dic 2024 - Actualidad
-        </span>
-      </div>
-
-      {/* Evolution Card */}
-      <div className="bg-white/50 backdrop-blur-sm rounded-xl border border-[rgb(201,188,63)]/30 overflow-hidden hover:shadow-lg hover:shadow-[rgb(201,188,63)]/10 transition-all duration-300 w-full sm:w-fit mx-auto lg:mx-0">
-        {/* Header with company name and logo */}
-        <div className="px-6 py-4 bg-gradient-to-r from-[rgb(201,188,63)]/10 to-transparent border-b border-[rgb(201,188,63)]/20 flex items-center">
-          {data.logo && (
-            <div className="p-1.5 bg-[rgb(201,188,63)]/15 rounded-md mr-3">
-              <img
-                src={data.logo}
-                alt={data.company}
-                className="w-4 h-4 object-contain opacity-70"
-              />
-            </div>
-          )}
-          <h3 className="text-lg font-medium text-[#2D2D2D]">{data.company}</h3>
-        </div>
-
-        {/* Roles evolution */}
-        <div className="p-6">
-          <div className="relative">
-            {/* Internal progress line */}
-            <div className="absolute left-[7px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-[rgb(201,188,63)] to-[#E0DBD6] opacity-40 z-0" />
-
-            <div className="space-y-6">
-              {data.roles.map((roleData, index) => {
-                const isFirst = index === 0;
-                return (
-                  <motion.div
-                    key={index}
-                    className="relative pl-8"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.2 + index * 0.15 }}
-                  >
-                    {/* Step indicator */}
-                    <div
-                      className={`absolute left-0 top-1 w-4 h-4 rounded-full border-2 ${
-                        isFirst
-                          ? "bg-[rgb(201,188,63)] border-[rgb(201,188,63)]"
-                          : "bg-white border-[#E0DBD6]"
-                      }`}
-                    />
-
-                    {/* Role content */}
-                    <div className={`${isFirst ? "" : "opacity-75"}`}>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
-                        <span
-                          className={`text-base font-medium ${isFirst ? "text-[#2D2D2D]" : "text-[#6B6B6B]"}`}
-                        >
-                          {roleData.role}
-                        </span>
-                        <span className="text-xs text-[#9A9A9A]">
-                          {roleData.year}
-                        </span>
-                      </div>
-                      {Array.isArray(roleData.description) ? (
-                        <ul className="text-[#6B6B6B] text-sm leading-relaxed mb-3 space-y-1.5">
-                          {roleData.description.map((item, i) => (
-                            <li key={i} className="flex gap-2">
-                              <span className="text-[rgb(201,188,63)] mt-1.5 flex-shrink-0">•</span>
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-[#6B6B6B] text-sm leading-relaxed mb-3">
-                          {roleData.description}
-                        </p>
-                      )}
-                      <div className="flex flex-wrap gap-2">
-                        {roleData.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="px-2.5 py-1 text-xs font-medium rounded-md bg-[rgb(201,188,63)]/15 text-[rgb(161,148,23)]"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
           </div>
         </div>
       </div>
