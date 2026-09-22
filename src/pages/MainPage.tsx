@@ -6,7 +6,6 @@ import ProjectsGrid from "../components/ProjectsGrid";
 import FAQ from "../components/FAQ";
 import MiProcesoSection from "../components/MiProcesoSection";
 import SobreMiSection from "../components/SobreMiSection";
-import Footer from "../components/Footer";
 import { Grid12Background } from "../components/Background";
 import { getFeaturedProjects } from "../data/projects";
 import { behanceProjects } from "../components/ProjectsList";
@@ -22,7 +21,6 @@ export const SECTION_IDS = [
 ];
 
 const TOPBAR_H = 40;
-const COL = "md:pl-[440px] md:pr-[440px]";
 
 // "Sobre mi" section index and extra scroll units
 // 2 horizontal transitions + 1 vertical scroll phase in Experiencia

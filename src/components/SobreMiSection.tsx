@@ -1,4 +1,4 @@
-import { motion, type MotionValue, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, type MotionValue, useTransform } from "framer-motion";
 import { useRef, useState, useEffect, useCallback, useLayoutEffect } from "react";
 import rosarioImage from "../assets/rosario.png";
 import xConsLogo from "../assets/companys/xcons.png";
@@ -401,7 +401,6 @@ function FrameFormacion() {
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
-const FRAME_LABELS = ["Intro", "Experiencia", "Formación"];
 const NAV_PAD = 440;
 
 function getEffectiveFrameW() {
@@ -417,7 +416,6 @@ interface Props {
 
 export default function SobreMiSection({ scrollY, sectionH, enterScroll }: Props) {
   const [frameW, setFrameW] = useState(getEffectiveFrameW);
-  const [activeFrame, setActiveFrame] = useState(0);
 
   const sectionHRef    = useRef(sectionH);
   const enterScrollRef = useRef(enterScroll);
@@ -507,13 +505,6 @@ export default function SobreMiSection({ scrollY, sectionH, enterScroll }: Props
     return -vProgress * maxVScroll2Ref.current;
   });
 
-  useMotionValueEvent(x, "change", (v: number) => {
-    const fw = frameWRef.current;
-    if (!fw) return;
-    setActiveFrame(Math.max(0, Math.min(Math.round(-v / fw), FRAME_COUNT - 1)));
-  });
-
-  const nextLabel = activeFrame < FRAME_COUNT - 1 ? FRAME_LABELS[activeFrame + 1] : null;
 
   return (
     <div className="h-full flex flex-col md:block">

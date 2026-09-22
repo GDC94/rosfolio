@@ -162,7 +162,6 @@ interface Grid12BackgroundProps {
 
 export const Grid12Background = ({
   className = "",
-  opacity = 0.02,
   delay = 0.3,
   duration = 1.5,
 }: Grid12BackgroundProps) => {
