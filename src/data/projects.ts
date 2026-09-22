@@ -1,4 +1,34 @@
 import hrImage from "../assets/hr.png";
+import puertaPuertaCard from "../assets/portadas/puerta-puerta.png";
+
+// Puerta a Puerta assets
+import ppScreenLogin from "../assets/puerta-puerta/screen-login.png";
+import ppScreenInicio from "../assets/puerta-puerta/screen-inicio.png";
+import ppScreenTipoTransporte from "../assets/puerta-puerta/screen-tipo-transporte.png";
+import ppScreenCamioneta from "../assets/puerta-puerta/screen-camioneta.png";
+import ppScreenDirecciones from "../assets/puerta-puerta/screen-direcciones.png";
+import ppScreenFechaHora from "../assets/puerta-puerta/screen-fecha-hora.png";
+import ppScreenResumen from "../assets/puerta-puerta/screen-resumen.png";
+import ppScreenReservado from "../assets/puerta-puerta/screen-reservado.png";
+import ppDesignSystem from "../assets/puerta-puerta/design-system.png";
+import ppFlows from "../assets/puerta-puerta/flows.png";
+import ppWireframes from "../assets/puerta-puerta/wireframes-media.png";
+import ppScreensHifi from "../assets/puerta-puerta/screens-hifi.png";
+
+export const puertaPuertaImages = {
+  screenLogin: ppScreenLogin,
+  screenInicio: ppScreenInicio,
+  screenTipoTransporte: ppScreenTipoTransporte,
+  screenCamioneta: ppScreenCamioneta,
+  screenDirecciones: ppScreenDirecciones,
+  screenFechaHora: ppScreenFechaHora,
+  screenResumen: ppScreenResumen,
+  screenReservado: ppScreenReservado,
+  designSystem: ppDesignSystem,
+  flows: ppFlows,
+  wireframes: ppWireframes,
+  screensHifi: ppScreensHifi,
+};
 import xconsCard from "../assets/xcons.png";
 import xconsCover from "../assets/xcons/portada-xcons.webp";
 
@@ -86,6 +116,7 @@ export interface ProjectData {
   description: string;
   image: string;
   homeImage?: string;
+  cardImagePosition?: string;
 
   // Case study fields
   projectName?: string;
@@ -124,6 +155,7 @@ export const projects: ProjectData[] = [
     year: "2024",
     description: "Plataforma de Gestión de Empleados / SaaS B2B",
     image: hrImage,
+    cardImagePosition: "50% 30%",
     projectName: "HacheR: HR Tech Evolution",
     projectType: "Plataforma de Gestión de Empleados / SaaS B2B",
     timeline: "2024",
@@ -238,6 +270,7 @@ export const projects: ProjectData[] = [
     year: "2024 - Actualidad",
     description: "Ecosistema E-commerce para la industria de la construcción",
     image: xconsCard,
+    cardImagePosition: "40% 25%",
     projectName: "XCONS Ecosystem",
     projectType: "Ecosistema E-commerce B2B",
     timeline: "2024",
@@ -330,6 +363,7 @@ export const projects: ProjectData[] = [
     description: "Agregador de eventos de música electrónica",
     image: jodifyCard,
     homeImage: jodifyHomeCard,
+    cardImagePosition: "50% 30%",
     projectName: "Jodify",
     projectType: "Aplicación de Eventos",
     timeline: "2023",
@@ -467,6 +501,43 @@ export const projects: ProjectData[] = [
     description: "AR VR Education site - Personal Project",
     image:
       "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=800&fit=crop",
+  },
+  {
+    id: "10",
+    title: "Puerta a Puerta",
+    category: "Academic",
+    company: "App de Fletes y Mudanzas",
+    year: "2024",
+    description: "Aplicación mobile iOS para centralizar servicios de fletes y mudanzas",
+    image: puertaPuertaCard,
+    projectName: "Puerta a Puerta",
+    projectType: "Aplicación Mobile iOS",
+    timeline: "2024",
+    contribution: [
+      "UX Research",
+      "Diseño de Interacción",
+      "Prototipado",
+      "Testing de Usabilidad",
+    ],
+    conceptSummary:
+      "Las personas tienen dificultades para encontrar servicios de fletes y mudanzas confiables, ya que no existe una plataforma centralizada que ofrezca todas las opciones de manera clara y transparente. Esto genera incertidumbre sobre los costos, la calidad del servicio y la seguridad de sus pertenencias, obligándolos a depender de recomendaciones informales o búsquedas en Google sin información suficiente.",
+    challenges: [
+      {
+        number: "01",
+        question: "¿Cómo centralizar los servicios de fletes y mudanzas en una sola plataforma accesible y confiable?",
+      },
+      {
+        number: "02",
+        question: "¿Cómo ofrecer transparencia en precios, disponibilidad y seguridad para las pertenencias del usuario?",
+      },
+      {
+        number: "03",
+        question: "¿Cómo simplificar el proceso de reserva de un servicio de mudanza en pocos pasos intuitivos?",
+      },
+    ],
+    images: {
+      cover: puertaPuertaCard,
+    },
   },
 ];
 

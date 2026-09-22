@@ -2,6 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Lab illustration animations */
+@keyframes lab-spin-cw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes lab-spin-ccw {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes lab-liquid {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
+}
+@keyframes lab-bubble1 {
+  0%   { transform: translateY(0px);   opacity: 1; }
+  100% { transform: translateY(-26px); opacity: 0; }
+}
+@keyframes lab-bubble2 {
+  0%   { transform: translateY(0px);   opacity: 1; }
+  100% { transform: translateY(-22px); opacity: 0; }
+}
+@keyframes lab-bubble3 {
+  0%   { transform: translateY(0px);   opacity: 1; }
+  100% { transform: translateY(-28px); opacity: 0; }
+}
+@keyframes lab-star {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%       { opacity: 0.85; transform: scale(1.2); }
+}
+
+.lab-spin-cw  { animation: lab-spin-cw  26s linear infinite;     transform-origin: 100px 100px; }
+.lab-spin-ccw { animation: lab-spin-ccw 18s linear infinite;     transform-origin: 100px 100px; }
+.lab-orbit-c  { animation: lab-spin-cw  11s linear infinite;     transform-origin: 100px 100px; }
+.lab-liquid   { animation: lab-liquid   3.4s ease-in-out infinite; }
+.lab-star     { animation: lab-star     2.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+
 :root {
   /* Pastel Color Palette */
   --color-background: #F5F0EB;
@@ -13,6 +57,11 @@
   --color-accent-blue: #A5B9D4;
   --color-accent-mint: #A5D4C4;
   --color-border: #E0DBD6;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 @layer base {
@@ -81,6 +130,110 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: "PP Neue Montreal";
+}
+
+/* ─── Typography Design System ───────────────────────────────────────────────
+   PP Neue Montreal — 10 semantic levels
+   Weights: 200 thin · 300 light · 400 book · 500 regular · 600 medium · 700 bold
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* DISPLAY — Hero only. Scales with content-area width so lines never wrap. */
+  .type-display {
+    font-size: clamp(40px, min(9vw, 14vh), 140px);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+  }
+
+  /* Hero font — scales with content-area width, never wraps.
+     Line 3 (ALZUETA + foto + Y SOY) is the widest at ~9.3em — divisor 10 adds margin.
+     Mobile: content = 100vw - 60px  |  Desktop: content = 100vw - 500px */
+  .hero-fs {
+    font-size: clamp(36px, calc((100vw - 32px) / 6.5), 72px);
+  }
+  @media (min-width: 768px) {
+    .hero-fs {
+      font-size: clamp(24px, calc((100vw - 500px) / 10), 110px);
+    }
+  }
+
+  /* H1 — Section main titles */
+  .type-h1 {
+    font-size: clamp(28px, 3.5vw, 56px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  /* H2 — Feature / card titles */
+  .type-h2 {
+    font-size: clamp(22px, 2.6vw, 44px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+
+  /* H3 — Item headers, accordion questions */
+  .type-h3 {
+    font-size: clamp(15px, 1.4vw, 22px);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  /* H4 — Label headers, small titles */
+  .type-h4 {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+
+  /* BODY L — Lead / intro paragraphs */
+  .type-body-l {
+    font-size: clamp(16px, 1.1vw, 20px);
+    font-weight: 300;
+    line-height: 1.75;
+    letter-spacing: 0;
+  }
+
+  /* BODY — Standard reading text */
+  .type-body {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: 0;
+  }
+
+  /* BODY S — Secondary descriptions, captions */
+  .type-body-s {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.55;
+    letter-spacing: 0;
+  }
+
+  /* CAPTION — Metadata, dates, counters */
+  .type-caption {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+  }
+
+  /* OVERLINE — Badges, eyebrows, category labels */
+  .type-overline {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.10em;
+  }
+
+  @media (min-width: 768px) {
+    .type-overline {
+      font-size: 12px;
+    }
+  }
 }
 
 /* Scrollbar personalizado */

@@ -173,15 +173,7 @@ export const Grid12Background = ({
       animate={{ opacity: 1 }}
       transition={{ duration, delay }}
     >
-      <div className="h-full w-full grid grid-cols-12 gap-2 sm:gap-3 md:gap-4 px-2 sm:px-3 md:px-4">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="h-full"
-            style={{ backgroundColor: `rgba(45, 45, 45, ${opacity})` }}
-          />
-        ))}
-      </div>
+      <div className="h-full w-full" />
     </motion.div>
   );
 };

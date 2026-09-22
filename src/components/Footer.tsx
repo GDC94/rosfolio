@@ -52,6 +52,47 @@ const itemVariants = {
   },
 };
 
+const ArgFlag = () => (
+  <svg
+    width="28" height="19" viewBox="0 0 28 19"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ display: "inline-block", flexShrink: 0, borderRadius: 2 }}
+    aria-label="Bandera Argentina"
+  >
+    {/* Franja celeste superior */}
+    <rect x="0" y="0" width="28" height="6.33" fill="#74ACDF"/>
+    {/* Franja blanca central */}
+    <rect x="0" y="6.33" width="28" height="6.33" fill="#FFFFFF"/>
+    {/* Franja celeste inferior */}
+    <rect x="0" y="12.67" width="28" height="6.33" fill="#74ACDF"/>
+    {/* Sol de Mayo — núcleo */}
+    <circle cx="14" cy="9.5" r="2.2" fill="#F6B40E"/>
+    {/* Rayos rectos (16 en total — 8 pares) */}
+    {[0,45,90,135,180,225,270,315].map((deg, i) => {
+      const rad = (deg * Math.PI) / 180;
+      const x1 = 14 + Math.cos(rad) * 2.6;
+      const y1 = 9.5 + Math.sin(rad) * 2.6;
+      const x2 = 14 + Math.cos(rad) * 4.2;
+      const y2 = 9.5 + Math.sin(rad) * 4.2;
+      return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F6B40E" strokeWidth="1.1" strokeLinecap="round"/>;
+    })}
+    {/* Rayos ondulados (entre los rectos) */}
+    {[22.5,67.5,112.5,157.5,202.5,247.5,292.5,337.5].map((deg, i) => {
+      const rad = (deg * Math.PI) / 180;
+      const x1 = 14 + Math.cos(rad) * 2.6;
+      const y1 = 9.5 + Math.sin(rad) * 2.6;
+      const x2 = 14 + Math.cos(rad) * 3.8;
+      const y2 = 9.5 + Math.sin(rad) * 3.8;
+      return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F6B40E" strokeWidth="0.7" strokeLinecap="round"/>;
+    })}
+    {/* Cara del sol (simplifcada) */}
+    <circle cx="14" cy="9.5" r="1.4" fill="#F6B40E"/>
+    <circle cx="13.4" cy="9.1" r="0.28" fill="#C8860A"/>
+    <circle cx="14.6" cy="9.1" r="0.28" fill="#C8860A"/>
+    <path d="M13.4 10.1 Q14 10.6 14.6 10.1" stroke="#C8860A" strokeWidth="0.3" fill="none" strokeLinecap="round"/>
+  </svg>
+);
+
 function Footer() {
   const footerRef = useRef(null);
   const isInView = useInView(footerRef, { once: true, margin: "-100px" });
@@ -81,7 +122,7 @@ function Footer() {
 
       {/* Main footer */}
       <div className="bg-gradient-to-b from-[#FAFAF8] to-[#F5F0EB] relative">
-        <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-16 sm:py-20 md:py-24 max-w-7xl mx-auto">
+        <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-16 sm:py-20 md:py-24">
           
           {/* CTA Section */}
           <motion.div
@@ -90,7 +131,6 @@ function Footer() {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* Decorative element */}
             <motion.div
               className="flex justify-center mb-8"
               initial={{ opacity: 0, scale: 0.5 }}
@@ -103,17 +143,17 @@ function Footer() {
               </div>
             </motion.div>
 
-            <motion.h2 
-              className="text-3xl sm:text-4xl md:text-5xl font-light text-[#2D2D2D] mb-4 tracking-tight"
+            <motion.h2
+              className="type-h1 font-light text-[#2D2D2D] mb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
               ¿Tenés un proyecto en mente?
             </motion.h2>
-            
-            <motion.p 
-              className="text-base sm:text-lg text-[#6B6B6B] mb-10 max-w-md mx-auto"
+
+            <motion.p
+              className="type-body text-[#6B6B6B] mb-10 max-w-md mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.4 }}
@@ -122,10 +162,8 @@ function Footer() {
             </motion.p>
 
             <motion.a
-              href="https://www.linkedin.com/messaging/compose/?recipient=rosarioalzueta"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-[rgb(111,141,181)] hover:bg-[rgb(91,121,161)] text-white text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[rgb(111,141,181)]/25 ring-1 ring-transparent hover:ring-[rgb(111,141,181)] ring-offset-4 ring-offset-white focus-visible:ring-2 focus-visible:ring-[rgb(111,141,181)] focus-visible:ring-offset-2"
+              href="mailto:rosario.alzueta@gmail.com"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A1A] hover:bg-[#333] text-white text-sm font-medium rounded-lg transition-all duration-200"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -156,7 +194,7 @@ function Footer() {
           >
             {/* Navigation */}
             <motion.div variants={itemVariants}>
-              <p className="text-xs font-medium text-[rgb(201,188,63)] uppercase tracking-[0.2em] mb-6">
+              <p className="type-overline text-[rgb(201,188,63)] mb-6">
                 Navegación
               </p>
               <ul className="space-y-3">
@@ -164,7 +202,7 @@ function Footer() {
                   <li key={link.label}>
                     <Link
                       to={link.href}
-                      className="text-[#6B6B6B] hover:text-[#2D2D2D] transition-all duration-300 text-sm inline-flex items-center gap-2 group"
+                      className="type-body-s text-[#6B6B6B] hover:text-[#2D2D2D] transition-all duration-300 inline-flex items-center gap-2 group"
                     >
                       <span className="w-0 h-px bg-[rgb(201,188,63)] group-hover:w-4 transition-all duration-300" />
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
@@ -178,7 +216,7 @@ function Footer() {
 
             {/* Social */}
             <motion.div variants={itemVariants}>
-              <p className="text-xs font-medium text-[rgb(201,188,63)] uppercase tracking-[0.2em] mb-6">
+              <p className="type-overline text-[rgb(201,188,63)] mb-6">
                 Redes
               </p>
               <div className="flex gap-3">
@@ -199,7 +237,7 @@ function Footer() {
 
             {/* Location & Availability */}
             <motion.div variants={itemVariants}>
-              <p className="text-xs font-medium text-[rgb(201,188,63)] uppercase tracking-[0.2em] mb-6">
+              <p className="type-overline text-[rgb(201,188,63)] mb-6">
                 Ubicación
               </p>
               <div className="space-y-4">
@@ -208,8 +246,8 @@ function Footer() {
                     {LocationIcon}
                   </span>
                   <div>
-                    <p className="text-sm text-[#2D2D2D] font-medium">Tandil, Argentina</p>
-                    <p className="text-xs text-[#9A9A9A]">GMT-3</p>
+                    <p className="type-h4 text-[#2D2D2D] flex items-center gap-2">Tandil, Argentina <ArgFlag /></p>
+                    <p className="type-caption text-[#9A9A9A]">GMT-3</p>
                   </div>
                 </div>
 
@@ -218,7 +256,7 @@ function Footer() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
-                  <span className="text-sm text-[#6B6B6B]">
+                  <span className="type-body-s text-[#6B6B6B]">
                     Disponible para proyectos
                   </span>
                 </div>
@@ -230,8 +268,8 @@ function Footer() {
 
       {/* Bottom bar */}
       <div className="bg-[#2D2D2D]">
-        <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-white/60 text-xs">
+        <div className="px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-white/60 type-caption">
             <span className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rounded-full" />
               © 2026 Rosario Alzueta
@@ -242,7 +280,7 @@ function Footer() {
               className="flex items-center gap-2 text-white/60 hover:text-white transition-all duration-300 group focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#2D2D2D] rounded px-2 py-1 -mx-2"
               aria-label="Volver al inicio"
             >
-              <span>Volver arriba</span>
+              <span>Volver al inicio</span>
               <span className="transition-transform duration-300 group-hover:-translate-y-1">
                 {ArrowUpIcon}
               </span>

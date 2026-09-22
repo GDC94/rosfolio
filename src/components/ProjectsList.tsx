@@ -35,7 +35,7 @@ const ArrowIcon = (
   </svg>
 );
 
-const behanceProjects = [
+export const behanceProjects = [
   {
     id: "behance-1",
     title: "Fluence",
@@ -96,6 +96,46 @@ const behanceProjects = [
   },
 ];
 
+function ProjectCardInner({ project }: { project: (typeof behanceProjects)[0] }) {
+  return (
+    <article className="relative rounded-2xl overflow-hidden aspect-square transition-all duration-300 group-hover:ring-2 group-hover:ring-[rgb(218,207,103)] group-hover:ring-offset-4 group-hover:ring-offset-[#F5F0EB]">
+      <img
+        src={project.image}
+        alt=""
+        width={400}
+        height={320}
+        loading="lazy"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-[rgb(201,188,63)]/30 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-0" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="flex items-end justify-between">
+          <div>
+            <h3 className="text-lg sm:text-xl font-medium text-white mb-1 leading-tight">
+              {project.title}
+            </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-white/70">{project.company}</span>
+              {project.year && (
+                <>
+                  <span className="text-white/30">·</span>
+                  <span className="text-sm text-white/50">
+                    {project.year}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[rgb(201,188,63)] transition-transform duration-300 group-hover:scale-110">
+            {ArrowIcon}
+          </span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 function ProjectCard({ project }: { project: (typeof behanceProjects)[0] }) {
   return (
     <a
@@ -105,41 +145,7 @@ function ProjectCard({ project }: { project: (typeof behanceProjects)[0] }) {
       className="group block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(201,188,63)] focus-visible:ring-offset-4 rounded-2xl"
       aria-label={`${project.title} - ${project.company}, ${project.year}. Se abre en Behance.`}
     >
-      <article className="relative rounded-2xl overflow-hidden h-[280px] sm:h-[300px] md:h-[320px] transition-all duration-300 group-hover:ring-2 group-hover:ring-[rgb(218,207,103)] group-hover:ring-offset-4 group-hover:ring-offset-[#F5F0EB]">
-        <img
-          src={project.image}
-          alt=""
-          width={400}
-          height={320}
-          loading="lazy"
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-[rgb(201,188,63)]/30 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-0" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="flex items-end justify-between">
-            <div>
-              <h3 className="text-lg sm:text-xl font-medium text-white mb-1 leading-tight">
-                {project.title}
-              </h3>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-white/70">{project.company}</span>
-                {project.year && (
-                  <>
-                    <span className="text-white/30">·</span>
-                    <span className="text-sm text-white/50">
-                      {project.year}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[rgb(201,188,63)] transition-transform duration-300 group-hover:scale-110">
-              {ArrowIcon}
-            </span>
-          </div>
-        </div>
-      </article>
+      <ProjectCardInner project={project} />
     </a>
   );
 }
@@ -170,6 +176,7 @@ function useCardsPerPage() {
 function ProjectsList() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -256,12 +263,12 @@ function ProjectsList() {
 
   // Auto-play
   useEffect(() => {
-    if (isHovering || maxIndex <= 0) return;
+    if (isHovering || isPaused || maxIndex <= 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
     }, 5000);
     return () => clearInterval(interval);
-  }, [isHovering, maxIndex]);
+  }, [isHovering, isPaused, maxIndex]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -281,22 +288,40 @@ function ProjectsList() {
       <Grid12Background />
 
       <div
-        className="relative z-10"
+        className="relative z-10 max-w-2xl mx-auto"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10 md:mb-14">
           <div>
-            <motion.h2
-              className="text-2xl sm:text-3xl md:text-4xl font-light text-[#2D2D2D] tracking-tight"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Otros proyectos
-            </motion.h2>
+            <div className="flex items-center gap-3">
+              <motion.h2
+                className="text-2xl sm:text-3xl md:text-4xl font-light text-[#2D2D2D] tracking-tight"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              >
+                Otros proyectos
+              </motion.h2>
+              <button
+                onClick={() => setIsPaused((p) => !p)}
+                aria-label={isPaused ? "Reanudar reproducción automática" : "Pausar reproducción automática"}
+                className="flex items-center justify-center w-7 h-7 rounded-full border border-[#E0DBD6] text-[#9A9A9A] hover:text-[#2D2D2D] hover:border-[#2D2D2D] transition-colors duration-200"
+              >
+                {isPaused ? (
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
+                    <path d="M2 1.5l6 3.5-6 3.5V1.5z" />
+                  </svg>
+                ) : (
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
+                    <rect x="2" y="1.5" width="2.5" height="7" rx="0.5" />
+                    <rect x="5.5" y="1.5" width="2.5" height="7" rx="0.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
             <motion.p
               className="mt-2 sm:mt-3 text-[#6B6B6B] text-sm sm:text-base"
               initial={{ opacity: 0, y: 20 }}

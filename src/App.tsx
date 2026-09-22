@@ -1,13 +1,35 @@
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import { ReactLenis } from "@studio-freight/react-lenis";
 import { useState } from "react";
 import ScrollToTop from "./components/ScrollToTop";
 import { BGGrid } from "./components/Background";
 import Preloader from "./components/Preloader";
 import AnimatedRoutes from "./components/AnimatedRoutes";
+import TopBar from "./components/TopBar";
+import SideNav from "./components/SideNav";
+import ProjectSideNav from "./components/ProjectSideNav";
+
+function NavSwitch() {
+  const { pathname } = useLocation();
+  return pathname.startsWith("/project/") ? <ProjectSideNav /> : <SideNav />;
+}
+
+// Applies sidebar padding only on pages that are not the main scroll page
+function ContentWrapper({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  const isMainPage = pathname === "/";
+  const isProjectPage = pathname.startsWith("/project/");
+  const paddingClass = isMainPage ? "" : isProjectPage ? " md:pl-[440px] pr-[60px]" : " md:pl-[440px] md:pr-[440px]";
+  return (
+    <div style={{ overflowX: "clip" }} className={`pt-10${paddingClass}`}>
+      {children}
+    </div>
+  );
+}
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const skipPreloader = new URLSearchParams(window.location.search).has('skip-preloader');
+  const [isLoading, setIsLoading] = useState(!skipPreloader);
 
   return (
     <>
@@ -25,8 +47,12 @@ function App() {
               <BGGrid />
             </div>
             <div className="relative z-10">
-              <ScrollToTop />
-              <AnimatedRoutes />
+              <TopBar />
+              <NavSwitch />
+              <ContentWrapper>
+                <ScrollToTop />
+                <AnimatedRoutes />
+              </ContentWrapper>
             </div>
           </div>
         </BrowserRouter>

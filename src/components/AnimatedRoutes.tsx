@@ -1,12 +1,15 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import Home from "../pages/Home";
+import MainPage from "../pages/MainPage";
 import PageTransition from "./PageTransition";
 
 // Lazy load heavy pages for better initial bundle size
 const Project = lazy(() => import("../pages/Project"));
 const Acerca = lazy(() => import("../pages/Acerca"));
+const Proyectos = lazy(() => import("../pages/Proyectos"));
+const Faqs = lazy(() => import("../pages/Faqs"));
+const UnderConstruction = lazy(() => import("../pages/UnderConstruction"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -28,7 +31,7 @@ function AnimatedRoutes() {
           path="/"
           element={
             <PageTransition>
-              <Home />
+              <MainPage />
             </PageTransition>
           }
         />
@@ -52,6 +55,39 @@ function AnimatedRoutes() {
             </Suspense>
           }
         />
+        <Route
+          path="/proyectos"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageTransition>
+                <Proyectos />
+              </PageTransition>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/faqs"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageTransition>
+                <Faqs />
+              </PageTransition>
+            </Suspense>
+          }
+        />
+        {["/casos-de-estudio", "/laboratorio"].map((path) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <PageTransition>
+                  <UnderConstruction />
+                </PageTransition>
+              </Suspense>
+            }
+          />
+        ))}
       </Routes>
     </AnimatePresence>
   );

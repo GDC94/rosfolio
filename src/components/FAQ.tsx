@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Grid12Background } from "./Background";
 
-// Chevron icon component
 const ChevronIcon = ({ isOpen }: { isOpen: boolean }) => (
   <motion.svg
     width="14"
@@ -55,15 +54,11 @@ const faqItems: FAQItem[] = [
   },
 ];
 
-// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.2,
-    },
+    transition: { staggerChildren: 0.08, delayChildren: 0.2 },
   },
 };
 
@@ -72,24 +67,21 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as const,
-    },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
 const contentVariants = {
-  collapsed: { 
-    height: 0, 
+  collapsed: {
+    height: 0,
     opacity: 0,
     transition: {
       height: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
       opacity: { duration: 0.2 },
     },
   },
-  expanded: { 
-    height: "auto", 
+  expanded: {
+    height: "auto",
     opacity: 1,
     transition: {
       height: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
@@ -98,40 +90,154 @@ const contentVariants = {
   },
 };
 
-function FAQ() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const toggleAccordion = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+function FAQAccordionItem({ item, index, isOpen, onToggle }: {
+  item: FAQItem;
+  index: number;
+  isOpen: boolean;
+  onToggle: (i: number) => void;
+}) {
+  const panelId = `faq-panel-${index}`;
+  const buttonId = `faq-button-${index}`;
 
   return (
-    <section
-      className="relative py-16 sm:pt-3 sm:pb-24 md:py-18"
-      aria-labelledby="faq-title"
-    >
-      <Grid12Background />
-      
-      <div className="relative z-10 max-w-3xl mx-auto">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-12 sm:mb-14"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+    <motion.div variants={itemVariants} role="listitem">
+      <motion.div
+        className={`rounded-xl border overflow-hidden transition-colors duration-300 ${
+          isOpen
+            ? "border-[rgb(201,188,63)]/40 bg-white"
+            : "border-[#E0DBD6] bg-white/80 hover:border-[rgb(201,188,63)]/30 hover:bg-white"
+        }`}
+        animate={{
+          boxShadow: isOpen
+            ? "0 10px 40px -10px rgba(201, 188, 63, 0.15), 0 4px 20px -5px rgba(0, 0, 0, 0.05)"
+            : "0 0 0 0 transparent",
+        }}
+        transition={{ duration: 0.3 }}
+      >
+        <button
+          id={buttonId}
+          onClick={() => onToggle(index)}
+          className="w-full px-5 sm:px-6 py-5 sm:py-6 flex items-center justify-between text-left group focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(201,188,63)] focus-visible:ring-inset rounded-xl"
+          aria-expanded={isOpen}
+          aria-controls={panelId}
         >
-          <h2 
-            id="faq-title" 
-            className="text-2xl sm:text-3xl md:text-4xl font-light text-[#2D2D2D] tracking-tight"
+          <motion.span
+            className="type-h4 pr-4"
+            animate={{ color: isOpen ? "rgb(161, 148, 23)" : "#2D2D2D" }}
+            transition={{ duration: 0.3 }}
           >
-            Preguntas frecuentes
-          </h2>
-        </motion.div>
+            {item.question}
+          </motion.span>
 
-        {/* Accordion */}
-        <motion.div 
-          className="space-y-3"
+          <motion.span
+            className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+            animate={{
+              backgroundColor: isOpen ? "rgb(201, 188, 63)" : "#F5F0EB",
+              color: isOpen ? "#ffffff" : "#6B6B6B",
+            }}
+            whileHover={{
+              backgroundColor: isOpen ? "rgb(181, 168, 43)" : "rgba(201, 188, 63, 0.15)",
+              scale: 1.05,
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            aria-hidden="true"
+          >
+            <ChevronIcon isOpen={isOpen} />
+          </motion.span>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {isOpen && (
+            <motion.div
+              id={panelId}
+              role="region"
+              aria-labelledby={buttonId}
+              variants={contentVariants}
+              initial="collapsed"
+              animate="expanded"
+              exit="collapsed"
+            >
+              <div className="px-5 sm:px-6 pb-5 sm:pb-6">
+                <motion.div
+                  className="h-px bg-gradient-to-r from-[rgb(201,188,63)]/30 via-[rgb(201,188,63)]/15 to-transparent mb-4"
+                  initial={{ scaleX: 0, originX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  aria-hidden="true"
+                />
+                <motion.p
+                  className="type-body text-[#6B6B6B] whitespace-pre-line"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.15 }}
+                >
+                  {item.answer}
+                </motion.p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function FAQ() {
+  const [openIndices, setOpenIndices] = useState<Set<number>>(new Set());
+
+  const toggle = (i: number) => {
+    setOpenIndices(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  };
+
+  const col1 = faqItems.slice(0, Math.ceil(faqItems.length / 2));
+  const col2 = faqItems.slice(Math.ceil(faqItems.length / 2));
+
+  return (
+    <section className="relative pt-4 pb-4 sm:pt-3 sm:pb-24 md:py-18" aria-labelledby="faq-title">
+      <Grid12Background />
+
+      <div className="relative z-10 w-full">
+        {/* Two-column grid on desktop, single column on mobile */}
+        <div className="hidden md:grid md:grid-cols-2 gap-3" role="list" aria-label="Lista de preguntas frecuentes">
+          {/* Column 1 */}
+          <motion.div
+            className="space-y-3"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            {col1.map((item, i) => (
+              <FAQAccordionItem key={i} item={item} index={i} isOpen={openIndices.has(i)} onToggle={toggle} />
+            ))}
+          </motion.div>
+
+          {/* Column 2 */}
+          <motion.div
+            className="space-y-3"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            {col2.map((item, i) => {
+              const globalIndex = i + col1.length;
+              return (
+                <FAQAccordionItem key={globalIndex} item={item} index={globalIndex} isOpen={openIndices.has(globalIndex)} onToggle={toggle} />
+              );
+            })}
+          </motion.div>
+        </div>
+
+        {/* Single column on mobile */}
+        <motion.div
+          className="md:hidden space-y-3"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -139,102 +245,63 @@ function FAQ() {
           role="list"
           aria-label="Lista de preguntas frecuentes"
         >
-          {faqItems.map((item, index) => {
-            const isOpen = openIndex === index;
-            const panelId = `faq-panel-${index}`;
-            const buttonId = `faq-button-${index}`;
-
-            return (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                role="listitem"
-              >
-                <motion.div
-                  className={`rounded-xl border overflow-hidden transition-colors duration-300 ${
-                    isOpen
-                      ? "border-[rgb(201,188,63)]/40 bg-white"
-                      : "border-[#E0DBD6] bg-white/80 hover:border-[rgb(201,188,63)]/30 hover:bg-white"
-                  }`}
-                  animate={{
-                    boxShadow: isOpen 
-                      ? "0 10px 40px -10px rgba(201, 188, 63, 0.15), 0 4px 20px -5px rgba(0, 0, 0, 0.05)" 
-                      : "0 0 0 0 transparent",
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <button
-                    id={buttonId}
-                    onClick={() => toggleAccordion(index)}
-                    className="w-full px-5 sm:px-6 py-5 sm:py-6 flex items-center justify-between text-left group focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(201,188,63)] focus-visible:ring-inset rounded-xl"
-                    aria-expanded={isOpen}
-                    aria-controls={panelId}
-                  >
-                    <motion.span
-                      className="text-sm sm:text-base font-medium pr-4"
-                      animate={{
-                        color: isOpen ? "rgb(161, 148, 23)" : "#2D2D2D",
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {item.question}
-                    </motion.span>
-                    
-                    <motion.span
-                      className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
-                      animate={{
-                        backgroundColor: isOpen ? "rgb(201, 188, 63)" : "#F5F0EB",
-                        color: isOpen ? "#ffffff" : "#6B6B6B",
-                      }}
-                      whileHover={{
-                        backgroundColor: isOpen ? "rgb(181, 168, 43)" : "rgba(201, 188, 63, 0.15)",
-                        scale: 1.05,
-                      }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ duration: 0.2 }}
-                      aria-hidden="true"
-                    >
-                      <ChevronIcon isOpen={isOpen} />
-                    </motion.span>
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        id={panelId}
-                        role="region"
-                        aria-labelledby={buttonId}
-                        variants={contentVariants}
-                        initial="collapsed"
-                        animate="expanded"
-                        exit="collapsed"
-                      >
-                        <div className="px-5 sm:px-6 pb-5 sm:pb-6">
-                          {/* Decorative line */}
-                          <motion.div 
-                            className="h-px bg-gradient-to-r from-[rgb(201,188,63)]/30 via-[rgb(201,188,63)]/15 to-transparent mb-4"
-                            initial={{ scaleX: 0, originX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                            aria-hidden="true" 
-                          />
-                          <motion.p 
-                            className="text-[#6B6B6B] leading-relaxed text-sm sm:text-base whitespace-pre-line"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: 0.15 }}
-                          >
-                            {item.answer}
-                          </motion.p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              </motion.div>
-            );
-          })}
+          {faqItems.map((item, index) => (
+            <FAQAccordionItem key={index} item={item} index={index} isOpen={openIndices.has(index)} onToggle={toggle} />
+          ))}
         </motion.div>
+
+        {/* Tenés un proyecto en mente */}
+        <div className="mt-8 sm:mt-16 pb-8 text-center">
+          <motion.div
+            className="flex justify-center mb-5 sm:mb-8"
+            initial={{ opacity: 0, scale: 0.5 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="relative">
+              <div className="w-3 h-3 bg-[rgb(201,188,63)] rotate-45" />
+              <div className="absolute -inset-2 border border-[rgb(201,188,63)]/30 rotate-45" />
+            </div>
+          </motion.div>
+
+          <motion.h2
+            className="type-h1 font-light text-[#2D2D2D] mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            ¿Tenés un proyecto en mente?
+          </motion.h2>
+
+          <motion.p
+            className="type-body text-[#6B6B6B] mb-6 sm:mb-10 max-w-md mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Me encantaría escuchar sobre tu próxima idea y cómo puedo ayudarte a hacerla realidad.
+          </motion.p>
+
+          <motion.a
+            href="mailto:rosario.alzueta@gmail.com"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] hover:bg-[#333] text-white text-sm font-medium rounded-xl transition-all duration-200"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Hablemos
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.a>
+        </div>
+
       </div>
     </section>
   );
