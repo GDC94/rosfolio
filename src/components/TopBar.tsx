@@ -53,7 +53,7 @@ function TopBar() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.3 }}
     >
-      <div className="hidden md:flex items-center gap-1.5 text-[11px] text-[#9A9A9A]">
+      <div className="hidden md:flex items-center gap-1.5 text-[12px] text-[#9A9A9A]">
         {LocationIcon}
         <span>Tandil, Argentina</span>
         <ArgFlag />
@@ -63,7 +63,7 @@ function TopBar() {
 
       <a
         href="mailto:rosario.alzueta@gmail.com"
-        className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-[#1A1A1A] hover:bg-[#333] text-white text-[11px] font-medium rounded-md transition-colors duration-200"
+        className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-[#1A1A1A] hover:bg-[#333] text-white text-[12px] font-medium rounded-md transition-colors duration-200"
       >
         Hablemos
         <svg width="9" height="9" viewBox="0 0 14 14" fill="none" aria-hidden="true">

@@ -5,6 +5,9 @@
 .hide-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  /* No overscroll containment: once an inner scroller ends, the swipe must
+     continue to the page, otherwise touch scrolling gets stuck there. */
 }
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
@@ -64,19 +67,55 @@
   to   { transform: translateX(-50%); }
 }
 
+/* ─── Project page section themes ────────────────────────────────────────────
+   Each stacked section of a case study sets one of these. Content uses the
+   ink / card / line tokens (see tailwind.config) so text always contrasts.
+   ─────────────────────────────────────────────────────────────────────────── */
+.pj-theme-beige {
+  --pj-bg: #F5F0EB;
+  --ink: 26 26 26;
+  --ink-muted: 82 82 82;
+  --ink-subtle: 120 120 120;
+  --card: 255 255 255;
+  --line: 224 219 214;
+}
+.pj-theme-dark {
+  --pj-bg: #141312;
+  /* Warm off-white instead of pure white: less glare, matches the beige palette */
+  --ink: 236 231 225;
+  --ink-muted: 190 184 177;
+  --ink-subtle: 150 144 137;
+  --card: 30 29 27;
+  --line: 58 55 52;
+}
+/* Light (300) text looks too thin on dark backgrounds */
+.pj-theme-dark .type-body-l {
+  font-weight: 400;
+}
+.pj-theme-white {
+  --pj-bg: #FFFFFF;
+  --ink: 26 26 26;
+  --ink-muted: 82 82 82;
+  --ink-subtle: 120 120 120;
+  --card: 245 242 238;
+  --line: 232 228 223;
+}
+
 @layer base {
+  /* `clip` (not `hidden`) so html/body don't become scroll containers —
+     that would break position: sticky on the project sections. */
   html {
     scroll-behavior: smooth;
     font-family: "PP Neue Montreal", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     background-color: var(--color-background);
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body {
     @apply antialiased font-sans;
     font-family: "PP Neue Montreal", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     color: var(--color-text);
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 
@@ -151,7 +190,7 @@
   .hero-fs {
     font-size: clamp(36px, calc((100vw - 32px) / 6.5), 72px);
   }
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .hero-fs {
       font-size: clamp(24px, calc((100vw - 500px) / 10), 110px);
     }
@@ -171,6 +210,14 @@
     font-weight: 600;
     line-height: 1.1;
     letter-spacing: -0.015em;
+  }
+
+  /* SUBTITLE — Sub-blocks inside a case-study section (Desafíos, Enfoque…) */
+  .type-subtitle {
+    font-size: clamp(20px, 2vw, 30px);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.012em;
   }
 
   /* H3 — Item headers, accordion questions */
@@ -229,7 +276,7 @@
     letter-spacing: 0.10em;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .type-overline {
       font-size: 12px;
     }

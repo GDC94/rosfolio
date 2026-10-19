@@ -94,11 +94,11 @@ function ComingSoonPill({ isActive, onClick, isMobile, collapsedSize }: { isActi
 function ProjectsGrid({ projects, showComingSoon = true }: ProjectsGridProps) {
   const [active, setActive] = useState(0);
   const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth < 768 : false
+    typeof window !== "undefined" ? window.innerWidth < 1024 : false
   );
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
@@ -106,9 +106,10 @@ function ProjectsGrid({ projects, showComingSoon = true }: ProjectsGridProps) {
   const items = showComingSoon ? projects.slice(0, 3) : projects;
   const allItems = showComingSoon ? [...items, COMING_SOON] : items;
 
-  const collapsedSize = isMobile ? 44 : 72;
+  const collapsedSize = isMobile ? 36 : 72;
+  const mobileH = allItems.length > 4 ? "h-[68vh]" : "h-[60vh]";
   const containerClass = isMobile
-    ? "flex flex-col gap-2 h-[52vh]"
+    ? `flex flex-col gap-1.5 ${mobileH}`
     : "flex flex-row gap-3 h-[58vh]";
 
   return (
@@ -165,7 +166,7 @@ function ProjectsGrid({ projects, showComingSoon = true }: ProjectsGridProps) {
                     className="absolute inset-0 flex items-center justify-center px-3"
                   >
                     {isMobile ? (
-                      <span className="text-white/80 text-xs font-semibold truncate select-none w-full">
+                      <span className="text-white/80 text-[13px] font-semibold truncate select-none w-full pl-1">
                         {project.title}
                       </span>
                     ) : (
@@ -186,13 +187,20 @@ function ProjectsGrid({ projects, showComingSoon = true }: ProjectsGridProps) {
                   <motion.div
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                     transition={{ duration: 0.4, delay: 0.28 }}
-                    className="absolute inset-0 flex flex-col justify-between p-7 sm:p-8"
+                    className="absolute inset-0 flex flex-col justify-between p-4 sm:p-7"
                   >
                     {/* Top row */}
-                    <div className="flex items-center justify-between">
+                    <div className="hidden sm:flex items-center justify-between">
                       <span className="type-overline text-white/50">
                         Proyecto 0{i + 1}
                       </span>
+                      {project.year && (
+                        <span className="type-caption text-white/40 tabular-nums">{project.year}</span>
+                      )}
+                    </div>
+                    {/* Top row mobile */}
+                    <div className="flex sm:hidden items-center justify-between">
+                      <span className="type-caption text-white/40 tracking-wide">0{i + 1}</span>
                       {project.year && (
                         <span className="type-caption text-white/40 tabular-nums">{project.year}</span>
                       )}
@@ -201,7 +209,7 @@ function ProjectsGrid({ projects, showComingSoon = true }: ProjectsGridProps) {
                     {/* Bottom content */}
                     <div>
                       <p className="type-body-s text-white/55 mb-1.5">{project.company}</p>
-                      <h3 className="type-h2 text-white font-bold mb-6">
+                      <h3 className="type-h2 text-white font-bold mb-3 sm:mb-5 leading-tight line-clamp-2">
                         {project.title}
                       </h3>
                       {project.externalUrl ? (

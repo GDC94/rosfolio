@@ -67,10 +67,11 @@ export const xconsImages = {
 };
 
 import hrCover from "../assets/hr/cover.webp";
-import hrScreen1 from "../assets/hr/screen-1.png";
-import hrScreen2 from "../assets/hr/screen-2.png";
-import hrScreen3 from "../assets/hr/screen-3.png";
-import hrScreen4 from "../assets/hr/screen-4.png";
+// Cropped to the browser window (no lilac backdrop), rounded corners transparent
+import hrScreen1 from "../assets/hr/screens-clean/screen-1.webp";
+import hrScreen2 from "../assets/hr/screens-clean/screen-2.webp";
+import hrScreen3 from "../assets/hr/screens-clean/screen-3.webp";
+import hrScreen4 from "../assets/hr/screens-clean/screen-4.webp";
 import hrWireframe from "../assets/hr/low-frame.png";
 import hrUiKit from "../assets/hr/UI KIT.png";
 import hrBenchmark from "../assets/hr/benchmark.svg";
@@ -117,6 +118,10 @@ export interface ProjectData {
   image: string;
   homeImage?: string;
   cardImagePosition?: string;
+  /** Role shown in the case-study header (defaults to "Diseñadora UX/UI"). */
+  role?: string;
+  /** object-position for the short case-study cover crop (defaults to "center 20%"). */
+  coverPosition?: string;
 
   // Case study fields
   projectName?: string;
@@ -142,6 +147,10 @@ export interface ProjectData {
     validationPlan?: string[];
     metrics?: string[];
     nextSteps?: string;
+    /** Each challenge question paired with the design decision that answers it. */
+    challengeDecisions?: { question: string; decision: string }[];
+    /** Usability test tasks with the metric and success criterion for each. */
+    testTasks?: { task: string; metric: string; criterion: string }[];
   };
   images?: ProjectImages;
 }
@@ -245,6 +254,41 @@ export const projects: ProjectData[] = [
       ],
       nextSteps:
         "Realizar iteraciones basadas en los resultados para asegurar que HacheR no solo sea una herramienta más, sino una solución que los usuarios realmente quieran usar.",
+      challengeDecisions: [
+        {
+          question: "¿Cómo democratizar la tecnología en RR.HH.?",
+          decision:
+            "Lenguaje sencillo, jerarquías visuales claras y tipografía Lato para una lectura sin esfuerzo, pensada también para quienes tienen poca experiencia digital.",
+        },
+        {
+          question: "¿Cómo equilibrar potencia y simplicidad?",
+          decision:
+            "Menú colapsable, filtros de búsqueda y acciones clave siempre visibles —crear y exportar— para tener las funciones avanzadas a mano sin saturar la pantalla.",
+        },
+        {
+          question: "¿Cómo migrar del papel a lo digital sin dolor?",
+          decision:
+            "Formularios de carga ágiles y la separación entre datos personales y laborales, para ordenar la información desde el primer registro.",
+        },
+      ],
+      // Success criteria are reference values to be confirmed before testing
+      testTasks: [
+        {
+          task: "Dar de alta un empleado nuevo",
+          metric: "Tiempo para completar la tarea",
+          criterion: "Menos de 3 minutos, sin ayuda",
+        },
+        {
+          task: "Encontrar un empleado usando los filtros",
+          metric: "Tasa de errores",
+          criterion: "Al menos 9 de cada 10 usuarios sin errores",
+        },
+        {
+          task: "Exportar un reporte de empleados",
+          metric: "Satisfacción del usuario",
+          criterion: "Puntaje promedio de 4/5 o más",
+        },
+      ],
     },
 
     images: {
@@ -271,6 +315,8 @@ export const projects: ProjectData[] = [
     description: "Ecosistema E-commerce para la industria de la construcción",
     image: xconsCard,
     cardImagePosition: "40% 25%",
+    role: "IA Product Designer",
+    coverPosition: "center 48%",
     projectName: "XCONS Ecosystem",
     projectType: "Ecosistema E-commerce B2B",
     timeline: "2024",
@@ -364,6 +410,7 @@ export const projects: ProjectData[] = [
     image: jodifyCard,
     homeImage: jodifyHomeCard,
     cardImagePosition: "50% 30%",
+    coverPosition: "center 64%",
     projectName: "Jodify",
     projectType: "Aplicación de Eventos",
     timeline: "2023",

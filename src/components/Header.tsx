@@ -1,7 +1,12 @@
-import { Link, useLocation } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MI_PROCESO_IDX, MI_PROCESO_EXTRA, SOBRE_MI_IDX, SOBRE_MI_EXTRA } from "../pages/MainPage";
+import { createPortal } from "react-dom";
+import { useLenis } from "@studio-freight/react-lenis";
+import { MI_PROCESO_IDX, MI_PROCESO_EXTRA, SOBRE_MI_IDX } from "../pages/MainPage";
+import { getSobreMiExtra } from "../data/homeScroll";
+import { getProjectSections, getSectionAt, getSectionScrollTop } from "../data/projectSections";
+import { getProjectById } from "../data/projects";
 
 const navItems = [
   { label: "Inicio",           path: "/",                 sectionId: "inicio"           },
@@ -37,19 +42,50 @@ function HamburgerIcon({ open }: { open: boolean }) {
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
   const isMainPage = location.pathname === "/";
+  const lenis = useLenis();
+
+  // Project pages: index of the case-study sections
+  const projectId = location.pathname.startsWith("/project/") ? location.pathname.split("/project/")[1] : null;
+  const projectSections = useMemo(() => (projectId ? getProjectSections(projectId) : []), [projectId]);
+  const projectTitle = projectId ? getProjectById(projectId)?.title : undefined;
+  const [activeProjectSection, setActiveProjectSection] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!projectSections.length) return;
+    const ids = projectSections.map((s) => s.id);
+    const update = () => setActiveProjectSection(getSectionAt(ids, window.innerHeight * 0.45) ?? ids[0]);
+    window.addEventListener("scroll", update, { passive: true });
+    const raf = requestAnimationFrame(update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      cancelAnimationFrame(raf);
+    };
+  }, [projectSections]);
+
+  const goToProjectSection = (id: string) => {
+    setOpen(false);
+    // Wait for the menu to release the body scroll lock
+    setTimeout(() => {
+      const top = getSectionScrollTop(id);
+      if (top === null) return;
+      if (lenis) lenis.scrollTo(top, { duration: 1.2 });
+      else window.scrollTo({ top, behavior: "smooth" });
+    }, 60);
+  };
 
   const updateActive = useCallback(() => {
     const sectionH = window.innerHeight - 40;
     const sy = window.scrollY;
-    const sobreMiEnd   = (SOBRE_MI_IDX + SOBRE_MI_EXTRA) * sectionH;
+    const sobreMiEnd   = (SOBRE_MI_IDX + getSobreMiExtra()) * sectionH;
     const miProcesoEnd = sobreMiEnd + sectionH + MI_PROCESO_EXTRA * sectionH;
 
     let adjustedSY: number;
     if (sy >= miProcesoEnd) {
-      adjustedSY = sy - (SOBRE_MI_EXTRA + MI_PROCESO_EXTRA) * sectionH;
+      adjustedSY = sy - (getSobreMiExtra() + MI_PROCESO_EXTRA) * sectionH;
     } else if (sy >= sobreMiEnd) {
       adjustedSY = MI_PROCESO_IDX * sectionH;
     } else if (sy >= SOBRE_MI_IDX * sectionH) {
@@ -69,32 +105,46 @@ function Header() {
     return () => window.removeEventListener("scroll", updateActive);
   }, [isMainPage, updateActive]);
 
-  // Lock body scroll when menu is open
+  // Lock page scroll (native + Lenis) while the menu is open
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [open]);
+    const root = document.documentElement;
+    if (open) {
+      root.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      lenis?.stop();
+    }
+    return () => {
+      root.style.overflow = "";
+      document.body.style.overflow = "";
+      lenis?.start();
+    };
+  }, [open, lenis]);
 
   const handleClick = (e: React.MouseEvent, sectionId: string) => {
     setOpen(false);
-    if (!isMainPage) return;
+    if (!isMainPage) {
+      e.preventDefault();
+      navigate("/", { state: { scrollTo: sectionId } });
+      return;
+    }
     e.preventDefault();
     const sectionH = window.innerHeight - 40;
     const index = navItems.findIndex((n) => n.sectionId === sectionId);
     const targetScroll =
       index > MI_PROCESO_IDX
-        ? (index + SOBRE_MI_EXTRA + MI_PROCESO_EXTRA) * sectionH
+        ? (index + getSobreMiExtra() + MI_PROCESO_EXTRA) * sectionH
         : index === MI_PROCESO_IDX
-          ? (index + SOBRE_MI_EXTRA) * sectionH
+          ? (index + getSobreMiExtra()) * sectionH
           : index * sectionH;
     window.scrollTo({ top: targetScroll, behavior: "smooth" });
   };
 
-  return (
+  // Portaled to <body> so no page container (transforms, stacking contexts) can clip it
+  return createPortal(
     <>
       {/* Hamburger — top-left, aligned with TopBar height */}
       <button
-        className="fixed top-0 left-0 z-[90] h-11 px-4 flex items-center md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-inset"
+        className="fixed top-0 left-0 z-[110] h-11 px-4 flex items-center md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-inset"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={open}
@@ -105,14 +155,59 @@ function Header() {
       {/* Full-screen menu */}
       <AnimatePresence>
         {open && (
+          // Large-viewport height so it also covers the area behind mobile browser toolbars;
+          // the inner list scrolls within the visible (dynamic) height.
           <motion.div
-            className="fixed inset-0 z-[60] bg-[#F5F0EB] flex flex-col px-8 pt-16 pb-10 md:hidden"
+            className="fixed top-0 left-0 w-full h-lvh z-[105] bg-[#F5F0EB] md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            data-lenis-prevent
           >
-            <nav className="flex flex-col">
+          <div className="h-dvh overflow-y-auto overscroll-contain flex flex-col px-8 pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
+            {projectSections.length > 0 && (
+              <div className="mb-10">
+                <Link
+                  to="/"
+                  state={{ scrollTo: "proyectos" }}
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center gap-2 type-caption text-[#9A9A9A] hover:text-[#2D2D2D] mb-5"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M19 12H5M5 12L12 19M5 12L12 5" />
+                  </svg>
+                  Proyectos
+                </Link>
+                {projectTitle && (
+                  <span className="block type-overline uppercase text-[#9A9A9A] mb-3">{projectTitle}</span>
+                )}
+                <nav aria-label="Secciones del proyecto" className="flex flex-col gap-1.5">
+                  {projectSections.map((section, i) => {
+                    const isActive = activeProjectSection === section.id;
+                    return (
+                      <motion.button
+                        key={section.id}
+                        initial={{ opacity: 0, x: -16 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        onClick={() => goToProjectSection(section.id)}
+                        aria-current={isActive ? "true" : undefined}
+                        className={`text-left leading-[1.05] transition-colors duration-200 ${
+                          isActive ? "text-[#1A1A1A] font-bold" : "text-[#C8C4BC] font-light hover:text-[#2D2D2D]"
+                        }`}
+                        style={{ fontSize: "clamp(24px, 7vw, 30px)" }}
+                      >
+                        {section.label}
+                      </motion.button>
+                    );
+                  })}
+                </nav>
+                <div className="h-px bg-[#E0DBD6] mt-8" aria-hidden="true" />
+              </div>
+            )}
+
+            <nav className={`flex flex-col ${projectSections.length > 0 ? "gap-2" : ""}`}>
               {navItems.map((item, i) => {
                 const isActive = isMainPage
                   ? activeSection === item.sectionId
@@ -135,7 +230,7 @@ function Header() {
                           ? "text-[#1A1A1A] font-bold"
                           : "text-[#C8C4BC] font-light hover:text-[#2D2D2D]"
                       }`}
-                      style={{ fontSize: "clamp(32px, 9vw, 44px)" }}
+                      style={{ fontSize: projectSections.length > 0 ? "18px" : "clamp(32px, 9vw, 44px)" }}
                     >
                       {item.label}
                     </Link>
@@ -146,7 +241,7 @@ function Header() {
 
             {/* Hablemos button — bottom-left */}
             <motion.div
-              className="mt-auto"
+              className="mt-auto pt-10"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: navItems.length * 0.04 + 0.1, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -161,10 +256,12 @@ function Header() {
                 </svg>
               </a>
             </motion.div>
+          </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </>,
+    document.body
   );
 }
 

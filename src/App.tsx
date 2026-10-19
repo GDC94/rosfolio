@@ -14,12 +14,26 @@ function NavSwitch() {
   return pathname.startsWith("/project/") ? <ProjectSideNav /> : <SideNav />;
 }
 
-// Applies sidebar padding only on pages that are not the main scroll page
+// Grid background everywhere except case studies (their sections have solid backgrounds)
+function GridBackground() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith("/project/")) return null;
+  return (
+    <div className="fixed inset-0 z-0">
+      <BGGrid />
+    </div>
+  );
+}
+
+// Applies sidebar padding only on pages that are not the main scroll page.
+// Project pages handle it per section so backgrounds can go edge to edge.
 function ContentWrapper({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   const isMainPage = pathname === "/";
   const isProjectPage = pathname.startsWith("/project/");
-  const paddingClass = isMainPage ? "" : isProjectPage ? " md:pl-[440px] pr-[60px]" : " md:pl-[440px] md:pr-[440px]";
+  // Right padding mirrors the side nav only on wide screens; below that it would
+  // squeeze the content column (e.g. 144px wide at 1024px).
+  const paddingClass = isMainPage || isProjectPage ? "" : " md:pl-[440px] md:pr-[60px] xl:pr-[440px]";
   return (
     <div style={{ overflowX: "clip" }} className={`pt-10${paddingClass}`}>
       {children}
@@ -43,9 +57,7 @@ function App() {
       <ReactLenis root>
         <BrowserRouter>
           <div className="relative min-h-screen">
-            <div className="fixed inset-0 z-0">
-              <BGGrid />
-            </div>
+            <GridBackground />
             <div className="relative z-10">
               <TopBar />
               <NavSwitch />

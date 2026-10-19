@@ -67,15 +67,18 @@ export function JodifyBenchmarkTable() {
   return (
     <div className="w-full">
       {/* Header con logos */}
-      <div className="grid grid-cols-[auto_1fr_1fr] gap-2 mb-4">
-        <div className="w-20 sm:w-28" /> {/* Espacio para labels */}
+      <div className="grid grid-cols-2 sm:grid-cols-[auto_1fr_1fr] gap-2 mb-4">
+        <div className="hidden sm:block w-32" /> {/* Espacio para labels */}
         {competitors.map((competitor) => (
           <div key={competitor.name} className="flex justify-center">
-            <img
-              src={competitor.logo}
-              alt={competitor.name}
-              className="h-4 sm:h-5 w-auto object-contain"
-            />
+            {/* White pill keeps the logos legible on any section background */}
+            <span className="inline-flex items-center bg-white rounded-md px-3 py-1.5">
+              <img
+                src={competitor.logo}
+                alt={competitor.name}
+                className="h-4 sm:h-5 w-auto object-contain"
+              />
+            </span>
           </div>
         ))}
       </div>
@@ -92,17 +95,17 @@ export function JodifyBenchmarkTable() {
               duration: 0.4,
             }}
             viewport={{ once: true, margin: "-30px" }}
-            className="grid grid-cols-[auto_1fr_1fr] gap-2"
+            className="grid grid-cols-2 sm:grid-cols-[auto_1fr_1fr] gap-2"
           >
             {/* Criterion Label */}
-            <div className="w-20 sm:w-28 flex items-start pt-2">
+            <div className="col-span-2 sm:col-span-1 sm:w-32 flex items-start pt-3">
               <span
-                className={`text-[10px] sm:text-xs font-semibold uppercase tracking-wide leading-tight ${
+                className={`type-overline uppercase ${
                   criterion.isHighlight === "strength"
-                    ? "text-[#7C16F5]"
+                    ? "text-[#9B4DFF]"
                     : criterion.isHighlight === "weakness"
-                    ? "text-[#1B1C20]"
-                    : "text-[#6B6B6B]"
+                    ? "text-ink"
+                    : "text-ink-subtle"
                 }`}
               >
                 {criterion.label}
@@ -115,13 +118,13 @@ export function JodifyBenchmarkTable() {
                 key={`${criterion.key}-${competitor.name}`}
                 className={`p-2 sm:p-3 rounded-lg ${
                   criterion.isHighlight === "strength"
-                    ? "bg-[#7C16F5]/5"
+                    ? "bg-[#7C16F5]/10"
                     : criterion.isHighlight === "weakness"
-                    ? "bg-[#1B1C20]/5"
-                    : "bg-white"
+                    ? "bg-ink/5"
+                    : "bg-card"
                 }`}
               >
-                <p className="text-[10px] sm:text-xs text-[#1B1C20] leading-relaxed">
+                <p className="type-body-s text-ink-muted">
                   {competitor.data[criterion.key]}
                 </p>
               </div>
@@ -136,17 +139,16 @@ export function JodifyBenchmarkTable() {
         whileInView={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
         viewport={{ once: true }}
-        className="mt-6 pt-4 border-t border-[#1B1C20]/10"
+        className="mt-8 pt-5 border-t border-line"
       >
         <div className="flex items-start gap-2">
-          <div className="w-1 h-1 bg-[#7C16F5] rotate-45 mt-1.5 flex-shrink-0" />
-          <p className="text-xs text-[#1B1C20] leading-relaxed">
-            <span className="text-[#7C16F5] font-medium">Insight:</span>{" "}
-            <span className="text-[#0C0C0C] font-medium">Ticketek</span> ofrece
+          <p className="type-body text-ink-muted">
+            <span className="text-[#9B4DFF] font-medium">Insight:</span>{" "}
+            <span className="text-ink font-medium">Ticketek</span> ofrece
             mayor reconocimiento de marca, mientras que{" "}
-            <span className="text-[#0C0C0C] font-medium">Passline</span>{" "}
+            <span className="text-ink font-medium">Passline</span>{" "}
             destaca por su diseño minimalista.{" "}
-            <span className="text-[#7C16F5] font-medium">Jodify</span>{" "}
+            <span className="text-[#9B4DFF] font-medium">Jodify</span>{" "}
             busca combinar lo mejor de ambos.
           </p>
         </div>

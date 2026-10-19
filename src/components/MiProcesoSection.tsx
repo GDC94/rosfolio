@@ -7,7 +7,7 @@ const FRAME_LABELS = ["Discovery", "Exploración", "Entrega"];
 
 function getEffectiveFrameW() {
   if (typeof window === "undefined") return 1000;
-  return window.innerWidth >= 768 ? window.innerWidth - NAV_PAD : window.innerWidth;
+  return window.innerWidth >= 1024 ? window.innerWidth - NAV_PAD : window.innerWidth;
 }
 
 type Anim = "hidden" | "visible";
@@ -46,7 +46,7 @@ function LeftCol({
 
       <motion.p
         animate={anim} variants={up(0.1)}
-        className="text-[13px] text-[#525252] leading-[1.7] max-w-[220px]"
+        className="text-[14px] text-[#525252] leading-[1.7] max-w-[220px]"
       >
         {body}
       </motion.p>
@@ -71,10 +71,10 @@ function ItemList({
           animate={anim}
           variants={up(baseDelay + i * 0.09)}
         >
-          <p className="text-[13px] font-medium text-[#DEDAD4] leading-snug mb-1.5">
+          <p className="text-[14px] font-medium text-[#DEDAD4] leading-snug mb-1.5">
             {row.label}
           </p>
-          <p className="text-[13px] text-[#525252] leading-[1.7]">
+          <p className="text-[14px] text-[#525252] leading-[1.7]">
             {row.body}
           </p>
         </motion.div>
@@ -182,13 +182,13 @@ function FrameEntrega({ anim }: { anim: Anim }) {
 
           {/* Diferencial */}
           <motion.div animate={anim} variants={up(0.34)} className="pt-5 mt-5 border-t border-white/[0.05]">
-            <p className="text-[9px] tracking-[0.28em] text-[rgb(201,188,63)] mb-3">
+            <p className="text-[11px] tracking-[0.20em] text-[rgb(201,188,63)] mb-3">
               Diferencial
             </p>
             <p className="text-[15px] font-medium text-[#F5F0EB] leading-snug mb-3">
               Cuando el proyecto lo pide, yo misma implemento el front.
             </p>
-            <p className="text-[13px] text-[#525252] leading-[1.7]">
+            <p className="text-[14px] text-[#525252] leading-[1.7]">
               Con Claude Code paso de Figma a React + TypeScript sin depender de un dev. La brecha entre diseño y producción desaparece.
             </p>
           </motion.div>

@@ -1,11 +1,21 @@
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence, useInView, useScroll, useTransform, type Variants } from "framer-motion";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Header from "../components/Header";
 import { getProjectById, xconsImages, jodifyImages, puertaPuertaImages } from "../data/projects";
+import { getProjectSections, themeForIndex } from "../data/projectSections";
 import BenchmarkTable from "../components/BenchmarkTable";
 import JodifyBenchmarkTable from "../components/JodifyBenchmarkTable";
 import UserPersonas from "../components/UserPersonas";
+import StackSection from "../components/project/StackSection";
+import HorizontalPanels from "../components/project/HorizontalPanels";
+import HandDrawnWireframes from "../components/project/HandDrawnWireframes";
+import MvpFeatureCards from "../components/project/MvpFeatureCards";
+import ChallengeSketches from "../components/project/ChallengeSketches";
+import PricingFlowSketches from "../components/project/PricingFlowSketches";
+import { JODIFY_CHALLENGE_SKETCHES, JODIFY_SKETCH_FILL } from "../components/project/JodifySketches";
+import UIKitMosaic, { type KitBlock, type MobileSection } from "../components/project/UIKitMosaic";
+import NextProjectCard from "../components/project/NextProjectCard";
 
 // Hoisted SVG icons - prevents recreation on each render
 const NextArrowIcon = (
@@ -20,44 +30,14 @@ const NextArrowIcon = (
   </svg>
 );
 
-const HomeIcon = (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    <polyline points="9 22 9 12 15 12 15 22" />
-  </svg>
-);
+const GOLD = "rgb(201,188,63)";
+const JODIFY = "#7C16F5";
 
-const LocationIcon = (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-    <circle cx="12" cy="10" r="3" />
-  </svg>
-);
-
-const UserIcon = (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
-
-const FlowArrowIcon = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M5 12h14M12 5l7 7-7 7" />
-  </svg>
-);
-
-const PriceIcon = (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <line x1="12" y1="1" x2="12" y2="23" />
-    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-  </svg>
-);
+type ProjectInfo = NonNullable<ReturnType<typeof getProjectById>>;
 
 function Project() {
   const { projectId } = useParams<{ projectId: string }>();
   const project = getProjectById(projectId || "1");
-  const mainRef = useRef<HTMLElement>(null);
 
   const getNextProjectId = (): string => {
     // Only cycle through navigable projects: HR (1), XCONS (2), Jodify (3)
@@ -65,10 +45,6 @@ function Project() {
     const currentId = parseInt(projectId || "1", 10);
     const nextId = currentId >= navigableProjects ? 1 : currentId + 1;
     return String(nextId);
-  };
-
-  const getNextProject = () => {
-    return getProjectById(getNextProjectId());
   };
 
   // Animation variants
@@ -92,38 +68,13 @@ function Project() {
   // Check if this project has case study content
   const hasCaseStudy = project?.challenges && project?.images?.cover;
 
-  // Check if this is the XCONS project
-  const isXCONS = project?.id === "2";
-
-  // Check if this is the Jodify project
-  const isJodify = project?.id === "3";
-
-  // Check if this is the Puerta a Puerta project
-  const isPuertaPuerta = project?.id === "10";
-
-  // Scroll-based background color for XCONS
-  const { scrollYProgress } = useScroll({
-    target: mainRef,
-    offset: ["start start", "end end"],
-  });
-
-  // Transform scroll progress to background color
-  // Verde muy claro: #f0f7f0 o #f5faf5
-  const backgroundColor = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    isXCONS 
-      ? ["#ffffff", "#f5faf5", "#f0f7f0"]
-      : ["#ffffff", "#ffffff", "#ffffff"]
-  );
-
   // If no case study, render simple version
-  if (!hasCaseStudy) {
+  if (!project || !hasCaseStudy) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen pj-theme-beige bg-[var(--pj-bg)] text-ink">
         <Header />
-        <main className="pt-24">
-          <section className="w-full h-[50vh] relative overflow-hidden">
+        <main className="pt-14 px-4 md:pl-[440px] md:pr-[60px] pb-20">
+          <section className="w-full h-[50vh] relative overflow-hidden rounded-2xl">
             <img
               src={project?.image}
               alt={project?.title}
@@ -134,109 +85,95 @@ function Project() {
             <div className="absolute inset-0 bg-black/20" />
           </section>
 
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-[#2D2D2D] mb-4">
-              {project?.title}
-            </h1>
-            <p className="text-base sm:text-lg text-[#6B6B6B]">{project?.description}</p>
-            <div className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
-              <span className="text-xs sm:text-sm text-[#9A9A9A]">{project?.company}</span>
-              <span className="text-xs sm:text-sm text-[#9A9A9A]">{project?.year}</span>
+          <section className="py-8">
+            <h1 className="type-h1 text-ink mb-4">{project?.title}</h1>
+            <p className="type-body-l text-ink-muted">{project?.description}</p>
+            <div className="mt-6 flex flex-wrap gap-4">
+              <span className="type-caption text-ink-subtle">{project?.company}</span>
+              <span className="type-caption text-ink-subtle">{project?.year}</span>
             </div>
           </section>
 
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8">
-            <Link
-              to={`/project/${getNextProjectId()}`}
-              className="inline-flex items-center gap-2 text-[rgb(201,188,63)] hover:underline"
-            >
-              Ver siguiente proyecto
-              {NextArrowIcon}
-            </Link>
-          </section>
+          <Link
+            to={`/project/${getNextProjectId()}`}
+            className="inline-flex items-center gap-2 type-body text-[rgb(201,188,63)] hover:underline"
+          >
+            Ver siguiente proyecto
+            {NextArrowIcon}
+          </Link>
         </main>
       </div>
     );
   }
 
-  return (
-    <motion.div 
-      className="min-h-screen relative"
-      {...(isXCONS && { style: { backgroundColor } })}
-    >
-      <Header />
-      <main ref={mainRef} className="pt-20 relative z-10">
-        <HeroSection project={project} />
+  const isXCONS = project.id === "2";
+  const isJodify = project.id === "3";
+  const isPuertaPuerta = project.id === "10";
+  const isHR = !isXCONS && !isJodify && !isPuertaPuerta;
+  const accent = isJodify ? JODIFY : GOLD;
 
-        <div id="project-brief">
-          {isPuertaPuerta ? (
-            <PuertaPuertaBriefSection fadeIn={fadeIn} staggerContainer={staggerContainer} />
-          ) : (
-            <ProjectBriefSection project={project} fadeIn={fadeIn} staggerContainer={staggerContainer} isXCONS={isXCONS} isJodify={isJodify} />
-          )}
-        </div>
+  const sections = getProjectSections(project.id);
+  const num = (i: number) => String(i + 1).padStart(2, "0");
+  const shared = { fadeIn, staggerContainer };
 
-        {!isPuertaPuerta && (
-          <div id="project-challenges">
-            <ChallengesSection project={project} fadeIn={fadeIn} staggerContainer={staggerContainer} isXCONS={isXCONS} isJodify={isJodify} />
-          </div>
-        )}
-
-        <div id="project-findings">
-          {isXCONS ? (
-            <XCONSKeyFindingsSection fadeIn={fadeIn} />
-          ) : isJodify ? (
-            <JodifyBenchmarkSection fadeIn={fadeIn} />
-          ) : isPuertaPuerta ? (
-            <PuertaPuertaBenchmarkSection fadeIn={fadeIn} />
-          ) : (
-            <KeyFindingsSection project={project} fadeIn={fadeIn} />
-          )}
-        </div>
-
-        <div id="project-personas">
-          {isXCONS ? (
-            <XCONSLogicSection fadeIn={fadeIn} />
-          ) : isJodify ? (
-            <JodifyPersonaSection fadeIn={fadeIn} />
-          ) : isPuertaPuerta ? (
-            <PuertaPuertaProcesoSection fadeIn={fadeIn} staggerContainer={staggerContainer} />
-          ) : (
-            <UserPersonasSection project={project} fadeIn={fadeIn} />
-          )}
-        </div>
-
-        {(isJodify || (!isXCONS && !isPuertaPuerta)) && (
-          <div id="project-solution">
-            {isJodify ? (
-              <JodifyUIKitSection fadeIn={fadeIn} />
+  const renderSection = (id: string, i: number): ReactNode => {
+    const n = num(i);
+    switch (id) {
+      case "project-brief":
+        return (
+          <>
+            <HeroSection project={project} />
+            {isPuertaPuerta ? (
+              <PuertaPuertaBriefSection n={n} {...shared} />
             ) : (
-              <SolutionSection project={project} fadeIn={fadeIn} staggerContainer={staggerContainer} />
+              <ProjectBriefSection project={project} n={n} {...shared} isXCONS={isXCONS} accent={accent} />
             )}
-          </div>
-        )}
+          </>
+        );
+      case "project-findings":
+        if (isXCONS) return <XCONSKeyFindingsSection n={n} {...shared} />;
+        if (isJodify) return <JodifyBenchmarkSection n={n} {...shared} />;
+        if (isPuertaPuerta) return <PuertaPuertaBenchmarkSection n={n} {...shared} />;
+        return <KeyFindingsSection project={project} n={n} {...shared} />;
+      case "project-personas":
+        if (isXCONS) return <XCONSLogicSection n={n} {...shared} />;
+        if (isJodify) return <JodifyPersonaSection n={n} {...shared} />;
+        if (isPuertaPuerta) return <PuertaPuertaProcesoSection n={n} {...shared} />;
+        return <UserPersonasSection project={project} n={n} {...shared} />;
+      case "project-solution":
+        if (isJodify) return <JodifyUIKitSection n={n} {...shared} />;
+        if (isPuertaPuerta) return <PuertaPuertaTestingSection n={n} {...shared} />;
+        return <SolutionSection project={project} n={n} label={sections[i].label} />;
+      case "project-results":
+        return isPuertaPuerta ? (
+          <PuertaPuertaDisenoSection n={n} {...shared} />
+        ) : (
+          <ResultsSection project={project} n={n} {...shared} isXCONS={isXCONS} isHR={isHR} />
+        );
+      default:
+        return null;
+    }
+  };
 
-        {isPuertaPuerta && (
-          <div id="project-solution">
-            <PuertaPuertaTestingSection fadeIn={fadeIn} staggerContainer={staggerContainer} />
-          </div>
-        )}
-
-        <div id="project-results">
-          {isPuertaPuerta ? (
-            <PuertaPuertaDisenoSection fadeIn={fadeIn} staggerContainer={staggerContainer} />
-          ) : (
-            <ResultsSection project={project} fadeIn={fadeIn} staggerContainer={staggerContainer} isXCONS={isXCONS} />
-          )}
-        </div>
-
-        <NextProjectSection
-          nextProject={getNextProject()}
-          nextProjectId={getNextProjectId()}
-          fadeIn={fadeIn}
-        />
+  return (
+    <div className="relative">
+      <Header />
+      <main>
+        {sections.map((s, i) => (
+          <StackSection
+            key={s.id}
+            id={s.id}
+            index={i}
+            label={s.label}
+            theme={themeForIndex(i)}
+            bare={isHR && s.id === "project-solution"}
+          >
+            {renderSection(s.id, i)}
+            {i === sections.length - 1 && <NextProjectCard projectId={getNextProjectId()} />}
+          </StackSection>
+        ))}
       </main>
-    </motion.div>
+    </div>
   );
 }
 
@@ -256,10 +193,7 @@ function renderHighlightedText(text: string | undefined, highlights: string[]) {
     const isHighlight = highlights.some(h => h.toLowerCase() === part.toLowerCase());
     if (isHighlight) {
       return (
-        <span
-          key={index}
-          className="text-[#2D2D2D] font-medium"
-        >
+        <span key={index} className="text-ink font-medium">
           {part}
         </span>
       );
@@ -268,39 +202,60 @@ function renderHighlightedText(text: string | undefined, highlights: string[]) {
   });
 }
 
-// Reusable Section Header Component with refined styling
+// ─── Shared building blocks ─────────────────────────────────────────────────
+
 interface SectionHeaderProps {
   number: string;
   title: string;
-  fadeIn: Variants;
+  fadeIn?: Variants;
   accentColor?: string;
 }
 
-function SectionHeader({ number, title, fadeIn, accentColor = "rgb(201,188,63)" }: SectionHeaderProps) {
+function SectionHeader({ title, fadeIn }: SectionHeaderProps) {
   return (
-    <motion.div variants={fadeIn} className="mb-5">
-      <div className="flex items-center gap-4 mb-2">
-        <span 
-          className="text-3xl sm:text-4xl md:text-5xl font-extralight tracking-tight"
-          style={{ color: accentColor }}
-        >
-          {number}
-        </span>
-        <div 
-          className="h-px w-8" 
-          style={{ backgroundColor: `${accentColor}66` }}
-          aria-hidden="true" 
-        />
-      </div>
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[#2D2D2D]">
-        {title}
-      </h2>
+    <motion.div variants={fadeIn} className="mb-5 md:mb-14">
+      <h2 className="type-h1 text-ink">{title}</h2>
     </motion.div>
   );
 }
 
-// Hero Section - Compact elegant design with metadata
-function HeroSection({ project }: { project: NonNullable<ReturnType<typeof getProjectById>> }) {
+/** Small uppercase label used for sub-blocks inside a section. */
+function Eyebrow({ children, color, className = "" }: { children: ReactNode; color?: string; className?: string }) {
+  return (
+    <h3
+      className={`type-overline uppercase ${color ? "" : "text-ink-subtle"} ${className}`}
+      style={color ? { color } : undefined}
+    >
+      {children}
+    </h3>
+  );
+}
+
+/** Small sub-block title. */
+function DiamondLabel({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <h3 className={`type-h4 text-ink ${className}`}>{children}</h3>;
+}
+
+/** Animates its children in when scrolled into view. */
+function Reveal({ children, stagger }: { children: ReactNode; stagger?: Variants }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  return (
+    <motion.div ref={ref} variants={stagger} initial="hidden" animate={isInView ? "visible" : "hidden"}>
+      {children}
+    </motion.div>
+  );
+}
+
+interface SectionProps {
+  n: string;
+  fadeIn: Variants;
+  staggerContainer?: Variants;
+}
+
+// ─── Hero (inside the first section) ────────────────────────────────────────
+
+function HeroSection({ project }: { project: ProjectInfo }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -308,106 +263,90 @@ function HeroSection({ project }: { project: NonNullable<ReturnType<typeof getPr
   });
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
 
+  const meta = [
+    { label: "Año", value: project.timeline },
+    { label: "Tipo de Proyecto", value: project.projectType },
+    { label: "Rol", value: project.role ?? "Diseñadora UX/UI" },
+  ];
+
   return (
-    <section ref={ref} className="pt-16 sm:pt-20 pb-6 sm:pb-8 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 relative z-10">
-        {/* Header info row */}
-        <motion.div
-          className="flex flex-wrap items-center gap-4 mb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-            <span className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
-              {project.category}
-            </span>
-          </div>
-        </motion.div>
+    <div ref={ref} className="relative mb-10 md:mb-24">
+      <motion.h1
+        className="type-h1 text-ink mb-6 md:mb-8 max-w-4xl"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {project.projectName || project.title}
+      </motion.h1>
 
-        {/* Title */}
-        <motion.h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-light text-[#2D2D2D] leading-[1.1] tracking-tight mb-4 sm:mb-6 max-w-4xl"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {project.projectName || project.title}
-        </motion.h1>
+      <motion.dl
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 py-4 md:py-6 border-t border-b border-line mb-6 md:mb-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.6 }}
+      >
+        {meta.map((m) => (
+          <div key={m.label}>
+            <dt className="type-overline uppercase text-ink-subtle mb-1.5">{m.label}</dt>
+            <dd className="type-body-s text-ink">{m.value}</dd>
+          </div>
+        ))}
+      </motion.dl>
 
-        {/* Metadata Grid */}
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 py-4 md:py-6 border-t border-b border-[#E0DBD6] mb-6 md:mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-        >
-          <div>
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
-              Cronograma
-            </h3>
-            <p className="text-sm sm:text-base text-[#2D2D2D] font-normal">{project.timeline}</p>
-          </div>
-          <div>
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
-              Tipo de Proyecto
-            </h3>
-            <p className="text-sm sm:text-base text-[#2D2D2D] font-normal">{project.projectType}</p>
-          </div>
-          <div>
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
-              Rol
-            </h3>
-            <p className="text-sm sm:text-base text-[#2D2D2D] font-normal">Diseñadora UX/UI</p>
-          </div>
-          <div>
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-1 font-medium">
-              Contribución
-            </h3>
-            <p className="text-xs sm:text-sm text-[#2D2D2D] font-normal">{project.contribution?.join(", ")}</p>
-          </div>
+      <motion.div
+        className="rounded-2xl overflow-hidden"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Short, full-width crop so the cover doesn't dominate the screen */}
+        <motion.div className="aspect-[2/1] sm:aspect-[3/1] overflow-hidden" style={{ y: imageY }}>
+          <img
+            src={project.images?.cover}
+            alt={project.title}
+            width={1200}
+            height={675}
+            loading="eager"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: project.coverPosition ?? "center 20%" }}
+          />
         </motion.div>
-
-        {/* Cover Image */}
-        <motion.div
-          className="rounded-2xl overflow-hidden"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <motion.div
-            className="aspect-[16/9] sm:aspect-video overflow-hidden"
-            style={{ y: imageY }}
-          >
-            <img
-              src={project.images?.cover}
-              alt={project.title}
-              width={1200}
-              height={675}
-              loading="eager"
-              className="w-full h-full object-cover"
-            />
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
+      </motion.div>
+    </div>
   );
 }
 
-// Section Components
-interface SectionProps {
-  project: NonNullable<ReturnType<typeof getProjectById>>;
-  fadeIn: Variants;
-  staggerContainer?: Variants;
-  isXCONS?: boolean;
-}
+// ─── 01 · Resumen del Proyecto (+ Desafíos) ─────────────────────────────────
 
-function ProjectBriefSection({ project, fadeIn, staggerContainer, isXCONS, isJodify }: SectionProps & { isJodify?: boolean }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const accentColor = isJodify ? "#7C16F5" : "rgb(201,188,63)";
+// XCONS challenges with problem / challenge / solution
+const XCONS_CHALLENGES = [
+  {
+    number: "01",
+    title: "\"El Carrito está Roto\"",
+    problem: "En la construcción, el paradigma tradicional de e-commerce (\"Agregar al carrito > Pagar\") falla. Las ventas son largas y requieren asesoramiento técnico.",
+    challenge: "¿Cómo diseñamos un flujo que priorice la negociación y el asesoramiento sobre la transacción inmediata?",
+    solution: "Reemplazar el \"Carrito\" por un sistema de Presupuestos Colaborativos."
+  },
+  {
+    number: "02",
+    title: "Logística vs. Facturación",
+    problem: "Un usuario puede pagar todo hoy, pero necesitar los materiales en 3 meses (Acopio), o recibir facturas parciales.",
+    challenge: "Diseñar una interfaz de Pedido que no colapse cuando el \"Estado del Pago\" y el \"Estado de la Entrega\" no coinciden.",
+    solution: "Una UI de Estados Independientes (Transacciones vs. Entregas)."
+  },
+  {
+    number: "03",
+    title: "Permisos Multi-Persona",
+    problem: "En una obra interactúan el Dueño (paga), el Arquitecto (elige) y el Constructor (recibe).",
+    challenge: "¿Cómo evitamos crear múltiples cuentas y contraseñas?",
+    solution: "Diseñar un sistema de Roles Dinámicos donde un mismo usuario cambia de permisos según el contexto del presupuesto."
+  }
+];
 
+function ProjectBriefSection({
+  project, n, fadeIn, staggerContainer, isXCONS, accent,
+}: SectionProps & { project: ProjectInfo; isXCONS: boolean; accent: string }) {
   const briefHighlights = isXCONS ? [
     "ecosistema e-commerce",
     "industria de la construcción",
@@ -428,270 +367,153 @@ function ProjectBriefSection({ project, fadeIn, staggerContainer, isXCONS, isJod
   ];
 
   return (
-    <section ref={ref} className="relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number="01" title="Resumen del Proyecto" fadeIn={fadeIn} accentColor={accentColor} />
+    <Reveal stagger={staggerContainer}>
+      <SectionHeader number={n} title="Resumen del Proyecto" fadeIn={fadeIn} accentColor={accent} />
 
-          {/* XCONS: Text and image side by side */}
-          {isXCONS ? (
-            <motion.div
-              variants={fadeIn}
-              className="flex flex-col md:flex-row items-start gap-8"
-            >
-              <p className="text-base md:text-lg text-[#5A5A5A] leading-relaxed max-w-xl pt-1">
-                {renderHighlightedText(project.conceptSummary, briefHighlights)}
-              </p>
-              <div className="w-full md:w-[180px] flex-shrink-0">
-                <img
-                  src={xconsImages.flujoCompra}
-                  alt="Flujo de compra - XCONS"
-                  width={180}
-                  height={110}
-                  loading="lazy"
-                  className="w-full rounded-lg"
-                />
-              </div>
-            </motion.div>
-          ) : (
-            <motion.p
-              variants={fadeIn}
-              className="text-lg md:text-xl text-[#6B6B6B] leading-[1.8] font-light"
-            >
-              {renderHighlightedText(project.conceptSummary, briefHighlights)}
-            </motion.p>
-          )}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function ChallengesSection({ project, fadeIn, staggerContainer, isXCONS, isJodify }: SectionProps & { isJodify?: boolean }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  // XCONS specific challenge data with solutions
-  const xconsChallenges = [
-    {
-      number: "01",
-      title: "\"El Carrito está Roto\"",
-      problem: "En la construcción, el paradigma tradicional de e-commerce (\"Agregar al carrito > Pagar\") falla. Las ventas son largas y requieren asesoramiento técnico.",
-      challenge: "¿Cómo diseñamos un flujo que priorice la negociación y el asesoramiento sobre la transacción inmediata?",
-      solution: "Reemplazar el \"Carrito\" por un sistema de Presupuestos Colaborativos."
-    },
-    {
-      number: "02",
-      title: "Logística vs. Facturación",
-      problem: "Un usuario puede pagar todo hoy, pero necesitar los materiales en 3 meses (Acopio), o recibir facturas parciales.",
-      challenge: "Diseñar una interfaz de Pedido que no colapse cuando el \"Estado del Pago\" y el \"Estado de la Entrega\" no coinciden.",
-      solution: "Una UI de Estados Independientes (Transacciones vs. Entregas)."
-    },
-    {
-      number: "03",
-      title: "Permisos Multi-Persona",
-      problem: "En una obra interactúan el Dueño (paga), el Arquitecto (elige) y el Constructor (recibe).",
-      challenge: "¿Cómo evitamos crear múltiples cuentas y contraseñas?",
-      solution: "Diseñar un sistema de Roles Dinámicos donde un mismo usuario cambia de permisos según el contexto del presupuesto."
-    }
-  ];
-
-  // Color accent based on project
-  const accentColor = isJodify ? "#7C16F5" : "rgb(201,188,63)";
-
-  return (
-    <section ref={ref} className={`py-8 ${isJodify ? "bg-[#F2F1EF]" : "bg-white/80"}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number="02" title="Desafíos" fadeIn={fadeIn} accentColor={accentColor} />
-
-          {/* XCONS Challenge Cards */}
-          {isXCONS ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-              {xconsChallenges.map((challenge, index) => (
-                <motion.div
-                  key={challenge.number}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  className="bg-[#FAFAF8] border border-[#E0DBD6]/50 rounded-xl p-4 sm:p-5"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-1 h-6 rounded-full bg-[rgb(201,188,63)]" aria-hidden="true" />
-                    <span className="text-2xl font-extralight tracking-tight text-[rgb(201,188,63)]">
-                      {challenge.number}
-                    </span>
-                  </div>
-
-                  <h3 className="text-lg font-medium text-[#2D2D2D] mb-4">
-                    {challenge.title}
-                  </h3>
-
-                  <div className="space-y-3">
-                    <div>
-                      <span className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
-                        El Problema
-                      </span>
-                      <p className="text-sm text-[#6B6B6B] leading-relaxed mt-1">
-                        {challenge.problem}
-                      </p>
-                    </div>
-
-                    <div>
-                      <span className="text-xs uppercase tracking-[0.15em] text-[rgb(201,188,63)] font-medium">
-                        El Reto
-                      </span>
-                      <p className="text-sm text-[#2D2D2D] font-medium leading-relaxed mt-1">
-                        {challenge.challenge}
-                      </p>
-                    </div>
-
-                    <div>
-                      <span className="text-xs uppercase tracking-[0.15em] text-[rgb(111,141,181)] font-medium">
-                        La Solución
-                      </span>
-                      <p className="text-sm text-[#2D2D2D] leading-relaxed mt-1">
-                        {challenge.solution}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            /* HR/Jodify Challenge Cards - Compact horizontal layout */
-            <div className="flex flex-wrap justify-between gap-3 sm:gap-4">
-              {project.challenges?.map((challenge, index) => (
-                <motion.div
-                  key={challenge.number}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border w-full sm:w-fit ${
-                    isJodify 
-                      ? "border-[#1B1C20]/10 bg-white" 
-                      : "border-[#E0DBD6]/60 bg-[#FAFAF8]/50"
-                  }`}
-                  style={{ borderLeftWidth: 3, borderLeftColor: accentColor }}
-                >
-                  <span 
-                    className="text-base sm:text-lg font-light flex-shrink-0"
-                    style={{ color: accentColor }}
-                  >
-                    {challenge.number}
-                  </span>
-                  <p className={`text-xs sm:text-sm leading-relaxed ${isJodify ? "text-[#1B1C20]" : "text-[#2D2D2D]"}`}>
-                    {challenge.question}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function KeyFindingsSection({ project, fadeIn }: Omit<SectionProps, "staggerContainer">) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  return (
-    <section ref={ref} className="bg-white/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"}>
-          <SectionHeader number="03" title="Análisis Comparativo" fadeIn={fadeIn} />
-
-          {/* Benchmark Table Component */}
-          {project.images?.benchmark && (
-            <motion.div variants={fadeIn} className="mb-8">
-              <BenchmarkTable />
-            </motion.div>
-          )}
-
-          {/* Competitors - Compact inline layout */}
-          <motion.div variants={fadeIn} className="mb-8">
-            <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-4 font-medium">
-              Competidores Analizados
-            </h4>
-            <div className="flex flex-wrap gap-3">
-              {project.keyFindings?.competitors?.map((competitor, index) => (
-                <motion.div
-                  key={competitor.name}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05, duration: 0.4 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="px-4 py-2 bg-[#FAFAF8] rounded-lg border border-[#E8E4DF]">
-                    <span className="text-sm font-medium text-[#2D2D2D]">{competitor.name}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Key Insights - Two columns without background card */}
-          <div className="grid md:grid-cols-2 gap-8 pt-6 border-t border-[#E8E4DF]">
-            <motion.div variants={fadeIn}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
-                  Necesidad del Usuario
-                </h4>
-              </div>
-              <p className="text-sm text-[#5A5A5A] leading-relaxed">
-                {renderHighlightedText(project.keyFindings?.userNeed, [
-                  "personalización de flujos",
-                  "claridad visual",
-                  "cantidad de funciones"
-                ])}
-              </p>
-            </motion.div>
-            <motion.div variants={fadeIn}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">
-                  Tendencia
-                </h4>
-              </div>
-              <p className="text-sm text-[#5A5A5A] leading-relaxed">
-                {renderHighlightedText(project.keyFindings?.trend, [
-                  "IA",
-                  "digitalización",
-                  "futuro",
-                  "accesibilidad",
-                  "presente necesario"
-                ])}
-              </p>
-            </motion.div>
+      {isXCONS ? (
+        <motion.div variants={fadeIn} className="flex flex-col md:flex-row items-start gap-8 md:gap-16">
+          <p className="type-body-l text-ink-muted max-w-xl">
+            {renderHighlightedText(project.conceptSummary, briefHighlights)}
+          </p>
+          <div className="w-full max-w-[280px] mx-auto md:mx-0 md:w-[260px] md:ml-auto flex-shrink-0">
+            <img
+              src={xconsImages.flujoCompra}
+              alt="Flujo de compra - XCONS"
+              width={260}
+              height={159}
+              loading="lazy"
+              className="w-full rounded-lg"
+            />
           </div>
         </motion.div>
-      </div>
-    </section>
+      ) : (
+        <motion.p variants={fadeIn} className="type-body-l text-ink-muted">
+          {renderHighlightedText(project.conceptSummary, briefHighlights)}
+        </motion.p>
+      )}
+
+      {/* Desafíos — subtitle inside the summary */}
+      <motion.div variants={fadeIn} className="mt-14 md:mt-20">
+        <h3 className="type-subtitle text-ink mb-6 md:mb-8">Desafíos</h3>
+
+        {isXCONS ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+            {XCONS_CHALLENGES.map((challenge, index) => (
+              <motion.div
+                key={challenge.number}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                viewport={{ once: true, margin: "-50px" }}
+                className="bg-card border border-line rounded-xl p-5 sm:p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-1 h-6 rounded-full bg-[rgb(201,188,63)]" aria-hidden="true" />
+                  <span className="type-h3 tabular-nums text-[rgb(201,188,63)]">{challenge.number}</span>
+                </div>
+
+                <h4 className="type-h3 text-ink mb-5">{challenge.title}</h4>
+
+                <div className="space-y-4">
+                  <div>
+                    <span className="type-overline uppercase text-ink-subtle">El Problema</span>
+                    <p className="type-body-s text-ink-muted mt-1.5">{challenge.problem}</p>
+                  </div>
+                  <div>
+                    <span className="type-overline uppercase text-[rgb(201,188,63)]">El Reto</span>
+                    <p className="type-body-s text-ink font-medium mt-1.5">{challenge.challenge}</p>
+                  </div>
+                  <div>
+                    <span className="type-overline uppercase text-[rgb(111,141,181)]">La Solución</span>
+                    <p className="type-body-s text-ink mt-1.5">{challenge.solution}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          project.id === "1" ? (
+            <ChallengeSketches challenges={project.challenges ?? []} />
+          ) : project.id === "3" ? (
+            <ChallengeSketches
+              challenges={project.challenges ?? []}
+              sketches={JODIFY_CHALLENGE_SKETCHES}
+              circleColor={JODIFY}
+              fill={JODIFY_SKETCH_FILL}
+            />
+          ) : (
+            <ol className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+              {project.challenges?.map((challenge, i) => (
+                <motion.li
+                  key={challenge.number}
+                  className="flex flex-col gap-6 p-6 rounded-3xl bg-card border border-line"
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.45, delay: i * 0.14, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <span className="text-[44px] font-bold leading-none tracking-[-0.02em]" style={{ color: accent }}>
+                    {challenge.number}
+                  </span>
+                  <p className="type-body-l font-medium text-ink">{challenge.question}</p>
+                </motion.li>
+              ))}
+            </ol>
+          )
+        )}
+      </motion.div>
+    </Reveal>
   );
 }
 
-// XCONS Key Findings Section - Design Solutions
-function XCONSKeyFindingsSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "project">) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+// ─── HR · Análisis Comparativo ──────────────────────────────────────────────
+
+function KeyFindingsSection({ project, n, fadeIn }: SectionProps & { project: ProjectInfo }) {
+  return (
+    <Reveal>
+      <SectionHeader number={n} title="Análisis Comparativo" fadeIn={fadeIn} />
+
+      {project.images?.benchmark && (
+        <motion.div variants={fadeIn} className="mb-12">
+          <BenchmarkTable />
+        </motion.div>
+      )}
+
+      <div className="grid md:grid-cols-2 gap-8 md:gap-12 pt-8 border-t border-line">
+        <motion.div variants={fadeIn}>
+          <h3 className="type-h4 text-ink mb-3">Necesidad del Usuario</h3>
+          <p className="type-body text-ink-muted">
+            {renderHighlightedText(project.keyFindings?.userNeed, [
+              "personalización de flujos",
+              "claridad visual",
+              "cantidad de funciones"
+            ])}
+          </p>
+        </motion.div>
+        <motion.div variants={fadeIn}>
+          <h3 className="type-h4 text-ink mb-3">Tendencia</h3>
+          <p className="type-body text-ink-muted">
+            {renderHighlightedText(project.keyFindings?.trend, [
+              "IA",
+              "digitalización",
+              "futuro",
+              "accesibilidad",
+              "presente necesario"
+            ])}
+          </p>
+        </motion.div>
+      </div>
+    </Reveal>
+  );
+}
+
+// ─── XCONS · Hallazgos Clave y Soluciones ───────────────────────────────────
+
+function XCONSKeyFindingsSection({ n, fadeIn }: SectionProps) {
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const designSolutions = [
     {
-      number: "03-01",
       title: "La Interfaz \"Presupuesto Primero\"",
       subtitle: "Diseñamos un sistema donde el Presupuesto es el rey.",
       features: [
@@ -704,10 +526,10 @@ function XCONSKeyFindingsSection({ fadeIn }: Omit<SectionProps, "staggerContaine
           description: "El cliente y el vendedor editan el mismo documento en tiempo real. Si el vendedor aplica un descuento manual, el sistema recalcula y elimina promociones automáticas para evitar conflictos."
         }
       ],
+      image: xconsImages.detail3,
       imageNote: "Tablero Kanban de presupuestos"
     },
     {
-      number: "03-02",
       title: "Panel de Gestión de Pedidos (OMS)",
       subtitle: "El diseño del detalle del pedido es la pieza central de la UI.",
       features: [
@@ -724,10 +546,10 @@ function XCONSKeyFindingsSection({ fadeIn }: Omit<SectionProps, "staggerContaine
           description: "Uso de barras de progreso y tarjetas separadas para que el usuario entienda el estado de su obra de un vistazo."
         }
       ],
+      image: xconsImages.detail322,
       imageNote: "Detalle del Pedido #2000005566"
     },
     {
-      number: "03-03",
       title: "Perfil de Usuario Unificado (CRM)",
       subtitle: "Diseñamos una \"Single Source of Truth\" para el usuario.",
       features: [
@@ -740,11 +562,11 @@ function XCONSKeyFindingsSection({ fadeIn }: Omit<SectionProps, "staggerContaine
           description: "Un historial visual de todas las interacciones (WhatsApp, cambios de estado, notas)."
         }
       ],
+      image: xconsImages.contacto,
       imageNote: "Historial del Contacto y embudo de ventas"
     }
   ];
 
-  // Animation config respecting reduced motion
   const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
   const getAnimationProps = (index: number) => {
     if (prefersReducedMotion) {
@@ -764,481 +586,104 @@ function XCONSKeyFindingsSection({ fadeIn }: Omit<SectionProps, "staggerContaine
   };
 
   return (
-    <section ref={ref} aria-labelledby="key-findings-heading" className="bg-white/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"}>
-          <SectionHeader number="03" title="Hallazgos Clave y Soluciones" fadeIn={fadeIn} />
+    <Reveal>
+      <SectionHeader number={n} title="Hallazgos Clave y Soluciones" fadeIn={fadeIn} />
 
-          {/* Design Solutions - Cards stacked with image on side */}
-          <div className="space-y-8 sm:space-y-12 md:space-y-16" role="list" aria-label="Soluciones de diseño">
-            {designSolutions.map((solution, solutionIndex) => {
-              const imageSrc = solutionIndex === 0
-                ? xconsImages.detail3
-                : solutionIndex === 1
-                  ? xconsImages.detail322
-                  : xconsImages.contacto;
+      <div className="space-y-12 md:space-y-20" role="list" aria-label="Soluciones de diseño">
+        {designSolutions.map((solution, solutionIndex) => (
+          <motion.article key={solution.title} role="listitem" {...getAnimationProps(solutionIndex)}>
+            <header className="flex items-center gap-3 mb-6">
+              <div className="h-px flex-1 bg-[rgb(201,188,63)]/30" aria-hidden="true" />
+            </header>
 
-              return (
-                <motion.article
-                  key={solution.number}
-                  role="listitem"
-                  {...getAnimationProps(solutionIndex)}
-                  className="scroll-mt-24"
-                >
-                  {/* Solution Header */}
-                  <header className="flex items-center gap-3 mb-5">
-                    <span
-                      className="text-xl font-extralight tracking-tight text-[rgb(201,188,63)] tabular-nums"
-                      aria-hidden="true"
-                    >
-                      {solution.number}
-                    </span>
-                    <div className="h-px flex-1 bg-[rgb(201,188,63)]/30" aria-hidden="true" />
-                  </header>
-
-                  {/* Side by side: Content left, Image right */}
-                  <div className="flex flex-col md:flex-row gap-6 sm:gap-8 items-start">
-                    {/* Left: Content */}
-                    <div className="flex-1 min-w-0">
-                      <h3
-                        className="text-lg sm:text-xl font-medium text-[#2D2D2D] mb-2"
-                        style={{ textWrap: "balance" } as React.CSSProperties}
-                      >
-                        {solution.title}
-                      </h3>
-                      <p className="text-sm sm:text-base text-[#5A5A5A] mb-4 sm:mb-6 leading-relaxed">
-                        {solution.subtitle}
-                      </p>
-
-                      {/* Features stacked - no cards, clean layout */}
-                      <div className="space-y-4 sm:space-y-5">
-                        {solution.features.map((feature) => (
-                          <div
-                            key={feature.name}
-                            className="border-l-2 border-[rgb(201,188,63)]/40 pl-3 sm:pl-4"
-                          >
-                            <h4 className="text-xs sm:text-sm font-semibold text-[rgb(161,148,23)] mb-1 uppercase tracking-wider">
-                              {feature.name}
-                            </h4>
-                            <p className="text-[#4A4A4A] text-xs sm:text-sm leading-relaxed">
-                              {feature.description}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Right: Image */}
-                    <figure className="w-full md:w-[500px] flex-shrink-0">
-                      <div className="rounded-xl overflow-hidden shadow-lg border border-[#E8E4DF]">
-                        <img
-                          src={imageSrc}
-                          alt=""
-                          width={500}
-                          height={350}
-                          loading="lazy"
-                          className="w-full h-auto"
-                        />
-                      </div>
-                      <figcaption className="mt-3 text-xs text-[#9A9A9A] text-center">
-                        {solution.imageNote}
-                      </figcaption>
-                    </figure>
-                  </div>
-                </motion.article>
-              );
-            })}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// XCONS Logic & Systems Section
-function XCONSLogicSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "project">) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  const pricingLayers = [
-    {
-      name: "Reglas del Seller",
-      description: "Precio base del proveedor",
-      icon: HomeIcon
-    },
-    {
-      name: "Contexto del Store",
-      description: "Ofertas geográficas y promociones de tienda",
-      icon: LocationIcon
-    },
-    {
-      name: "Perfil del Cliente",
-      description: "¿Es arquitecto? ¿Es empresa? Descuentos especiales",
-      icon: UserIcon
-    }
-  ];
-
-  return (
-    <section ref={ref} className="bg-white/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"}>
-          <SectionHeader number="04" title="Lógica y Sistemas" fadeIn={fadeIn} />
-
-          <motion.div variants={fadeIn} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-0">
-            {/* Section subtitle with diamond */}
-            <div className="flex-1">
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h3 className="text-xs sm:text-sm uppercase tracking-[0.15em] text-[#2D2D2D] font-medium">
-                  Arquitectura de Precios Dinámicos
+            <div className="flex flex-col md:flex-row gap-6 sm:gap-10 items-start">
+              <div className="flex-1 min-w-0">
+                <h3 className="type-h2 text-ink mb-3" style={{ textWrap: "balance" } as React.CSSProperties}>
+                  {solution.title}
                 </h3>
-              </div>
-              <p className="text-sm sm:text-base md:text-lg text-[#4A4A4A] mb-6 sm:mb-8 leading-relaxed max-w-3xl font-light">
-                Como diseñador, tuve que estructurar cómo se le presenta el precio al usuario.
-                <span className="hidden sm:inline"><br /></span> No es un número estático; es una variable que cambia según múltiples factores:
-              </p>
-            </div>
+                <p className="type-body text-ink-muted mb-6">{solution.subtitle}</p>
 
-            {/* Pricing Flow Visualization */}
-            <div className="w-full lg:w-fit lg:pl-8 mx-auto">
-              {/* Desktop layout */}
-              <div className="hidden md:flex items-start justify-center">
-                {/* Layer 1 */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col items-center text-center w-full sm:w-[140px]"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-[rgb(201,188,63)]/10 flex items-center justify-center border border-[rgb(201,188,63)]/30 text-[rgb(201,188,63)]">
-                    {pricingLayers[0].icon}
-                  </div>
-                  <div className="mt-3 sm:mt-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-[#2D2D2D] mb-1">{pricingLayers[0].name}</h4>
-                    <p className="text-xs text-[#6B6B6B]">{pricingLayers[0].description}</p>
-                  </div>
-                </motion.div>
-
-                {/* Arrow 1 - positioned at icon center (32px from top) */}
-                <motion.div
-                  className="flex items-start pt-[22px] justify-center w-8 text-[rgb(201,188,63)]"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.1, duration: 0.3 }}
-                  viewport={{ once: true }}
-                >
-                  {FlowArrowIcon}
-                </motion.div>
-
-                {/* Layer 2 */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.15, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col items-center text-center w-full sm:w-[140px]"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-[rgb(201,188,63)]/10 flex items-center justify-center border border-[rgb(201,188,63)]/30 text-[rgb(201,188,63)]">
-                    {pricingLayers[1].icon}
-                  </div>
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-[#2D2D2D] mb-1">{pricingLayers[1].name}</h4>
-                    <p className="text-xs text-[#6B6B6B]">{pricingLayers[1].description}</p>
-                  </div>
-                </motion.div>
-
-                {/* Arrow 2 - positioned at icon center (32px from top) */}
-                <motion.div
-                  className="flex items-start pt-[22px] justify-center w-8 text-[rgb(201,188,63)]"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.25, duration: 0.3 }}
-                  viewport={{ once: true }}
-                >
-                  {FlowArrowIcon}
-                </motion.div>
-
-                {/* Layer 3 */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col items-center text-center w-full sm:w-[140px]"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-[rgb(201,188,63)]/10 flex items-center justify-center border border-[rgb(201,188,63)]/30 text-[rgb(201,188,63)]">
-                    {pricingLayers[2].icon}
-                  </div>
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-[#2D2D2D] mb-1">{pricingLayers[2].name}</h4>
-                    <p className="text-xs text-[#6B6B6B]">{pricingLayers[2].description}</p>
-                  </div>
-                </motion.div>
-
-                {/* Arrow 3 - positioned at icon center (32px from top) */}
-                <motion.div
-                  className="flex items-start pt-[22px] justify-center w-8 text-[rgb(201,188,63)]"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.3 }}
-                  viewport={{ once: true }}
-                >
-                  {FlowArrowIcon}
-                </motion.div>
-
-                {/* Final Price */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col items-center text-center w-full sm:w-[140px]"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-[rgb(201,188,63)]/20 flex items-center justify-center border-2 border-[rgb(201,188,63)]/50 text-[rgb(201,188,63)]">
-                    {PriceIcon}
-                  </div>
-                  <div className="mt-3 sm:mt-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-[#2D2D2D] mb-1">Precio Final</h4>
-                    <p className="text-xs text-[#6B6B6B]">Calculado dinámicamente</p>
-                  </div>
-                </motion.div>
-              </div>
-
-              {/* Mobile layout */}
-              <div className="flex md:hidden flex-col items-center gap-4 sm:gap-6">
-                {pricingLayers.map((layer, index) => (
-                  <motion.div
-                    key={layer.name}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.15, duration: 0.5 }}
-                    viewport={{ once: true }}
-                    className="flex flex-col items-center text-center w-full sm:w-[140px]"
-                  >
-                    <div className="w-16 h-16 rounded-2xl bg-[rgb(201,188,63)]/10 flex items-center justify-center border border-[rgb(201,188,63)]/30 text-[rgb(201,188,63)]">
-                      {layer.icon}
+                <div className="space-y-5">
+                  {solution.features.map((feature) => (
+                    <div key={feature.name} className="border-l-2 border-[rgb(201,188,63)]/40 pl-4">
+                      <h4 className="type-overline uppercase text-[rgb(201,188,63)] mb-1.5">{feature.name}</h4>
+                      <p className="type-body-s text-ink-muted">{feature.description}</p>
                     </div>
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-[#2D2D2D] mb-1">{layer.name}</h4>
-                      <p className="text-xs text-[#6B6B6B]">{layer.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="flex flex-col items-center text-center w-full sm:w-[140px]"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-[rgb(201,188,63)]/20 flex items-center justify-center border-2 border-[rgb(201,188,63)]/50 text-[rgb(201,188,63)]">
-                    {PriceIcon}
-                  </div>
-                  <div className="mt-3 sm:mt-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-[#2D2D2D] mb-1">Precio Final</h4>
-                    <p className="text-xs text-[#6B6B6B]">Calculado dinámicamente</p>
-                  </div>
-                </motion.div>
+                  ))}
+                </div>
               </div>
+
+              <figure className="w-full md:w-[460px] flex-shrink-0">
+                <div className="rounded-xl overflow-hidden shadow-lg border border-line">
+                  <img
+                    src={solution.image}
+                    alt=""
+                    width={500}
+                    height={350}
+                    loading="lazy"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <figcaption className="mt-3 type-caption text-ink-subtle text-center">
+                  {solution.imageNote}
+                </figcaption>
+              </figure>
             </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function UserPersonasSection({ project, fadeIn }: Omit<SectionProps, "staggerContainer">) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  return (
-    <section ref={ref} className="bg-[rgb(228,219,205)]/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"}>
-          <SectionHeader number="04" title="Personas de Usuario" fadeIn={fadeIn} />
-
-          {project.images?.personas && (
-            <motion.div variants={fadeIn}>
-              <UserPersonas />
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// Screens Carousel Component
-interface Screen {
-  url: string;
-  title: string;
-}
-
-const CarouselArrowLeft = (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M15 18l-6-6 6-6" />
-  </svg>
-);
-
-const CarouselArrowRight = (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 18l6-6-6-6" />
-  </svg>
-);
-
-function ScreensCarousel({ screens }: { screens: Screen[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const totalScreens = screens.length;
-
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % totalScreens);
-  }, [totalScreens]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + totalScreens) % totalScreens);
-  }, [totalScreens]);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-    setIsAutoPlaying(false);
-  };
-
-  // Auto-play
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    const interval = setInterval(nextSlide, 4000);
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, nextSlide]);
-
-  return (
-    <div
-      className="relative max-w-4xl mx-auto"
-      onMouseEnter={() => setIsAutoPlaying(false)}
-      onMouseLeave={() => setIsAutoPlaying(true)}
-    >
-      {/* Main carousel container */}
-      <div className="relative overflow-hidden rounded-xl">
-        {/* Slides */}
-        <div className="relative aspect-[16/9]">
-          {screens.map((screen, index) => (
-            <motion.div
-              key={index}
-              className="absolute inset-0"
-              initial={false}
-              animate={{
-                opacity: index === currentIndex ? 1 : 0,
-                scale: index === currentIndex ? 1 : 0.95,
-                zIndex: index === currentIndex ? 1 : 0,
-              }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <img
-                src={screen.url}
-                alt={screen.title}
-                className="w-full h-full object-contain p-2"
-                loading={index === 0 ? "eager" : "lazy"}
-              />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Navigation arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] hover:text-[#2D2D2D] hover:border-[rgb(201,188,63)] hover:bg-white transition-all duration-200 shadow-sm z-10"
-          aria-label="Anterior"
-        >
-          {CarouselArrowLeft}
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-[#E0DBD6] flex items-center justify-center text-[#6B6B6B] hover:text-[#2D2D2D] hover:border-[rgb(201,188,63)] hover:bg-white transition-all duration-200 shadow-sm z-10"
-          aria-label="Siguiente"
-        >
-          {CarouselArrowRight}
-        </button>
-
-        {/* Current slide info */}
-        <div className="absolute bottom-3 left-3 z-10">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/90 rounded-md border border-[#E0DBD6] shadow-sm">
-            <span className="text-xs font-medium text-[rgb(201,188,63)]">
-              {String(currentIndex + 1).padStart(2, "0")}
-            </span>
-            <span className="text-xs text-[#9A9A9A]">/</span>
-            <span className="text-xs text-[#9A9A9A]">
-              {String(totalScreens).padStart(2, "0")}
-            </span>
-            <span className="text-xs text-[#2D2D2D] ml-1 font-medium">
-              {screens[currentIndex].title}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Dots navigation */}
-      <div className="flex items-center justify-center gap-1.5 mt-3">
-        {screens.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`transition-all duration-300 ${
-              index === currentIndex
-                ? "w-5 h-1.5 bg-[rgb(201,188,63)] rounded-full"
-                : "w-1.5 h-1.5 bg-[#E0DBD6] rounded-full hover:bg-[rgb(201,188,63)]/50"
-            }`}
-            aria-label={`Ir a pantalla ${index + 1}`}
-          />
+          </motion.article>
         ))}
       </div>
-
-      {/* Thumbnails strip - centered */}
-      <div className="flex gap-2 mt-4 justify-center">
-        {screens.map((screen, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`flex-shrink-0 w-16 h-10 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-              index === currentIndex
-                ? "border-[rgb(201,188,63)] shadow-md"
-                : "border-transparent opacity-50 hover:opacity-100"
-            }`}
-          >
-            <img
-              src={screen.url}
-              alt={screen.title}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </button>
-        ))}
-      </div>
-    </div>
+    </Reveal>
   );
 }
 
-function SolutionSection({ project, fadeIn, staggerContainer }: SectionProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+// ─── XCONS · Lógica y Sistemas ──────────────────────────────────────────────
 
+function XCONSLogicSection({ n, fadeIn }: SectionProps) {
   return (
-    <section ref={ref} className="py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number="05" title="Solución y Diseño" fadeIn={fadeIn} />
+    <Reveal>
+      <SectionHeader number={n} title="Lógica y Sistemas" fadeIn={fadeIn} />
 
-          {/* Approach */}
-          <motion.div variants={fadeIn} className="mb-10">
-            <h3 className="text-xs uppercase tracking-[0.1em] text-[rgb(201,188,63)] mb-3 font-medium">
-              Enfoque de Diseño
-            </h3>
-            <p className="text-base text-[#6B6B6B] leading-relaxed">
+      <motion.div variants={fadeIn} className="flex flex-col gap-10">
+        <div>
+          <h3 className="type-subtitle text-ink mb-4">Arquitectura de Precios Dinámicos</h3>
+          <p className="type-body-l text-ink-muted max-w-3xl">
+            Como diseñador, tuve que estructurar cómo se le presenta el precio al usuario.
+            <span className="hidden sm:inline"><br /></span> No es un número estático; es una variable que cambia según múltiples factores:
+          </p>
+        </div>
+
+        <PricingFlowSketches />
+      </motion.div>
+    </Reveal>
+  );
+}
+
+// ─── HR · Personas de Usuario ───────────────────────────────────────────────
+
+function UserPersonasSection({ project, n, fadeIn }: SectionProps & { project: ProjectInfo }) {
+  return (
+    <Reveal>
+      <SectionHeader number={n} title="Usuarios" fadeIn={fadeIn} />
+      {project.images?.personas && (
+        <motion.div variants={fadeIn}>
+          <UserPersonas />
+        </motion.div>
+      )}
+    </Reveal>
+  );
+}
+
+// ─── HR · Solución y Diseño (horizontal) ────────────────────────────────────
+
+function SolutionSection({ project, n, label }: { project: ProjectInfo; n: string; label: string }) {
+  const panels = [
+    {
+      key: "approach",
+      content: (
+        <div className="space-y-12 md:pt-6">
+          <div>
+            <h3 className="type-subtitle text-ink mb-4">Enfoque de Diseño</h3>
+            <p className="type-body-l text-ink-muted">
               {renderHighlightedText(project.solution?.approach, [
                 "claridad",
                 "jerarquías visuales claras",
@@ -1246,83 +691,149 @@ function SolutionSection({ project, fadeIn, staggerContainer }: SectionProps) {
                 "lenguaje sencillo"
               ])}
             </p>
-          </motion.div>
-
-          {/* MVP Features */}
-          <motion.div variants={fadeIn} className="mb-10">
-            <h3 className="text-xs uppercase tracking-[0.1em] text-[rgb(201,188,63)] mb-3 font-medium">
-              Funcionalidades MVP
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {project.solution?.mvpFeatures?.map((feature) => (
-                <span
-                  key={feature}
-                  className="px-4 py-2 bg-white rounded-full text-[#2D2D2D] border border-[#E0DBD6] text-sm"
-                >
-                  {feature}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Wireframes */}
+          </div>
+          <div>
+            <h3 className="type-subtitle text-ink mb-5">Funcionalidades MVP</h3>
+            <MvpFeatureCards features={project.solution?.mvpFeatures ?? []} />
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "wireframes",
+      content: (
+        <div className="space-y-14">
           {project.images?.wireframes && (
-            <motion.div variants={fadeIn} className="mb-10">
-              <h3 className="text-xs uppercase tracking-[0.1em] text-[rgb(201,188,63)] mb-3 font-medium">
-                Wireframes
-              </h3>
-              <div className="rounded-xl overflow-hidden">
-                <img
-                  src={project.images.wireframes}
-                  alt="Bocetos"
-                  width={1200}
-                  height={800}
-                  loading="lazy"
-                  className="w-full"
-                />
+            <div>
+              <h3 className="type-subtitle text-ink mb-6">Wireframes en baja fidelidad</h3>
+              <div className="max-w-3xl mx-auto md:px-6">
+                <HandDrawnWireframes />
               </div>
-            </motion.div>
+            </div>
           )}
-
-          {/* UI Kit */}
           {project.images?.uiKit && (
-            <motion.div variants={fadeIn} className="mb-10">
-              <h3 className="text-xs uppercase tracking-[0.1em] text-[rgb(201,188,63)] mb-3 font-medium">
-                Sistema de Diseño
-              </h3>
-              <div className="rounded-xl overflow-hidden">
-                <img
-                  src={project.images.uiKit}
-                  alt="Sistema de Diseño"
-                  width={1200}
-                  height={800}
-                  loading="lazy"
-                  className="w-full"
-                />
-              </div>
-            </motion.div>
+            <div>
+              <h3 className="type-subtitle text-ink mb-3">Sistema de Diseño</h3>
+              {project.solution?.designSystem && (
+                <p className="type-body text-ink-muted mb-6">{project.solution.designSystem}</p>
+              )}
+              <motion.img
+                src={project.images.uiKit}
+                alt="Sistema de diseño de HacheR: tipografía, colores, botones, íconos y componentes"
+                width={1819}
+                height={1321}
+                loading="lazy"
+                className="w-full h-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </div>
           )}
+        </div>
+      ),
+    },
+    {
+      key: "screens",
+      content: (
+        <div className="space-y-12 md:space-y-16">
+          {project.images?.screens?.map((screen) => (
+            <motion.figure
+              key={screen.url}
+              className="w-fit max-w-full mx-auto"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <figcaption className="type-h4 text-ink mb-4">{screen.title}</figcaption>
+              {/* Capped to the panel height so each screen is seen whole */}
+              <img
+                src={screen.url}
+                alt={screen.title}
+                loading="lazy"
+                className="block w-auto max-w-full h-auto max-h-[58vh] [filter:drop-shadow(0_10px_24px_rgba(0,0,0,0.10))]"
+              />
+            </motion.figure>
+          ))}
+        </div>
+      ),
+    },
+  ];
 
-          {/* Final Screens - Carousel */}
-          {project.images?.screens && project.images.screens.length > 0 && (
-            <motion.div variants={fadeIn} >
-              <h3 className="text-xs uppercase tracking-[0.1em] text-[rgb(201,188,63)] mb-4 font-medium text-center w-full">
-                Pantallas Finales
-              </h3>
-              <ScreensCarousel screens={project.images.screens} />
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
-    </section>
+  return (
+    <HorizontalPanels
+      mobileLabel={label}
+      header={<SectionHeaderCompact number={n} title="Solución y Diseño" />}
+      panels={panels}
+    />
   );
 }
 
-function ResultsSection({ project, fadeIn, staggerContainer, isXCONS }: SectionProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+/** Header variant for the pinned horizontal section (less vertical space). */
+function SectionHeaderCompact({ title }: { number: string; title: string }) {
+  return (
+    <div>
+      <h2 className="type-h1 text-ink">{title}</h2>
+    </div>
+  );
+}
 
-  // XCONS specific highlights for next steps
+// ─── Resultados y Próximos Pasos ────────────────────────────────────────────
+
+function NumberedList({ items }: { items: string[] }) {
+  return (
+    <ul className="border-t border-line">
+      {items.map((item, index) => (
+        <li key={index} className="py-4 border-b border-line">
+          <span className="type-body text-ink">{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Arrow that draws itself from question to decision when scrolled into view. */
+function DecisionArrow({ delay = 0 }: { delay?: number }) {
+  const draw = {
+    hidden: { pathLength: 0, opacity: 0 },
+    visible: { pathLength: 1, opacity: 1 },
+  };
+  return (
+    <motion.svg
+      viewBox="0 0 64 24"
+      fill="none"
+      className="w-10 md:w-16 h-auto text-[rgb(201,188,63)] rotate-90 md:rotate-0 flex-shrink-0"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-40px" }}
+      aria-hidden="true"
+    >
+      <motion.path
+        d="M2 12h58"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        variants={draw}
+        transition={{ duration: 0.5, delay: delay + 0.15, ease: [0.65, 0, 0.35, 1] }}
+      />
+      <motion.path
+        d="M50 4l10 8-10 8"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        variants={draw}
+        transition={{ duration: 0.25, delay: delay + 0.6, ease: "easeOut" }}
+      />
+    </motion.svg>
+  );
+}
+
+function ResultsSection({
+  project, n, fadeIn, staggerContainer, isXCONS, isHR,
+}: SectionProps & { project: ProjectInfo; isXCONS: boolean; isHR: boolean }) {
   const xconsHighlights = [
     "modelo mental de la construcción",
     "Presupuesto > Carrito",
@@ -1339,150 +850,96 @@ function ResultsSection({ project, fadeIn, staggerContainer, isXCONS }: SectionP
     "usuarios realmente quieran usar"
   ];
 
-  return (
-    <section ref={ref} className="bg-white/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number={isXCONS ? "05" : "06"} title={isXCONS ? "Resumen" : "Resultados y Próximos Pasos"} fadeIn={fadeIn} />
-
-          {/* Two column layout for Validation Plan and Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-            {/* Validation Plan */}
-            <motion.div variants={fadeIn}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h3 className="text-sm uppercase tracking-[0.15em] text-[#2D2D2D] font-medium">
-                  Plan de Validación
-                </h3>
-              </div>
-              <ul className="space-y-4">
-                {project.results?.validationPlan?.map((item, index) => (
-                  <li
-                    key={index}
-                    className="flex items-baseline gap-4 group"
-                  >
-                    <span className="text-2xl font-extralight text-[rgb(201,188,63)] tabular-nums">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-[#4A4A4A] leading-relaxed border-b border-transparent group-hover:border-[rgb(201,188,63)]/30 transition-colors pb-1">
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-
-            {/* Metrics */}
-            <motion.div variants={fadeIn}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h3 className="text-sm uppercase tracking-[0.15em] text-[#2D2D2D] font-medium">
-                  Métricas a Evaluar
-                </h3>
-              </div>
-              <ul className="space-y-4">
-                {project.results?.metrics?.map((metric, index) => (
-                  <li
-                    key={index}
-                    className="flex items-baseline gap-4 group"
-                  >
-                    <span className="text-2xl font-extralight text-[rgb(201,188,63)] tabular-nums">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-[#4A4A4A] leading-relaxed border-b border-transparent group-hover:border-[rgb(201,188,63)]/30 transition-colors pb-1">
-                      {metric}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          </div>
-
-          {/* Next Steps - elegant quote style */}
-          {project.results?.nextSteps && (
-            <motion.div
-              variants={fadeIn}
-              className="mt-12 pt-8 border-t border-[#E8E4DF] py-4"
-            >
-              <p className="text-lg md:text-xl text-[#5A5A5A] leading-relaxed text-center max-w-3xl mx-auto font-light">
-                "{renderHighlightedText(project.results.nextSteps, isXCONS ? xconsHighlights : hrHighlights)}"
-              </p>
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-interface NextProjectSectionProps {
-  nextProject: ReturnType<typeof getProjectById>;
-  nextProjectId: string;
-  fadeIn: Variants;
-}
-
-function NextProjectSection({ nextProject, nextProjectId, fadeIn }: NextProjectSectionProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const decisions = isHR ? project.results?.challengeDecisions : undefined;
+  const tasks = isHR ? project.results?.testTasks : undefined;
 
   return (
-    <section ref={ref} className="py-12 sm:py-16 md:py-20 lg:py-24 border-t border-[#E8E4DF] bg-[#F5F0EB]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"}>
-          {/* Title */}
-          <motion.h3
-            variants={fadeIn}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-[#2D2D2D] text-center mb-6 sm:mb-8 md:mb-10"
-          >
-            Siguiente proyecto
-          </motion.h3>
+    <Reveal stagger={staggerContainer}>
+      <SectionHeader number={n} title={isXCONS ? "Resumen" : "Resultados y Próximos Pasos"} fadeIn={fadeIn} />
 
-          {/* Project Link - Horizontal layout */}
-          <motion.div variants={fadeIn}>
-            <Link
-              to={`/project/${nextProjectId}`}
-              className="group flex flex-col md:flex-row items-center gap-4 sm:gap-6 md:gap-10 p-4 sm:p-6 rounded-2xl bg-white/90 border border-[#E8E4DF] hover:shadow-lg transition-all duration-300"
-            >
-              {/* Thumbnail */}
-              <div className="w-full sm:w-32 h-40 sm:h-20 md:w-40 md:h-24 rounded-xl overflow-hidden flex-shrink-0">
-                <img
-                  src={nextProject?.homeImage || nextProject?.image}
-                  alt=""
-                  width={160}
-                  height={96}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 w-full text-center md:text-left">
-                <p className="text-xs uppercase tracking-[0.15em] font-medium mb-1 sm:mb-2 text-[rgb(201,188,63)]">
-                  {nextProject?.company}
-                </p>
-                <h4 className="text-lg sm:text-xl md:text-2xl font-medium text-[#2D2D2D] transition-colors duration-300">
-                  {nextProject?.title}
-                </h4>
-                {nextProject?.year && (
-                  <p className="text-xs sm:text-sm text-[#9A9A9A] mt-1">{nextProject.year}</p>
-                )}
-              </div>
-
-              {/* Arrow */}
-              <motion.div
-                className="w-12 h-12 rounded-full border-2 border-[rgb(201,188,63)] text-[rgb(201,188,63)] flex items-center justify-center transition-all duration-300 flex-shrink-0 group-hover:bg-[rgb(201,188,63)] group-hover:text-white"
+      {/* Del desafío a la decisión */}
+      {decisions && decisions.length > 0 && (
+        <motion.div variants={fadeIn} className="mb-16 md:mb-20">
+          <h3 className="type-subtitle text-ink mb-2">Del desafío a la decisión</h3>
+          <p className="type-body text-ink-muted mb-8 max-w-2xl">
+            Cada pregunta del inicio tuvo una respuesta concreta en el diseño.
+          </p>
+          <ol className="border-t border-line">
+            {decisions.map((d, i) => (
+              <motion.li
+                key={d.question}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className="grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_auto_minmax(0,7fr)] gap-3 md:gap-8 py-6 border-b border-line md:items-start"
               >
-                {NextArrowIcon}
-              </motion.div>
-            </Link>
-          </motion.div>
+                <p className="type-h3 text-ink">{d.question}</p>
+                <div className="md:pt-1">
+                  <DecisionArrow delay={i * 0.08} />
+                </div>
+                <p className="type-body text-ink-muted">{d.decision}</p>
+              </motion.li>
+            ))}
+          </ol>
+        </motion.div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+        <motion.div variants={fadeIn}>
+          <h3 className="type-h4 text-ink mb-4">Plan de Validación</h3>
+          <NumberedList items={project.results?.validationPlan ?? []} />
+        </motion.div>
+        <motion.div variants={fadeIn}>
+          <h3 className="type-h4 text-ink mb-4">Métricas a Evaluar</h3>
+          <NumberedList items={project.results?.metrics ?? []} />
         </motion.div>
       </div>
-    </section>
+
+      {/* Tareas a testear y criterios de éxito */}
+      {tasks && tasks.length > 0 && (
+        <motion.div variants={fadeIn} className="mt-16 md:mt-20">
+          <h3 className="type-subtitle text-ink mb-2">Tareas a testear y criterios de éxito</h3>
+          <p className="type-body text-ink-muted mb-8 max-w-2xl">
+            Lo que se le pedirá a cada participante, cómo se mide y cuándo la consideramos superada.
+          </p>
+
+          <div className="hidden md:grid grid-cols-[minmax(0,4fr)_minmax(0,3fr)_minmax(0,3fr)] gap-6 pb-3 border-b border-line">
+            <span className="type-overline uppercase text-ink-muted">Tarea</span>
+            <span className="type-overline uppercase text-ink-muted">Métrica</span>
+            <span className="type-overline uppercase text-ink-muted">Criterio de éxito</span>
+          </div>
+          <ul>
+            {tasks.map((t, i) => (
+              <motion.li
+                key={t.task}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className="grid grid-cols-1 md:grid-cols-[minmax(0,4fr)_minmax(0,3fr)_minmax(0,3fr)] gap-2 md:gap-6 py-5 border-b border-line"
+              >
+                <span className="type-h4 text-ink">{t.task}</span>
+                <p className="type-body text-ink-muted">
+                  <span className="md:hidden text-ink-subtle">Métrica: </span>{t.metric}
+                </p>
+                <p className="type-body text-ink">
+                  <span className="md:hidden text-ink-subtle">Criterio: </span>{t.criterion}
+                </p>
+              </motion.li>
+            ))}
+          </ul>
+        </motion.div>
+      )}
+
+      {project.results?.nextSteps && (
+        <motion.div variants={fadeIn} className={`mt-16 pt-10 ${tasks?.length ? "" : "border-t border-line"}`}>
+          <p className="type-body-l text-ink-muted text-center max-w-3xl mx-auto">
+            "{renderHighlightedText(project.results.nextSteps, isXCONS ? xconsHighlights : hrHighlights)}"
+          </p>
+        </motion.div>
+      )}
+    </Reveal>
   );
 }
 
@@ -1490,386 +947,273 @@ function NextProjectSection({ nextProject, nextProjectId, fadeIn }: NextProjectS
 // JODIFY SPECIFIC SECTIONS
 // ============================================
 
-function JodifyBenchmarkSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "project">) {
-  const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
-
+function JodifyBenchmarkSection({ n, fadeIn }: SectionProps) {
   return (
-    <section ref={sectionRef} className="py-8 bg-[#F2F1EF]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={fadeIn}
-        >
-          {/* Section Header */}
-          <div className="mb-5">
-            <div className="flex items-center gap-4 mb-2">
-              <span className="text-3xl sm:text-4xl md:text-5xl font-extralight tracking-tight text-[#7C16F5]">
-                03
-              </span>
-              <div className="h-px w-8 bg-[#7C16F5]/40" aria-hidden="true" />
-            </div>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[#0C0C0C]">
-              Análisis Comparativo
-            </h2>
-          </div>
-
-          {/* Benchmark Table Component */}
-          <motion.div variants={fadeIn}>
-            <JodifyBenchmarkTable />
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
+    <Reveal>
+      <SectionHeader number={n} title="Análisis Comparativo" fadeIn={fadeIn} accentColor={JODIFY} />
+      <motion.div variants={fadeIn}>
+        <JodifyBenchmarkTable />
+      </motion.div>
+    </Reveal>
   );
 }
 
-function JodifyPersonaSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "project">) {
+const PinIcon = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={JODIFY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const DeviceIcon = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={JODIFY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+  </svg>
+);
+
+function JodifyPersonaSection({ n, fadeIn }: SectionProps) {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
-  const empathyMap = {
-    piensaSiente: [
-      "Le encanta descubrir nuevos eventos y artistas en la escena de la música electrónica.",
-      "Desea vivir experiencias únicas y vibrantes en cada evento.",
-    ],
-    frustra: [
-      "No encontrar los eventos de música electrónica que se ajusten a sus preferencias.",
-      "Preocupación por costos ocultos y falta de transparencia en el proceso de compra.",
-    ],
-    motiva: [
-      "Descubrir eventos emocionantes y participar en experiencias únicas.",
-      "Recibir recomendaciones personalizadas que reflejen sus gustos musicales.",
-      "Conectar con una comunidad que comparte su pasión por la música electrónica.",
-    ],
-    diceHace: [
-      "Comparte activamente eventos en sus redes sociales.",
-      "Compra entradas, buscando plataformas que ofrezcan una gran cantidad de eventos.",
-    ],
-  };
+  const traits = [
+    { title: "Intereses", accent: true, text: "Creativa, con un enfoque moderno y contemporáneo. Le gusta la estética minimalista y busca plataformas que resalten la innovación." },
+    { title: "Necesidades", accent: true, text: "Amplia oferta de eventos, desde festivales masivos hasta fiestas underground. Recomendaciones personalizadas basadas en preferencias." },
+    { title: "Frustraciones", accent: false, text: "No encontrar eventos de su interés. Preocupación por costos ocultos o falta de claridad en el proceso de compra." },
+  ];
+
+  const empathyMap = [
+    {
+      title: "¿Qué piensa y siente?",
+      icon: <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />,
+      items: [
+        "Le encanta descubrir nuevos eventos y artistas en la escena de la música electrónica.",
+        "Desea vivir experiencias únicas y vibrantes en cada evento.",
+      ],
+    },
+    {
+      title: "¿Qué la frustra?",
+      icon: <><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></>,
+      items: [
+        "No encontrar los eventos de música electrónica que se ajusten a sus preferencias.",
+        "Preocupación por costos ocultos y falta de transparencia en el proceso de compra.",
+      ],
+    },
+    {
+      title: "¿Qué la motiva?",
+      icon: <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />,
+      items: [
+        "Descubrir eventos emocionantes y participar en experiencias únicas.",
+        "Recibir recomendaciones personalizadas que reflejen sus gustos musicales.",
+        "Conectar con una comunidad que comparte su pasión por la música electrónica.",
+      ],
+    },
+    {
+      title: "¿Qué dice y hace?",
+      icon: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
+      items: [
+        "Comparte activamente eventos en sus redes sociales.",
+        "Compra entradas, buscando plataformas que ofrezcan una gran cantidad de eventos.",
+      ],
+    },
+  ];
+
+  const bio = "Enérgica amante de la música electrónica, Martina disfruta de eventos como festivales de techno y fiestas underground. Busca experiencias vibrantes y vanguardistas en la escena de música electrónica local e internacional.";
+
+  const traitClass = (accent: boolean) =>
+    accent ? "bg-[#7C16F5]/5 border-[#7C16F5]/15" : "bg-ink/5 border-line";
 
   return (
-    <section ref={sectionRef} className="py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+    <div ref={sectionRef}>
+      <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"} variants={fadeIn}>
+        <SectionHeader number={n} title="Usuarios" accentColor={JODIFY} />
+
+        {/* User Persona Card - Mobile */}
         <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={fadeIn}
+          className="md:hidden bg-card rounded-2xl border border-line overflow-hidden mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.1 }}
         >
-          {/* Section Header */}
-          <div className="mb-5">
-            <div className="flex items-center gap-4 mb-2">
-              <span className="text-3xl sm:text-4xl md:text-5xl font-extralight tracking-tight text-[#7C16F5]">
-                04
-              </span>
-              <div className="h-px w-8 bg-[#7C16F5]/40" aria-hidden="true" />
+          <div className="bg-gradient-to-b from-[#7C16F5]/15 to-[#7C16F5]/5 p-6 flex flex-col items-center text-center">
+            <div className="relative mb-4">
+              <img
+                src={jodifyImages.persona}
+                alt="Martina Rodríguez"
+                className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg"
+                loading="lazy"
+              />
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-[#7C16F5] text-white type-caption rounded-full whitespace-nowrap">
+                28 años
+              </div>
             </div>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[#0C0C0C]">
-              Conociendo a Nuestra Usuaria
-            </h2>
+            <h3 className="type-h3 text-ink">Martina Rodríguez</h3>
+            <p className="type-body-s text-[#7C16F5]">Diseñadora Gráfica</p>
           </div>
 
-          {/* User Persona Card - Mobile */}
-          <motion.div
-            className="md:hidden bg-white rounded-2xl border border-[#1B1C20]/10 overflow-hidden mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            {/* Photo Header */}
-            <div className="bg-gradient-to-b from-[#7C16F5]/15 to-[#7C16F5]/5 p-6 flex flex-col items-center text-center">
-              <div className="relative mb-4">
+          <div className="px-5 py-4 border-b border-line flex flex-wrap justify-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink/5 rounded-full">
+              {PinIcon}
+              <span className="type-caption text-ink">La Plata, Argentina</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink/5 rounded-full">
+              {DeviceIcon}
+              <span className="type-caption text-ink">iPhone, Macbook</span>
+            </div>
+          </div>
+
+          <div className="px-5 py-4">
+            <p className="type-body-s text-ink-muted text-center">{bio}</p>
+          </div>
+
+          <div className="px-5 pb-5 space-y-3">
+            {traits.map((t) => (
+              <div key={t.title} className={`p-4 rounded-xl border ${traitClass(t.accent)}`}>
+                <h4 className={`type-overline uppercase mb-2 flex items-center gap-2 ${t.accent ? "text-[#7C16F5]" : "text-ink"}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${t.accent ? "bg-[#7C16F5]" : "bg-ink"}`} />
+                  {t.title}
+                </h4>
+                <p className="type-body-s text-ink-muted">{t.text}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* User Persona Card - Desktop */}
+        <motion.div
+          className="hidden md:block bg-card rounded-2xl border border-line overflow-hidden mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <div className="grid md:grid-cols-3 gap-0">
+            <div className="md:col-span-1 bg-[#7C16F5]/10 p-8 flex items-center justify-center">
+              <div className="relative">
                 <img
                   src={jodifyImages.persona}
                   alt="Martina Rodríguez"
-                  className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg"
+                  className="w-40 h-40 lg:w-48 lg:h-48 rounded-full object-cover border-4 border-white shadow-lg"
                   loading="lazy"
                 />
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-[#7C16F5] text-white text-xs font-medium rounded-full whitespace-nowrap">
+                <div className="absolute -bottom-2 -right-2 px-3 py-1.5 bg-[#7C16F5] text-white type-caption rounded-full">
                   28 años
                 </div>
               </div>
-              <h3 className="text-lg font-medium text-[#0C0C0C]">Martina Rodríguez</h3>
-              <p className="text-sm text-[#7C16F5] font-medium">Diseñadora Gráfica</p>
             </div>
 
-            {/* Quick Info Pills */}
-            <div className="px-5 py-4 border-b border-[#1B1C20]/5 flex flex-wrap justify-center gap-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F1EF] rounded-full">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                <span className="text-xs text-[#1B1C20]">La Plata, Argentina</span>
+            <div className="md:col-span-2 p-8">
+              <h3 className="type-h2 text-ink mb-1">Martina Rodríguez</h3>
+              <p className="type-body-s text-[#7C16F5] mb-5">Diseñadora Gráfica</p>
+
+              <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">{PinIcon}</div>
+                  <span className="type-body-s text-ink">La Plata, Argentina</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">{DeviceIcon}</div>
+                  <span className="type-body-s text-ink">iPhone, Macbook</span>
+                </div>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F1EF] rounded-full">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                  <line x1="8" y1="21" x2="16" y2="21" />
-                  <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-                <span className="text-xs text-[#1B1C20]">iPhone, Macbook</span>
+
+              <p className="type-body text-ink-muted mb-6">{bio}</p>
+
+              <div className="grid sm:grid-cols-3 gap-4">
+                {traits.map((t) => (
+                  <div key={t.title} className={`p-4 rounded-xl border ${traitClass(t.accent)}`}>
+                    <h4 className={`type-overline uppercase mb-2 ${t.accent ? "text-[#7C16F5]" : "text-ink"}`}>{t.title}</h4>
+                    <p className="type-body-s text-ink-muted">{t.text}</p>
+                  </div>
+                ))}
               </div>
             </div>
-
-            {/* Bio */}
-            <div className="px-5 py-4">
-              <p className="text-sm text-[#1B1C20] leading-relaxed text-center">
-                Enérgica amante de la música electrónica, Martina disfruta de eventos como festivales de techno y fiestas underground. Busca experiencias vibrantes y vanguardistas en la escena de música electrónica local e internacional.
-              </p>
-            </div>
-
-            {/* Interests, Needs, Frustrations - Stacked */}
-            <div className="px-5 pb-5 space-y-3">
-              <div className="p-4 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
-                <h4 className="text-xs font-semibold text-[#7C16F5] uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5]" />
-                  Intereses
-                </h4>
-                <p className="text-xs text-[#1B1C20] leading-relaxed">Creativa, con un enfoque moderno y contemporáneo. Le gusta la estética minimalista y busca plataformas que resalten la innovación.</p>
-              </div>
-              <div className="p-4 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
-                <h4 className="text-xs font-semibold text-[#7C16F5] uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5]" />
-                  Necesidades
-                </h4>
-                <p className="text-xs text-[#1B1C20] leading-relaxed">Amplia oferta de eventos, desde festivales masivos hasta fiestas underground. Recomendaciones personalizadas basadas en preferencias.</p>
-              </div>
-              <div className="p-4 bg-[#1B1C20]/5 rounded-xl border border-[#1B1C20]/10">
-                <h4 className="text-xs font-semibold text-[#1B1C20] uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1B1C20]" />
-                  Frustraciones
-                </h4>
-                <p className="text-xs text-[#1B1C20] leading-relaxed">No encontrar eventos de su interés. Preocupación por costos ocultos o falta de claridad en el proceso de compra.</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* User Persona Card - Desktop */}
-          <motion.div
-            className="hidden md:block bg-white rounded-2xl border border-[#1B1C20]/10 overflow-hidden mb-10 sm:mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <div className="grid md:grid-cols-3 gap-0">
-              {/* Photo */}
-              <div className="md:col-span-1 bg-[#7C16F5]/10 p-6 sm:p-8 flex items-center justify-center">
-                <div className="relative">
-                  <img
-                    src={jodifyImages.persona}
-                    alt="Martina Rodríguez"
-                    className="w-40 h-40 sm:w-48 sm:h-48 rounded-full object-cover border-4 border-white shadow-lg"
-                    loading="lazy"
-                  />
-                  <div className="absolute -bottom-2 -right-2 px-3 py-1.5 bg-[#7C16F5] text-white text-xs font-medium rounded-full">
-                    28 años
-                  </div>
-                </div>
-              </div>
-
-              {/* Info */}
-              <div className="md:col-span-2 p-6 sm:p-8">
-                <h3 className="text-xl sm:text-2xl font-medium text-[#0C0C0C] mb-1">Martina Rodríguez</h3>
-                <p className="text-sm text-[#7C16F5] font-medium mb-4">Diseñadora Gráfica</p>
-
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-[#1B1C20]">La Plata, Argentina</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                        <line x1="8" y1="21" x2="16" y2="21" />
-                        <line x1="12" y1="17" x2="12" y2="21" />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-[#1B1C20]">iPhone, Macbook</span>
-                  </div>
-                </div>
-
-                <p className="text-sm text-[#1B1C20] leading-relaxed mb-6">
-                  Enérgica amante de la música electrónica, Martina disfruta de eventos como festivales de techno y fiestas underground. Busca experiencias vibrantes y vanguardistas en la escena de música electrónica local e internacional.
-                </p>
-
-                {/* Interests, Needs, Frustrations */}
-                <div className="grid sm:grid-cols-3 gap-4">
-                  <div className="p-3 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
-                    <h4 className="text-xs font-medium text-[#7C16F5] uppercase tracking-wider mb-2">Intereses</h4>
-                    <p className="text-xs text-[#1B1C20]">Creativa, con un enfoque moderno y contemporáneo. Le gusta la estética minimalista y busca plataformas que resalten la innovación.</p>
-                  </div>
-                  <div className="p-3 bg-[#7C16F5]/5 rounded-xl border border-[#7C16F5]/10">
-                    <h4 className="text-xs font-medium text-[#7C16F5] uppercase tracking-wider mb-2">Necesidades</h4>
-                    <p className="text-xs text-[#1B1C20]">Amplia oferta de eventos, desde festivales masivos hasta fiestas underground. Recomendaciones personalizadas basadas en preferencias.</p>
-                  </div>
-                  <div className="p-3 bg-[#1B1C20]/5 rounded-xl border border-[#1B1C20]/10">
-                    <h4 className="text-xs font-medium text-[#1B1C20] uppercase tracking-wider mb-2">Frustraciones</h4>
-                    <p className="text-xs text-[#1B1C20]">No encontrar eventos de su interés. Preocupación por costos ocultos o falta de claridad en el proceso de compra.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Empathy Map */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <h3 className="text-lg sm:text-xl font-medium text-[#0C0C0C] mb-6">Mapa de Empatía</h3>
-            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-              {/* Piensa y Siente */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#1B1C20]/10">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                  </div>
-                  <h4 className="text-sm font-medium text-[#0C0C0C]">¿Qué piensa y siente?</h4>
-                </div>
-                <ul className="space-y-2">
-                  {empathyMap.piensaSiente.map((item, i) => (
-                    <li key={i} className="text-xs sm:text-sm text-[#1B1C20] flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5] mt-1.5 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Frustra */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#1B1C20]/10">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="15" y1="9" x2="9" y2="15" />
-                      <line x1="9" y1="9" x2="15" y2="15" />
-                    </svg>
-                  </div>
-                  <h4 className="text-sm font-medium text-[#0C0C0C]">¿Qué la frustra?</h4>
-                </div>
-                <ul className="space-y-2">
-                  {empathyMap.frustra.map((item, i) => (
-                    <li key={i} className="text-xs sm:text-sm text-[#1B1C20] flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5] mt-1.5 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Motiva */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#1B1C20]/10">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  </div>
-                  <h4 className="text-sm font-medium text-[#0C0C0C]">¿Qué la motiva?</h4>
-                </div>
-                <ul className="space-y-2">
-                  {empathyMap.motiva.map((item, i) => (
-                    <li key={i} className="text-xs sm:text-sm text-[#1B1C20] flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5] mt-1.5 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Dice y Hace */}
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#1B1C20]/10">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C16F5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                    </svg>
-                  </div>
-                  <h4 className="text-sm font-medium text-[#0C0C0C]">¿Qué dice y hace?</h4>
-                </div>
-                <ul className="space-y-2">
-                  {empathyMap.diceHace.map((item, i) => (
-                    <li key={i} className="text-xs sm:text-sm text-[#1B1C20] flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5] mt-1.5 flex-shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* POV Statement */}
-          <motion.div
-            className="mt-10 sm:mt-12 p-6 sm:p-8 bg-[#7C16F5]/10 rounded-2xl border border-[#7C16F5]/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <h4 className="text-sm font-medium text-[#7C16F5] uppercase tracking-wider mb-3">Point of View</h4>
-            <p className="text-sm sm:text-base text-[#0C0C0C] leading-relaxed">
-              <strong>Martina Rodríguez</strong> necesita una plataforma que no solo simplifique la compra de entradas para eventos de música electrónica, sino que también le ofrezca <strong>recomendaciones personalizadas</strong> basadas en sus gustos. Además, busca conectar con una <strong>comunidad</strong> que comparta su pasión musical. Una interfaz intuitiva, descubrimiento de eventos personalizado y la posibilidad de participar activamente en una comunidad son esenciales para una experiencia completa y satisfactoria.
-            </p>
-          </motion.div>
+          </div>
         </motion.div>
-      </div>
-    </section>
+
+        {/* Empathy Map */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <h3 className="type-h2 text-ink mb-6">Mapa de Empatía</h3>
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+            {empathyMap.map((block) => (
+              <div key={block.title} className="bg-card p-5 sm:p-6 rounded-2xl border border-line">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-full bg-[#7C16F5]/10 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={JODIFY} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      {block.icon}
+                    </svg>
+                  </div>
+                  <h4 className="type-h4 text-ink">{block.title}</h4>
+                </div>
+                <ul className="space-y-2">
+                  {block.items.map((item, i) => (
+                    <li key={i} className="type-body-s text-ink-muted flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#7C16F5] mt-2 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* POV Statement */}
+        <motion.div
+          className="mt-12 p-6 sm:p-8 bg-[#7C16F5]/10 rounded-2xl border border-[#7C16F5]/20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <h4 className="type-overline uppercase text-[#7C16F5] mb-3">Point of View</h4>
+          <p className="type-body text-ink">
+            <strong>Martina Rodríguez</strong> necesita una plataforma que no solo simplifique la compra de entradas para eventos de música electrónica, sino que también le ofrezca <strong>recomendaciones personalizadas</strong> basadas en sus gustos. Además, busca conectar con una <strong>comunidad</strong> que comparta su pasión musical. Una interfaz intuitiva, descubrimiento de eventos personalizado y la posibilidad de participar activamente en una comunidad son esenciales para una experiencia completa y satisfactoria.
+          </p>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
-function JodifyUIKitSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | "project">) {
-  const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+// Blocks of the Jodify UI-kit export (src/assets/jodify/UI-kit.svg), grouped into rows
+const JODIFY_KIT_ROWS: KitBlock[][] = [
+  [
+    { label: "Tipografía", rect: [59, 107, 1613, 925] },
+    { label: "Dropdown", rect: [1229, 1071, 444, 643] },
+  ],
+  [
+    { label: "Colores", rect: [59, 1073, 800, 325] },
+    { label: "Logo", rect: [927, 1073, 234, 328] },
+  ],
+  [
+    { label: "Íconos", rect: [59, 1526, 540, 188] },
+    { label: "Botones", rect: [669, 1477, 377, 291] },
+  ],
+  [{ label: "Cards", rect: [54, 1790, 1619, 956] }],
+];
 
+// Mobile: typography full width, colours + logo side by side, a two-column
+// board for the small components, cards at the bottom
+const [[KIT_TYPE, KIT_DROPDOWN], [KIT_COLORS, KIT_LOGO], [KIT_ICONS, KIT_BUTTONS], [KIT_CARDS]] = JODIFY_KIT_ROWS;
+const JODIFY_KIT_MOBILE: MobileSection[] = [
+  { row: [KIT_TYPE] },
+  { row: [KIT_COLORS, KIT_LOGO] },
+  { columns: [[KIT_DROPDOWN], [KIT_ICONS, KIT_BUTTONS]] },
+  { row: [KIT_CARDS] },
+];
+
+function JodifyUIKitSection({ n, fadeIn }: SectionProps) {
   return (
-    <section ref={sectionRef} className="py-8 bg-[#F2F1EF]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={fadeIn}
-        >
-          {/* Section Header */}
-          <div className="mb-5">
-            <div className="flex items-center gap-4 mb-2">
-              <span className="text-3xl sm:text-4xl md:text-5xl font-extralight tracking-tight text-[#7C16F5]">
-                05
-              </span>
-              <div className="h-px w-8 bg-[#7C16F5]/40" aria-hidden="true" />
-            </div>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[#0C0C0C]">
-              Sistema de Diseño
-            </h2>
-          </div>
-
-          {/* UI Kit Image */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-          >
-            <img 
-              src={jodifyImages.uiKit} 
-              alt="Jodify UI Kit" 
-              className="w-full h-auto"
-              loading="lazy"
-            />
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
+    <Reveal>
+      <SectionHeader number={n} title="Sistema de Diseño" fadeIn={fadeIn} accentColor={JODIFY} />
+      <motion.div variants={fadeIn}>
+        <UIKitMosaic src={jodifyImages.uiKit} size={[1727, 2852]} rows={JODIFY_KIT_ROWS} mobile={JODIFY_KIT_MOBILE} />
+      </motion.div>
+    </Reveal>
   );
 }
 
@@ -1877,96 +1221,62 @@ function JodifyUIKitSection({ fadeIn }: Omit<SectionProps, "staggerContainer" | 
 // PUERTA A PUERTA SPECIFIC SECTIONS
 // ============================================
 
-function PuertaPuertaBriefSection({ fadeIn, staggerContainer }: { fadeIn: Variants; staggerContainer?: Variants }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+/** Card used across the Puerta a Puerta sections. */
+const ppCard = "bg-card border border-line rounded-xl";
 
+function PuertaPuertaBriefSection({ n, fadeIn, staggerContainer }: SectionProps) {
   const mvpSteps = [
-    {
-      number: "01",
-      title: "Selección del servicio",
-      description: "Interfaz sencilla para elegir entre envío de paquetes, envío de muebles y mudanza completa.",
-    },
-    {
-      number: "02",
-      title: "Elección del vehículo",
-      description: "Opciones claras y visuales para seleccionar el tamaño del vehículo adecuado según la cantidad o tipo de carga.",
-    },
-    {
-      number: "03",
-      title: "Programación del servicio",
-      description: "Funcionalidad para seleccionar la fecha y hora del servicio.",
-    },
-    {
-      number: "04",
-      title: "Reserva y pago",
-      description: "Sistema seguro y fácil de usar con integración de opciones de pago (tarjeta de crédito, débito).",
-    },
-    {
-      number: "05",
-      title: "Contacto con el prestador",
-      description: "Chat directo con el prestador para coordinar detalles adicionales o resolver dudas.",
-    },
+    { number: "01", title: "Selección del servicio", description: "Interfaz sencilla para elegir entre envío de paquetes, envío de muebles y mudanza completa." },
+    { number: "02", title: "Elección del vehículo", description: "Opciones claras y visuales para seleccionar el tamaño del vehículo adecuado según la cantidad o tipo de carga." },
+    { number: "03", title: "Programación del servicio", description: "Funcionalidad para seleccionar la fecha y hora del servicio." },
+    { number: "04", title: "Reserva y pago", description: "Sistema seguro y fácil de usar con integración de opciones de pago (tarjeta de crédito, débito)." },
+    { number: "05", title: "Contacto con el prestador", description: "Chat directo con el prestador para coordinar detalles adicionales o resolver dudas." },
   ];
 
   return (
-    <section ref={ref} className="relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number="01" title="Resumen del Proyecto" fadeIn={fadeIn} />
+    <Reveal stagger={staggerContainer}>
+      <SectionHeader number={n} title="Resumen del Proyecto" fadeIn={fadeIn} />
 
-          <motion.div variants={fadeIn} className="mb-8">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-3 font-medium">Problema</h3>
-            <p className="text-base md:text-lg text-[#5A5A5A] leading-relaxed">
-              Las personas tienen dificultades para encontrar servicios de fletes y mudanzas confiables, ya que no existe una plataforma centralizada que ofrezca todas las opciones de manera clara y transparente. Esto genera{" "}
-              <span className="text-[#2D2D2D] font-medium">incertidumbre sobre los costos, la calidad del servicio y la seguridad de sus pertenencias</span>, obligándolos a depender de recomendaciones informales o búsquedas en Google.
-            </p>
-          </motion.div>
+      <motion.div variants={fadeIn} className="mb-10">
+        <Eyebrow className="mb-3">Problema</Eyebrow>
+        <p className="type-body-l text-ink-muted">
+          Las personas tienen dificultades para encontrar servicios de fletes y mudanzas confiables, ya que no existe una plataforma centralizada que ofrezca todas las opciones de manera clara y transparente. Esto genera{" "}
+          <span className="text-ink font-medium">incertidumbre sobre los costos, la calidad del servicio y la seguridad de sus pertenencias</span>, obligándolos a depender de recomendaciones informales o búsquedas en Google.
+        </p>
+      </motion.div>
 
-          <motion.div variants={fadeIn} className="mb-10">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-3 font-medium">Objetivo</h3>
-            <p className="text-base md:text-lg text-[#5A5A5A] leading-relaxed">
-              Crear una solución que{" "}
-              <span className="text-[#2D2D2D] font-medium">centralice los servicios de fletes y mudanzas</span>, ofreciendo a los usuarios una plataforma donde puedan comparar opciones, obtener cotizaciones inmediatas y programar mudanzas o envíos con confianza.
-            </p>
-          </motion.div>
+      <motion.div variants={fadeIn} className="mb-12">
+        <Eyebrow className="mb-3">Objetivo</Eyebrow>
+        <p className="type-body-l text-ink-muted">
+          Crear una solución que{" "}
+          <span className="text-ink font-medium">centralice los servicios de fletes y mudanzas</span>, ofreciendo a los usuarios una plataforma donde puedan comparar opciones, obtener cotizaciones inmediatas y programar mudanzas o envíos con confianza.
+        </p>
+      </motion.div>
 
-          <motion.div variants={fadeIn} className="mb-10">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-4 font-medium">MVP — 5 pasos clave</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              {mvpSteps.map((step, index) => (
-                <motion.div
-                  key={step.number}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                  viewport={{ once: true }}
-                  className="bg-[#FAFAF8] rounded-xl p-4 border-l-[3px] border-[rgb(201,188,63)] border border-[#E0DBD6]/50"
-                >
-                  <span className="text-2xl font-extralight tracking-tight text-[rgb(201,188,63)] block mb-2">
-                    {step.number}
-                  </span>
-                  <h4 className="text-sm font-medium text-[#2D2D2D] mb-2">{step.title}</h4>
-                  <p className="text-xs text-[#6B6B6B] leading-relaxed">{step.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-        </motion.div>
-      </div>
-    </section>
+      <motion.div variants={fadeIn}>
+        <Eyebrow className="mb-4">MVP — 5 pasos clave</Eyebrow>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {mvpSteps.map((step, index) => (
+            <motion.div
+              key={step.number}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true }}
+              className={`${ppCard} p-4 border-l-[3px] border-l-[rgb(201,188,63)]`}
+            >
+              <span className="type-h3 tabular-nums text-[rgb(201,188,63)] block mb-2">{step.number}</span>
+              <h4 className="type-h4 text-ink mb-2">{step.title}</h4>
+              <p className="type-body-s text-ink-muted">{step.description}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </Reveal>
   );
 }
 
-function PuertaPuertaBenchmarkSection({ fadeIn }: { fadeIn: Variants }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
+function PuertaPuertaBenchmarkSection({ n, fadeIn }: SectionProps) {
   const competitors = [
     {
       name: "Fletalo",
@@ -1974,7 +1284,6 @@ function PuertaPuertaBenchmarkSection({ fadeIn }: { fadeIn: Variants }) {
       searchSteps: 3,
       reserveSteps: 4,
       vocabulary: "Claro y específico",
-      design: "Limpio y funcional",
       strength: "Especialización y rapidez en la reserva",
       weakness: "Menor reconocimiento de marca. Posible confusión con términos técnicos",
     },
@@ -1984,7 +1293,6 @@ function PuertaPuertaBenchmarkSection({ fadeIn }: { fadeIn: Variants }) {
       searchSteps: 4,
       reserveSteps: 4,
       vocabulary: "Accesible y sencillo",
-      design: "Moderno y visualmente atractivo",
       strength: "Variedad de servicios e interfaz atractiva",
       weakness: "Puede ser confuso por la variedad de servicios. Riesgo de saturación",
     },
@@ -1994,83 +1302,69 @@ function PuertaPuertaBenchmarkSection({ fadeIn }: { fadeIn: Variants }) {
       searchSteps: 4,
       reserveSteps: 4,
       vocabulary: "Claro pero orientado al e-commerce",
-      design: "Complejo y cargado",
       strength: "Amplia base de usuarios y confianza de marca",
       weakness: "Interfaz compleja. Enfoque principal en e-commerce, no en mudanzas",
     },
   ];
 
   return (
-    <section ref={ref} className="bg-white/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div initial="hidden" animate={isInView ? "visible" : "hidden"}>
-          <SectionHeader number="02" title="Benchmarking" fadeIn={fadeIn} />
+    <Reveal>
+      <SectionHeader number={n} title="Benchmarking" fadeIn={fadeIn} />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-10">
-            {competitors.map((comp, index) => (
-              <motion.div
-                key={comp.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                viewport={{ once: true, margin: "-50px" }}
-                className="bg-[#FAFAF8] border border-[#E0DBD6]/50 rounded-xl p-4 sm:p-5"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-1 h-6 rounded-full bg-[rgb(201,188,63)]" aria-hidden="true" />
-                  <h3 className="text-lg font-medium text-[#2D2D2D]">{comp.name}</h3>
-                </div>
-                <p className="text-xs text-[#9A9A9A] mb-4">{comp.focus}</p>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b border-[#E0DBD6]/50">
-                    <span className="text-xs text-[#6B6B6B]">Pasos para buscar</span>
-                    <span className="text-sm font-medium text-[rgb(201,188,63)]">{comp.searchSteps}</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 border-b border-[#E0DBD6]/50">
-                    <span className="text-xs text-[#6B6B6B]">Pasos para reservar</span>
-                    <span className="text-sm font-medium text-[rgb(201,188,63)]">{comp.reserveSteps}</span>
-                  </div>
-                  <div className="py-2 border-b border-[#E0DBD6]/50">
-                    <span className="text-xs uppercase tracking-[0.1em] text-[#9A9A9A] font-medium block mb-1">Vocabulario</span>
-                    <p className="text-xs text-[#2D2D2D]">{comp.vocabulary}</p>
-                  </div>
-                  <div>
-                    <span className="text-xs uppercase tracking-[0.1em] text-[rgb(201,188,63)] font-medium block mb-1">Fortaleza</span>
-                    <p className="text-xs text-[#5A5A5A]">{comp.strength}</p>
-                  </div>
-                  <div>
-                    <span className="text-xs uppercase tracking-[0.1em] text-[#9A9A9A] font-medium block mb-1">Debilidad</span>
-                    <p className="text-xs text-[#6B6B6B]">{comp.weakness}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-10">
+        {competitors.map((comp, index) => (
           <motion.div
-            variants={fadeIn}
-            className="bg-[#FAFAF8] border border-[rgb(201,188,63)]/30 rounded-xl p-5 sm:p-6"
+            key={comp.name}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true, margin: "-50px" }}
+            className={`${ppCard} p-5`}
           >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-              <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">Conclusión</h4>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-1 h-6 rounded-full bg-[rgb(201,188,63)]" aria-hidden="true" />
+              <h3 className="type-h3 text-ink">{comp.name}</h3>
             </div>
-            <p className="text-sm sm:text-base text-[#5A5A5A] leading-relaxed">
-              Para diseñar un producto que centralice servicios de mudanza y envíos, es fundamental{" "}
-              <span className="text-[#2D2D2D] font-medium">priorizar la simplicidad y especialización</span> en la interfaz: diseñar de manera intuitiva que minimice los pasos para buscar y reservar servicios, con información clara sobre precios, disponibilidad y características.
-            </p>
+            <p className="type-caption text-ink-subtle mb-4">{comp.focus}</p>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-line">
+                <span className="type-body-s text-ink-muted">Pasos para buscar</span>
+                <span className="type-h4 text-[rgb(201,188,63)]">{comp.searchSteps}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-line">
+                <span className="type-body-s text-ink-muted">Pasos para reservar</span>
+                <span className="type-h4 text-[rgb(201,188,63)]">{comp.reserveSteps}</span>
+              </div>
+              <div className="py-2 border-b border-line">
+                <span className="type-overline uppercase text-ink-subtle block mb-1">Vocabulario</span>
+                <p className="type-body-s text-ink">{comp.vocabulary}</p>
+              </div>
+              <div>
+                <span className="type-overline uppercase text-[rgb(201,188,63)] block mb-1">Fortaleza</span>
+                <p className="type-body-s text-ink-muted">{comp.strength}</p>
+              </div>
+              <div>
+                <span className="type-overline uppercase text-ink-subtle block mb-1">Debilidad</span>
+                <p className="type-body-s text-ink-muted">{comp.weakness}</p>
+              </div>
+            </div>
           </motion.div>
-        </motion.div>
+        ))}
       </div>
-    </section>
+
+      <motion.div variants={fadeIn} className="bg-card border border-[rgb(201,188,63)]/30 rounded-xl p-5 sm:p-6">
+        <DiamondLabel className="mb-3">Conclusión</DiamondLabel>
+        <p className="type-body text-ink-muted">
+          Para diseñar un producto que centralice servicios de mudanza y envíos, es fundamental{" "}
+          <span className="text-ink font-medium">priorizar la simplicidad y especialización</span> en la interfaz: diseñar de manera intuitiva que minimice los pasos para buscar y reservar servicios, con información clara sobre precios, disponibilidad y características.
+        </p>
+      </motion.div>
+    </Reveal>
   );
 }
 
-function PuertaPuertaProcesoSection({ fadeIn, staggerContainer }: { fadeIn: Variants; staggerContainer?: Variants }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
+function PuertaPuertaProcesoSection({ n, fadeIn, staggerContainer }: SectionProps) {
   const processSteps = [
     { name: "Empatizar", description: "Investigación del problema. Entrevistas para entender las frustraciones al contratar mudanzas." },
     { name: "Definir", description: "POV de Martín + identificación del problema central: falta de plataforma centralizada y transparente." },
@@ -2080,64 +1374,45 @@ function PuertaPuertaProcesoSection({ fadeIn, staggerContainer }: { fadeIn: Vari
   ];
 
   return (
-    <section ref={ref} className="bg-white/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number="03" title="Proceso UX" fadeIn={fadeIn} />
+    <Reveal stagger={staggerContainer}>
+      <SectionHeader number={n} title="Proceso UX" fadeIn={fadeIn} />
 
-          {/* POV */}
-          <motion.div variants={fadeIn} className="mb-10">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-4 font-medium">Punto de Vista (POV)</h3>
-            <div className="bg-[#FAFAF8] border border-[#E0DBD6]/50 rounded-xl p-5 sm:p-6">
-              <p className="text-sm text-[#9A9A9A] mb-3 uppercase tracking-[0.1em] font-medium">Martín</p>
-              <p className="text-base md:text-lg text-[#5A5A5A] leading-relaxed">
-                <span className="font-medium text-[#2D2D2D]">necesita</span> mudarse o enviar objetos grandes y necesita una manera confiable y sencilla de encontrar, comparar y contratar servicios de fletes o mudanzas{" "}
-                <span className="font-medium text-[#2D2D2D]">porque</span> actualmente no tiene acceso a una plataforma que le ofrezca transparencia en precios, disponibilidad y garantías de seguridad para sus pertenencias.
-              </p>
-            </div>
-          </motion.div>
+      <motion.div variants={fadeIn} className="mb-12">
+        <Eyebrow className="mb-4">Punto de Vista (POV)</Eyebrow>
+        <div className={`${ppCard} p-5 sm:p-6`}>
+          <p className="type-overline uppercase text-ink-subtle mb-3">Martín</p>
+          <p className="type-body-l text-ink-muted">
+            <span className="font-medium text-ink">necesita</span> mudarse o enviar objetos grandes y necesita una manera confiable y sencilla de encontrar, comparar y contratar servicios de fletes o mudanzas{" "}
+            <span className="font-medium text-ink">porque</span> actualmente no tiene acceso a una plataforma que le ofrezca transparencia en precios, disponibilidad y garantías de seguridad para sus pertenencias.
+          </p>
+        </div>
+      </motion.div>
 
-          {/* Process Steps */}
-          <motion.div variants={fadeIn} className="mb-10">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-4 font-medium">Metodología de Diseño</h3>
-            <div className="flex flex-col sm:flex-row gap-0 sm:gap-0 relative">
-              {processSteps.map((step, index) => (
-                <motion.div
-                  key={step.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                  viewport={{ once: true }}
-                  className="flex-1 relative"
-                >
-                  <div className="flex flex-row sm:flex-col items-start gap-3 sm:gap-0 p-4 sm:p-5 border border-[#E0DBD6]/50 bg-[#FAFAF8] sm:border-r-0 last:border-r sm:border-b sm:first:rounded-tl-xl sm:last:rounded-tr-xl first:rounded-t-xl last:rounded-b-xl sm:first:rounded-bl-xl sm:last:rounded-br-xl sm:rounded-none">
-                    <span className="text-2xl font-extralight text-[rgb(201,188,63)] flex-shrink-0 sm:mb-3 tabular-nums">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <div>
-                      <h4 className="text-sm font-semibold text-[#2D2D2D] mb-1 sm:mb-2">{step.name}</h4>
-                      <p className="text-xs text-[#6B6B6B] leading-relaxed">{step.description}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-        </motion.div>
-      </div>
-    </section>
+      <motion.div variants={fadeIn}>
+        <Eyebrow className="mb-4">Metodología de Diseño</Eyebrow>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+          {processSteps.map((step, index) => (
+            <motion.div
+              key={step.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true }}
+              className={`${ppCard} flex flex-row sm:flex-col items-start gap-3 sm:gap-0 p-4 sm:p-5`}
+            >
+              <div>
+                <h4 className="type-h4 text-ink mb-1 sm:mb-2">{step.name}</h4>
+                <p className="type-body-s text-ink-muted">{step.description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </Reveal>
   );
 }
 
-function PuertaPuertaTestingSection({ fadeIn, staggerContainer }: { fadeIn: Variants; staggerContainer?: Variants }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
+function PuertaPuertaTestingSection({ n, fadeIn, staggerContainer }: SectionProps) {
   const marvelTasks = [
     "Seleccionar el tipo de servicio",
     "Seleccionar el tipo de transporte",
@@ -2153,132 +1428,112 @@ function PuertaPuertaTestingSection({ fadeIn, staggerContainer }: { fadeIn: Vari
     { name: "Paz Segade", age: 37, type: "Remoto" },
   ];
 
+  const abTests = [
+    {
+      name: "Prueba A",
+      participants: 9,
+      flow: "Flujo: Día y horario → Origen y destino",
+      stats: [
+        { label: "Tiempo promedio", value: "1:34 min", tone: "text-ink" },
+        { label: "Tasa de abandono", value: "15%", tone: "text-[#C47C5A]" },
+      ],
+      note: "Los usuarios no tenían clara la ubicación antes de definir el horario. Mayor confusión y mayor tasa de abandono.",
+      winner: false,
+    },
+    {
+      name: "Prueba B",
+      participants: 7,
+      flow: "Flujo: Origen y destino → Día y horario",
+      stats: [
+        { label: "Tiempo promedio", value: "1:05 min", tone: "text-ink" },
+        { label: "Tasa de completado", value: "98%", tone: "text-[rgb(201,188,63)]" },
+      ],
+      note: "La secuencia fue más fluida: elegir la ubicación primero proporcionó contexto y facilitó la selección del horario.",
+      winner: true,
+    },
+  ];
+
   return (
-    <section ref={ref} className="py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number="04" title="Testing y Decisiones" fadeIn={fadeIn} />
+    <Reveal stagger={staggerContainer}>
+      <SectionHeader number={n} title="Testing y Decisiones" fadeIn={fadeIn} />
 
-          {/* Marvel Testing */}
-          <motion.div variants={fadeIn} className="mb-12">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-5 font-medium">Testeo en Marvel — Wireframes en Baja</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Tasks + Results */}
-              <div className="bg-[#FAFAF8] border border-[#E0DBD6]/50 rounded-xl p-5">
-                <h4 className="text-sm font-medium text-[#2D2D2D] mb-4">Tareas evaluadas — 100% conversión</h4>
-                <div className="space-y-3">
-                  {marvelTasks.map((task, index) => (
-                    <div key={index} className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs text-[rgb(201,188,63)] font-light tabular-nums">{String(index + 1).padStart(2, "0")}</span>
-                        <span className="text-sm text-[#5A5A5A]">{task}</span>
-                      </div>
-                      <span className="text-sm font-semibold text-[rgb(201,188,63)] flex-shrink-0">100%</span>
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-5 text-xs text-[#9A9A9A] leading-relaxed border-t border-[#E0DBD6]/50 pt-4">
-                  Todos los usuarios lograron completar las tareas propuestas. Se recomienda implementar un onboarding para usuarios sin experiencia previa en mudanzas.
-                </p>
-              </div>
-
-              {/* Participants */}
-              <div className="bg-[#FAFAF8] border border-[#E0DBD6]/50 rounded-xl p-5">
-                <h4 className="text-sm font-medium text-[#2D2D2D] mb-4">Participantes</h4>
-                <div className="space-y-2">
-                  {marvelUsers.map((user, index) => (
-                    <div key={index} className="flex items-center justify-between py-2 border-b border-[#E0DBD6]/30 last:border-0">
-                      <span className="text-sm text-[#5A5A5A]">{user.name}, {user.age} años</span>
-                      <span className="text-xs text-[#9A9A9A] bg-[#E0DBD6]/30 px-2 py-0.5 rounded-full">{user.type}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Wireframes A/B comparison image */}
-          <motion.div variants={fadeIn} className="mb-12">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-3 font-medium">Wireframes en media fidelidad — versión A y B</h3>
-            <div>
-              <img
-                src={puertaPuertaImages.wireframes}
-                alt="Wireframes en media fidelidad — versión A y B para prueba A/B"
-                loading="lazy"
-                className="w-full h-auto"
-              />
-            </div>
-          </motion.div>
-
-          {/* A/B Maze */}
-          <motion.div variants={fadeIn}>
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-5 font-medium">Pruebas A/B en Maze — Pantalla de direcciones y fecha</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-              {/* Prueba A */}
-              <div className="bg-[#FAFAF8] border border-[#E0DBD6]/50 rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-1 h-6 rounded-full bg-[#C8C4BC]" aria-hidden="true" />
-                  <h4 className="text-base font-medium text-[#2D2D2D]">Prueba A</h4>
-                  <span className="text-xs text-[#9A9A9A] ml-auto">9 participantes</span>
-                </div>
-                <p className="text-xs text-[#6B6B6B] mb-4">Flujo: Día y horario → Origen y destino</p>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#9A9A9A]">Tiempo promedio</span>
-                    <span className="text-sm font-medium text-[#2D2D2D]">1:34 min</span>
+      <motion.div variants={fadeIn} className="mb-14">
+        <Eyebrow className="mb-5">Testeo en Marvel — Wireframes en Baja</Eyebrow>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className={`${ppCard} p-5`}>
+            <h4 className="type-h4 text-ink mb-4">Tareas evaluadas — 100% conversión</h4>
+            <div className="space-y-3">
+              {marvelTasks.map((task, index) => (
+                <div key={index} className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="type-body-s text-ink-muted">{task}</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#9A9A9A]">Tasa de abandono</span>
-                    <span className="text-sm font-medium text-[#C47C5A]">15%</span>
-                  </div>
+                  <span className="type-h4 text-[rgb(201,188,63)] flex-shrink-0">100%</span>
                 </div>
-                <p className="mt-4 text-xs text-[#6B6B6B] leading-relaxed">
-                  Los usuarios no tenían clara la ubicación antes de definir el horario. Mayor confusión y mayor tasa de abandono.
-                </p>
-              </div>
-
-              {/* Prueba B */}
-              <div className="bg-[#FAFAF8] border border-[rgb(201,188,63)]/40 rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-1 h-6 rounded-full bg-[rgb(201,188,63)]" aria-hidden="true" />
-                  <h4 className="text-base font-medium text-[#2D2D2D]">Prueba B</h4>
-                  <span className="text-xs text-[#9A9A9A] ml-auto">7 participantes</span>
-                </div>
-                <p className="text-xs text-[#6B6B6B] mb-4">Flujo: Origen y destino → Día y horario</p>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#9A9A9A]">Tiempo promedio</span>
-                    <span className="text-sm font-medium text-[#2D2D2D]">1:05 min</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#9A9A9A]">Tasa de completado</span>
-                    <span className="text-sm font-medium text-[rgb(201,188,63)]">98%</span>
-                  </div>
-                </div>
-                <p className="mt-4 text-xs text-[#6B6B6B] leading-relaxed">
-                  La secuencia fue más fluida: elegir la ubicación primero proporcionó contexto y facilitó la selección del horario.
-                </p>
-              </div>
+              ))}
             </div>
+            <p className="mt-5 type-body-s text-ink-subtle border-t border-line pt-4">
+              Todos los usuarios lograron completar las tareas propuestas. Se recomienda implementar un onboarding para usuarios sin experiencia previa en mudanzas.
+            </p>
+          </div>
 
-            <div className="bg-[#FAFAF8] border border-[rgb(201,188,63)]/30 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-1.5 h-1.5 bg-[rgb(201,188,63)] rotate-45" aria-hidden="true" />
-                <h4 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] font-medium">Decisión de diseño</h4>
-              </div>
-              <p className="text-sm text-[#5A5A5A] leading-relaxed">
-                El flujo de la Prueba B es más eficiente. La combinación de menor tiempo promedio, mayor tasa de éxito y menos confusión confirma que es preferible{" "}
-                <span className="text-[#2D2D2D] font-medium">guiar al usuario a seleccionar origen y destino antes de establecer el día y hora</span>, alineando los pasos con la forma en que los usuarios conceptualizan la organización de una mudanza.
-              </p>
+          <div className={`${ppCard} p-5`}>
+            <h4 className="type-h4 text-ink mb-4">Participantes</h4>
+            <div className="space-y-2">
+              {marvelUsers.map((user, index) => (
+                <div key={index} className="flex items-center justify-between py-2 border-b border-line last:border-0">
+                  <span className="type-body-s text-ink-muted">{user.name}, {user.age} años</span>
+                  <span className="type-caption text-ink-subtle bg-ink/5 px-2 py-0.5 rounded-full">{user.type}</span>
+                </div>
+              ))}
             </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div variants={fadeIn} className="mb-14">
+        <Eyebrow className="mb-3">Wireframes en media fidelidad — versión A y B</Eyebrow>
+        <img
+          src={puertaPuertaImages.wireframes}
+          alt="Wireframes en media fidelidad — versión A y B para prueba A/B"
+          loading="lazy"
+          className="w-full h-auto"
+        />
+      </motion.div>
+
+      <motion.div variants={fadeIn}>
+        <Eyebrow className="mb-5">Pruebas A/B en Maze — Pantalla de direcciones y fecha</Eyebrow>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          {abTests.map((test) => (
+            <div key={test.name} className={`bg-card border rounded-xl p-5 ${test.winner ? "border-[rgb(201,188,63)]/40" : "border-line"}`}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-1 h-6 rounded-full ${test.winner ? "bg-[rgb(201,188,63)]" : "bg-[#C8C4BC]"}`} aria-hidden="true" />
+                <h4 className="type-h3 text-ink">{test.name}</h4>
+                <span className="type-caption text-ink-subtle ml-auto">{test.participants} participantes</span>
+              </div>
+              <p className="type-body-s text-ink-muted mb-4">{test.flow}</p>
+              <div className="space-y-3">
+                {test.stats.map((s) => (
+                  <div key={s.label} className="flex items-center justify-between">
+                    <span className="type-body-s text-ink-subtle">{s.label}</span>
+                    <span className={`type-h4 ${s.tone}`}>{s.value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 type-body-s text-ink-muted">{test.note}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-card border border-[rgb(201,188,63)]/30 rounded-xl p-5">
+          <DiamondLabel className="mb-3">Decisión de diseño</DiamondLabel>
+          <p className="type-body text-ink-muted">
+            El flujo de la Prueba B es más eficiente. La combinación de menor tiempo promedio, mayor tasa de éxito y menos confusión confirma que es preferible{" "}
+            <span className="text-ink font-medium">guiar al usuario a seleccionar origen y destino antes de establecer el día y hora</span>, alineando los pasos con la forma en que los usuarios conceptualizan la organización de una mudanza.
+          </p>
+        </div>
+      </motion.div>
+    </Reveal>
   );
 }
 
@@ -2299,20 +1554,16 @@ function PPScreenCarousel() {
   const prev = () => setCurrent((c) => (c - 1 + total) % total);
   const next = () => setCurrent((c) => (c + 1) % total);
   const screen = PP_SCREENS[current];
+  const arrowBtn = "w-10 h-10 rounded-full border border-line flex items-center justify-center text-ink-subtle hover:text-ink hover:border-[rgb(201,188,63)] transition-all duration-200";
 
   return (
-    <div className="flex flex-col md:flex-row gap-10 items-center">
-      {/* Screen + arrows */}
+    <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-center">
       <div className="relative flex items-center gap-4 shrink-0">
-        <button
-          onClick={prev}
-          className="w-8 h-8 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#9A9A9A] hover:text-[#2D2D2D] hover:border-[rgb(201,188,63)] transition-all duration-200"
-          aria-label="Anterior"
-        >
+        <button onClick={prev} className={arrowBtn} aria-label="Anterior">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
 
-        <div className="relative w-[185px]">
+        <div className="relative w-[clamp(140px,42vw,185px)]">
           <AnimatePresence mode="wait">
             <motion.img
               key={current}
@@ -2328,16 +1579,11 @@ function PPScreenCarousel() {
           </AnimatePresence>
         </div>
 
-        <button
-          onClick={next}
-          className="w-8 h-8 rounded-full border border-[#E0DBD6] flex items-center justify-center text-[#9A9A9A] hover:text-[#2D2D2D] hover:border-[rgb(201,188,63)] transition-all duration-200"
-          aria-label="Siguiente"
-        >
+        <button onClick={next} className={arrowBtn} aria-label="Siguiente">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
       </div>
 
-      {/* Context */}
       <div className="flex-1">
         <AnimatePresence mode="wait">
           <motion.div
@@ -2347,21 +1593,20 @@ function PPScreenCarousel() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="text-[11px] font-mono text-[#C8C4BC] block mb-1">{screen.step} / {String(total).padStart(2, "0")}</span>
-            <span className="text-[10px] uppercase tracking-[0.12em] text-[rgb(201,188,63)] font-medium block mb-2">{screen.label}</span>
-            <h4 className="text-xl font-semibold text-[#1A1A1A] mb-3 leading-snug">{screen.title}</h4>
-            <p className="text-sm text-[#6B6B6B] leading-relaxed">{screen.note}</p>
+            <span className="type-caption tabular-nums text-ink-subtle block mb-1">{screen.step} / {String(total).padStart(2, "0")}</span>
+            <span className="type-overline uppercase text-[rgb(201,188,63)] block mb-2">{screen.label}</span>
+            <h4 className="type-h2 text-ink mb-3">{screen.title}</h4>
+            <p className="type-body text-ink-muted">{screen.note}</p>
           </motion.div>
         </AnimatePresence>
 
-        {/* Dots */}
         <div className="flex gap-1.5 mt-6">
           {PP_SCREENS.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
               className={`transition-all duration-300 rounded-full ${
-                i === current ? "w-5 h-1.5 bg-[rgb(201,188,63)]" : "w-1.5 h-1.5 bg-[#E0DBD6] hover:bg-[rgb(201,188,63)]/50"
+                i === current ? "w-5 h-1.5 bg-[rgb(201,188,63)]" : "w-1.5 h-1.5 bg-line hover:bg-[rgb(201,188,63)]/50"
               }`}
               aria-label={`Pantalla ${i + 1}`}
             />
@@ -2372,10 +1617,7 @@ function PPScreenCarousel() {
   );
 }
 
-function PuertaPuertaDisenoSection({ fadeIn, staggerContainer }: { fadeIn: Variants; staggerContainer?: Variants }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
+function PuertaPuertaDisenoSection({ n, fadeIn, staggerContainer }: SectionProps) {
   const iosPatterns = [
     { title: "NavBar", description: "Para contener las 4 funciones principales de la app." },
     { title: "Separación", description: "22px entre secciones relacionadas, 33px entre secciones no relacionadas." },
@@ -2385,43 +1627,33 @@ function PuertaPuertaDisenoSection({ fadeIn, staggerContainer }: { fadeIn: Varia
   ];
 
   return (
-    <section ref={ref} className="bg-white/80 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <SectionHeader number="05" title="Diseño Final" fadeIn={fadeIn} />
+    <Reveal stagger={staggerContainer}>
+      <SectionHeader number={n} title="Diseño Final" fadeIn={fadeIn} />
 
-          {/* iOS Patterns */}
-          <motion.div variants={fadeIn} className="mb-12">
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-4 font-medium">Patrones iOS</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              {iosPatterns.map((pattern, index) => (
-                <motion.div
-                  key={pattern.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                  viewport={{ once: true }}
-                  className="bg-[#FAFAF8] border border-[#E0DBD6]/50 rounded-xl p-4"
-                >
-                  <h4 className="text-sm font-semibold text-[rgb(201,188,63)] mb-2">{pattern.title}</h4>
-                  <p className="text-xs text-[#6B6B6B] leading-relaxed">{pattern.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+      <motion.div variants={fadeIn} className="mb-14">
+        <Eyebrow className="mb-4">Patrones iOS</Eyebrow>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {iosPatterns.map((pattern, index) => (
+            <motion.div
+              key={pattern.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true }}
+              className={`${ppCard} p-4`}
+            >
+              <h4 className="type-h4 text-[rgb(201,188,63)] mb-2">{pattern.title}</h4>
+              <p className="type-body-s text-ink-muted">{pattern.description}</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
 
-          {/* Portrait screen carousel */}
-          <motion.div variants={fadeIn}>
-            <h3 className="text-xs uppercase tracking-[0.15em] text-[#9A9A9A] mb-8 font-medium">Pantallas finales</h3>
-            <PPScreenCarousel />
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
+      <motion.div variants={fadeIn}>
+        <Eyebrow className="mb-8">Pantallas finales</Eyebrow>
+        <PPScreenCarousel />
+      </motion.div>
+    </Reveal>
   );
 }
 

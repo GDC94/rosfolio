@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useScroll, useTransform, motion } from "framer-motion";
 import Header from "../components/Header";
 import Hero from "../components/Hero";
@@ -8,6 +9,7 @@ import MiProcesoSection from "../components/MiProcesoSection";
 import SobreMiSection from "../components/SobreMiSection";
 import { Grid12Background } from "../components/Background";
 import { getFeaturedProjects } from "../data/projects";
+import { getSobreMiExtra, useSobreMiExtra } from "../data/homeScroll";
 import { behanceProjects } from "../components/ProjectsList";
 
 export const SECTION_IDS = [
@@ -22,10 +24,8 @@ export const SECTION_IDS = [
 
 const TOPBAR_H = 40;
 
-// "Sobre mi" section index and extra scroll units
-// 2 horizontal transitions + 1 vertical scroll phase in Experiencia
+// "Sobre mi" section index; its extra scroll length is measured (see data/homeScroll)
 export const SOBRE_MI_IDX   = 3;
-export const SOBRE_MI_EXTRA = 4;
 
 // "Mi proceso" section index and extra scroll units (horizontal frames - 1)
 export const MI_PROCESO_IDX   = 4;
@@ -43,12 +43,12 @@ export const SECTION_META = [
 
 // When does section `index` start sliding in from below?
 // Sections after a horizontal zone are delayed by that zone's extra frames.
-function getSectionEnterStart(index: number, sectionH: number): number {
+function getSectionEnterStart(index: number, sectionH: number, sobreMiExtra: number): number {
   if (index === 0) return 0; // unused (section 0 is always fixed at y=0)
   const base = (index - 1) * sectionH;
   let extra = 0;
   if (index > MI_PROCESO_IDX) extra += MI_PROCESO_EXTRA * sectionH;
-  if (index > SOBRE_MI_IDX)   extra += SOBRE_MI_EXTRA   * sectionH;
+  if (index > SOBRE_MI_IDX)   extra += sobreMiExtra     * sectionH;
   return base + extra;
 }
 
@@ -277,6 +277,8 @@ function StackedSection({
 export default function MainPage() {
   const projects = getFeaturedProjects(4);
   const { scrollY } = useScroll();
+  const location = useLocation();
+  const sobreMiExtra = useSobreMiExtra();
 
   useEffect(() => {
     const s = new URLSearchParams(window.location.search).get('figma-section');
@@ -285,6 +287,26 @@ export default function MainPage() {
       setTimeout(() => window.scrollTo({ top: parseInt(s) * sh, behavior: 'instant' }), 300);
     }
   }, []);
+
+  // Scroll to section when navigating from another page (e.g. from a project page)
+  useEffect(() => {
+    const sectionId = (location.state as { scrollTo?: string } | null)?.scrollTo;
+    if (!sectionId) return;
+    const index = SECTION_IDS.indexOf(sectionId);
+    if (index < 0) return;
+    const sh = window.innerHeight - TOPBAR_H;
+    // Read when firing: Sobre mi measures its length after mounting
+    setTimeout(() => {
+      const extra = getSobreMiExtra();
+      const targetScroll =
+        index > MI_PROCESO_IDX
+          ? (index + extra + MI_PROCESO_EXTRA) * sh
+          : index === MI_PROCESO_IDX
+            ? (index + extra) * sh
+            : index * sh;
+      window.scrollTo({ top: targetScroll, behavior: "smooth" });
+    }, 300);
+  }, [location.state]);
 
   const [sectionH, setSectionH] = useState(
     () => (typeof window !== "undefined" ? window.innerHeight - TOPBAR_H : 760)
@@ -299,11 +321,11 @@ export default function MainPage() {
   const N = SECTION_META.length;
 
   // Total scroll space: N sections + both horizontal extra zones
-  const scrollSpaceH = (N + MI_PROCESO_EXTRA + SOBRE_MI_EXTRA) * sectionH;
+  const scrollSpaceH = (N + MI_PROCESO_EXTRA + sobreMiExtra) * sectionH;
 
   // scrollY when each horizontal section has fully slid in (horizontal scroll begins)
   const sobreMiEnterScroll   = SOBRE_MI_IDX * sectionH;
-  const miProcesoEnterScroll = (MI_PROCESO_IDX + SOBRE_MI_EXTRA) * sectionH;
+  const miProcesoEnterScroll = (MI_PROCESO_IDX + sobreMiExtra) * sectionH;
 
   const sectionContents = [
     <Hero key="inicio" />,
@@ -348,9 +370,9 @@ export default function MainPage() {
 
     <div key="faqs" className="h-full flex flex-col overflow-hidden">
       {/* Scrollable FAQ content — scrollbar oculto */}
-      <div className="flex-1 overflow-y-auto hide-scrollbar px-4 md:pl-[440px] md:pr-[60px] relative">
-        <span className="md:hidden sticky top-0 block type-overline text-[#9A9A9A] z-10 pt-3 pb-4">FAQs</span>
-        <div className="pb-52 md:py-16">
+      <div className="flex-1 overflow-y-scroll hide-scrollbar px-4 md:pl-[440px] md:pr-[60px] relative" style={{ touchAction: "pan-y" }}>
+        <span className="md:hidden sticky top-0 block type-overline text-[#9A9A9A] z-10 pt-3 pb-4 bg-[#FAFAF8]">FAQs</span>
+        <div className="pb-8 md:py-16">
           <FAQ />
         </div>
       </div>
@@ -405,7 +427,7 @@ export default function MainPage() {
         <StackedSection
           key={SECTION_META[i].id}
           index={i}
-          enterStart={getSectionEnterStart(i, sectionH)}
+          enterStart={getSectionEnterStart(i, sectionH, sobreMiExtra)}
           sectionH={sectionH}
           scrollY={scrollY}
         >

@@ -1,6 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useLenis } from "@studio-freight/react-lenis";
+import { getProjectSections, getSectionAt, getSectionScrollTop } from "../data/projectSections";
 
 const BackArrowIcon = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -8,81 +10,48 @@ const BackArrowIcon = (
   </svg>
 );
 
-interface Section {
-  id: string;
-  label: string;
-}
-
-function getProjectSections(projectId: string): Section[] {
-  if (projectId === "2") {
-    return [
-      { id: "project-brief",      label: "Resumen del Proyecto" },
-      { id: "project-challenges", label: "Desafíos" },
-      { id: "project-findings",   label: "Hallazgos Clave y Soluciones" },
-      { id: "project-personas",   label: "Lógica y Sistemas" },
-      { id: "project-results",    label: "Resumen" },
-    ];
-  }
-  if (projectId === "3") {
-    return [
-      { id: "project-brief",      label: "Resumen del Proyecto" },
-      { id: "project-challenges", label: "Desafíos" },
-      { id: "project-findings",   label: "Análisis Comparativo" },
-      { id: "project-personas",   label: "Conociendo a Nuestra Usuaria" },
-      { id: "project-solution",   label: "Sistema de Diseño" },
-      { id: "project-results",    label: "Resultados y Próximos Pasos" },
-    ];
-  }
-  if (projectId === "10") {
-    return [
-      { id: "project-brief",    label: "Resumen del Proyecto" },
-      { id: "project-findings", label: "Benchmarking" },
-      { id: "project-personas", label: "Proceso UX" },
-      { id: "project-solution", label: "Testing y Decisiones" },
-      { id: "project-results",  label: "Diseño Final" },
-    ];
-  }
-  return [
-    { id: "project-brief",      label: "Resumen del Proyecto" },
-    { id: "project-challenges", label: "Desafíos" },
-    { id: "project-findings",   label: "Análisis Comparativo" },
-    { id: "project-personas",   label: "Personas de Usuario" },
-    { id: "project-solution",   label: "Solución y Diseño" },
-    { id: "project-results",    label: "Resultados y Próximos Pasos" },
-  ];
-}
+// Viewport line that decides which section is "active" (labels)
+const ACTIVE_LINE = 0.45;
+// Vertical position of the nav itself — decides its color (light/dark background behind it)
+const NAV_LINE = 220;
 
 function ProjectSideNav() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const lenis = useLenis();
   const projectId = pathname.startsWith("/project/") ? pathname.split("/project/")[1] : "1";
   const sections = useMemo(() => getProjectSections(projectId), [projectId]);
   const [activeSection, setActiveSection] = useState(sections[0]?.id ?? "project-brief");
+  const [onDark, setOnDark] = useState(false);
 
   useEffect(() => {
-    const updateActive = () => {
-      // Trigger point: 35% down the viewport
-      const trigger = window.scrollY + window.innerHeight * 0.35;
-      let current = sections[0]?.id ?? "";
-      for (const { id } of sections) {
-        const el = document.getElementById(id);
-        if (el && el.offsetTop <= trigger) current = id;
-      }
-      setActiveSection(current);
+    const ids = sections.map((s) => s.id);
+    const update = () => {
+      setActiveSection(getSectionAt(ids, window.innerHeight * ACTIVE_LINE) ?? ids[0]);
+      const behind = getSectionAt(ids, NAV_LINE);
+      setOnDark(!!behind && document.getElementById(behind)?.dataset.sectionTheme === "dark");
     };
 
-    window.addEventListener("scroll", updateActive, { passive: true });
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
     // Defer first run so section elements are in the DOM after page transition
-    const raf = requestAnimationFrame(updateActive);
+    const raf = requestAnimationFrame(update);
     return () => {
-      window.removeEventListener("scroll", updateActive);
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
       cancelAnimationFrame(raf);
     };
   }, [sections]);
 
   const handleSectionClick = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    const top = getSectionScrollTop(id);
+    if (top === null) return;
+    if (lenis) lenis.scrollTo(top, { duration: 1.2 });
+    else window.scrollTo({ top, behavior: "smooth" });
   };
+
+  const idle = onDark ? "text-white/35 hover:text-white/80" : "text-[#C8C4BC] hover:text-[#2D2D2D]";
+  const current = onDark ? "text-white" : "text-[#1A1A1A]";
 
   return (
     <motion.aside
@@ -91,13 +60,13 @@ function ProjectSideNav() {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Link
-        to="/proyectos"
-        className="flex items-center gap-2 text-[#C8C4BC] hover:text-[#2D2D2D] transition-colors duration-200 w-fit"
+      <button
+        onClick={() => navigate("/", { state: { scrollTo: "proyectos" } })}
+        className={`flex items-center gap-2 transition-colors duration-300 w-fit ${idle}`}
       >
         {BackArrowIcon}
         <span className="text-sm font-medium">Proyectos</span>
-      </Link>
+      </button>
 
       <nav role="navigation" aria-label="Secciones del proyecto" className="flex flex-col">
         {sections.map((section) => {
@@ -106,10 +75,9 @@ function ProjectSideNav() {
             <button
               key={section.id}
               onClick={() => handleSectionClick(section.id)}
-              className={`text-left leading-[1.1] transition-all duration-200 inline-block origin-left hover:scale-[1.05] ${
-                isActive
-                  ? "text-[26px] font-bold text-[#1A1A1A]"
-                  : "text-[24px] font-light text-[#C8C4BC] hover:text-[#2D2D2D]"
+              aria-current={isActive ? "true" : undefined}
+              className={`text-left leading-[1.1] transition-all duration-300 inline-block origin-left hover:scale-[1.05] ${
+                isActive ? `text-[26px] font-bold ${current}` : `text-[24px] font-light ${idle}`
               }`}
             >
               {section.label}

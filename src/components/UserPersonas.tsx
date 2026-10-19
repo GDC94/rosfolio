@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import claraImage from "../assets/hr/CLARA.svg";
-import santiagoImage from "../assets/hr/SANTIAGO.svg";
+// 400px avatars (the original CLARA/SANTIAGO.svg embed 4096px photos, ~15MB, and stall scrolling on phones)
+import claraImage from "../assets/hr/clara-avatar.jpg";
+import santiagoImage from "../assets/hr/santiago-avatar.jpg";
 
 interface PersonaData {
   name: string;
@@ -31,7 +32,7 @@ const personas: PersonaData[] = [
     details: {
       edad: "54 años",
       educacion: "Universitario",
-      rol: "Jefa de RRHH",
+      rol: "Líder de Recursos Humanos",
       ubicacion: "Córdoba, Arg.",
       dispositivos: ["Windows", "Android"],
     },
@@ -92,23 +93,13 @@ export function UserPersonas() {
               ease: [0.16, 1, 0.3, 1],
             }}
             viewport={{ once: true, margin: "-50px" }}
-            className="bg-white rounded-3xl shadow-sm border border-[#E0DBD6]/50 overflow-hidden"
+            className="bg-card rounded-3xl border border-line overflow-hidden flex flex-col"
           >
             {/* Header con foto y quote */}
             <div
               className="p-6 relative"
               style={{ backgroundColor: persona.accentLight }}
             >
-              {/* Decorative elements */}
-              <div
-                className="absolute top-4 right-4 w-2 h-2 rotate-45"
-                style={{ backgroundColor: persona.color }}
-              />
-              <div
-                className="absolute bottom-4 right-8 w-1.5 h-1.5 rounded-full opacity-40"
-                style={{ backgroundColor: persona.color }}
-              />
-
               <div className="flex gap-5">
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
@@ -143,12 +134,12 @@ export function UserPersonas() {
                 {/* Name and quote */}
                 <div className="flex-1 min-w-0">
                   <h3
-                    className="text-xl font-semibold mb-2"
+                    className="type-h3 mb-2"
                     style={{ color: persona.color }}
                   >
                     {persona.name}
                   </h3>
-                  <p className="text-[#4A4A4A] text-sm leading-relaxed italic">
+                  <p className="type-body-s text-ink-muted italic">
                     "{persona.quote}"
                   </p>
                 </div>
@@ -156,8 +147,8 @@ export function UserPersonas() {
             </div>
 
             {/* Details grid */}
-            <div className="px-6 py-4 border-b border-[#E0DBD6]/50">
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+            <div className="px-6 py-4 border-b border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                 {[
                   { label: "Edad", value: persona.details.edad },
                   { label: "Educación", value: persona.details.educacion },
@@ -165,10 +156,10 @@ export function UserPersonas() {
                   { label: "Ubicación", value: persona.details.ubicacion },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-2">
-                    <span className="text-xs uppercase tracking-wider text-[#9A9A9A] font-medium">
+                    <span className="type-overline uppercase text-ink-subtle">
                       {item.label}:
                     </span>
-                    <span className="text-sm text-[#2D2D2D] font-medium">
+                    <span className="type-body-s text-ink font-medium">
                       {item.value}
                     </span>
                   </div>
@@ -176,11 +167,11 @@ export function UserPersonas() {
               </div>
 
               {/* Devices */}
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-dashed border-[#E0DBD6]/60">
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-dashed border-line">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="w-4 h-4 text-[#9A9A9A]"
+                  className="w-4 h-4 text-ink-subtle"
                 >
                   <path
                     d="M4 6h18V4H4c-1.1 0-2 .9-2 2v11H0v3h14v-3H4V6zm19 2h-6c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1zm-1 9h-4v-7h4v7z"
@@ -191,7 +182,7 @@ export function UserPersonas() {
                   {persona.details.dispositivos.map((device) => (
                     <span
                       key={device}
-                      className="text-xs px-2 py-1 rounded-full bg-[#F5F0EB] text-[#6B6B6B] font-medium"
+                      className="type-caption px-2 py-1 rounded-full bg-ink/5 text-ink-muted"
                     >
                       {device}
                     </span>
@@ -201,22 +192,19 @@ export function UserPersonas() {
             </div>
 
             {/* Contexto */}
-            <div className="px-6 py-4 border-b border-[#E0DBD6]/50">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-1 h-4 rounded-full bg-[rgb(201,188,63)]" />
-                <h4 className="text-xs uppercase tracking-[0.1em] text-[rgb(201,188,63)] font-semibold">
-                  Contexto
-                </h4>
-              </div>
-              <p className="text-sm text-[#4A4A4A] leading-relaxed">
+            <div className="px-6 py-4 border-b border-line">
+              <h4 className="type-overline uppercase text-[rgb(201,188,63)] mb-3">
+                Contexto
+              </h4>
+              <p className="type-body-s text-ink-muted">
                 {persona.contexto}
               </p>
             </div>
 
             {/* Motivaciones */}
-            <div className="px-6 py-4 border-b border-[#E0DBD6]/50 bg-emerald-50/30">
+            <div className="px-6 py-4 border-b border-line bg-emerald-500/5">
               <div className="flex items-center gap-2 mb-3">
-                <div className="p-1.5 rounded-lg bg-emerald-100">
+                <div className="p-1.5 rounded-lg bg-emerald-500/15">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -228,7 +216,7 @@ export function UserPersonas() {
                     />
                   </svg>
                 </div>
-                <h4 className="text-xs uppercase tracking-[0.1em] text-emerald-700 font-semibold">
+                <h4 className="type-overline uppercase text-emerald-700">
                   Motivaciones
                 </h4>
               </div>
@@ -243,7 +231,7 @@ export function UserPersonas() {
                     className="flex items-start gap-2"
                   >
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
-                    <span className="text-sm text-[#4A4A4A] leading-relaxed">
+                    <span className="type-body-s text-ink-muted">
                       {item}
                     </span>
                   </motion.li>
@@ -252,21 +240,25 @@ export function UserPersonas() {
             </div>
 
             {/* Frustraciones */}
-            <div className="px-6 py-4 bg-amber-50/30">
+            <div className="flex-1 px-6 py-4 bg-amber-500/5">
               <div className="flex items-center gap-2 mb-3">
-                <div className="p-1.5 rounded-lg bg-amber-100">
+                <div className="p-1.5 rounded-lg bg-amber-500/15">
+                  {/* Sad face */}
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
                     className="w-4 h-4 text-amber-600"
+                    aria-hidden="true"
                   >
-                    <path
-                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
-                      fill="currentColor"
-                    />
+                    <circle cx="12" cy="12" r="9.5" />
+                    <path d="M8 16.5c1-1.3 2.4-2 4-2s3 .7 4 2" />
+                    <path d="M9 9.5v.5M15 9.5v.5" strokeWidth={2.5} />
                   </svg>
                 </div>
-                <h4 className="text-xs uppercase tracking-[0.1em] text-amber-700 font-semibold">
+                <h4 className="type-overline uppercase text-amber-700">
                   Frustraciones
                 </h4>
               </div>
@@ -281,7 +273,7 @@ export function UserPersonas() {
                     className="flex items-start gap-2"
                   >
                     <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-2 flex-shrink-0" />
-                    <span className="text-sm text-[#4A4A4A] leading-relaxed">
+                    <span className="type-body-s text-ink-muted">
                       {item}
                     </span>
                   </motion.li>
@@ -298,27 +290,16 @@ export function UserPersonas() {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.6 }}
         viewport={{ once: true }}
-        className="mt-10 p-8 bg-white rounded-2xl shadow-sm border border-[#E0DBD6]/50 relative overflow-hidden"
+        className="mt-10 p-6 sm:p-8 bg-card rounded-2xl border border-line relative overflow-hidden"
       >
         {/* Decorative gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-[rgb(201,188,63)]/5 via-transparent to-[rgb(111,141,181)]/5" />
 
-        {/* Corner accents */}
-        <div className="absolute top-4 left-4 w-3 h-3 border-l-2 border-t-2 border-[rgb(201,188,63)]/40" />
-        <div className="absolute bottom-4 right-4 w-3 h-3 border-r-2 border-b-2 border-[rgb(201,188,63)]/40" />
-
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <motion.div
-              className="w-2.5 h-2.5 bg-[rgb(201,188,63)] rotate-45"
-              animate={{ rotate: [45, 90, 45] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <span className="text-xs uppercase tracking-[0.15em] text-[rgb(201,188,63)] font-semibold">
-              Insight de las Personas
-            </span>
-          </div>
-          <p className="text-[#4A4A4A] text-base leading-[1.8]">
+          <span className="block type-overline uppercase text-[rgb(201,188,63)] mb-4">
+            Insight de las Personas
+          </span>
+          <p className="type-body-l text-ink-muted">
             El contraste entre{" "}
             <span className="font-semibold" style={{ color: "rgb(201,188,63)" }}>
               Clara
@@ -330,11 +311,11 @@ export function UserPersonas() {
             representa el desafío central de{" "}
             <span className="text-[rgb(201,188,63)] font-semibold">HacheR</span>
             : crear una herramienta que sea{" "}
-            <span className="text-[#2D2D2D] font-semibold">
+            <span className="text-ink font-semibold">
               suficientemente simple
             </span>{" "}
             para usuarios con poca experiencia tecnológica, pero{" "}
-            <span className="text-[#2D2D2D] font-semibold">
+            <span className="text-ink font-semibold">
               suficientemente potente
             </span>{" "}
             para profesionales que buscan agilidad y personalización.

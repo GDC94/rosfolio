@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, PresenceContext } from "framer-motion";
 import { ReactNode } from "react";
 
 interface PageTransitionProps {
@@ -13,7 +13,10 @@ function PageTransition({ children }: PageTransitionProps) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25, ease: "easeInOut" }}
     >
-      {children}
+      {/* AnimatePresence's initial={false} (no fade on first load) would otherwise
+          reach every motion component in the page and skip their `initial`
+          states, so entry animations would render already finished. */}
+      <PresenceContext.Provider value={null}>{children}</PresenceContext.Provider>
     </motion.div>
   );
 }

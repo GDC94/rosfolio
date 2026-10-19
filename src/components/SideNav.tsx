@@ -1,6 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
-import { MI_PROCESO_IDX, MI_PROCESO_EXTRA, SOBRE_MI_IDX, SOBRE_MI_EXTRA, SECTION_META } from "../pages/MainPage";
+import { MI_PROCESO_IDX, MI_PROCESO_EXTRA, SOBRE_MI_IDX, SECTION_META } from "../pages/MainPage";
+import { getSobreMiExtra } from "../data/homeScroll";
 
 function isDarkBg(hex: string) {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -21,6 +22,7 @@ const navItems = [
 
 function SideNav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMainPage = location.pathname === "/";
   const [activeSection, setActiveSection] = useState("inicio");
 
@@ -28,15 +30,15 @@ function SideNav() {
     const sectionH = window.innerHeight - 40;
     const sy = window.scrollY;
 
-    // Sobre Mi is fully visible at SOBRE_MI_IDX*sH, horizontal zone ends at +SOBRE_MI_EXTRA*sH
-    const sobreMiEnd    = (SOBRE_MI_IDX + SOBRE_MI_EXTRA) * sectionH;   // 6*sH
+    // Sobre Mi is fully visible at SOBRE_MI_IDX*sH, its horizontal zone lasts getSobreMiExtra()*sH
+    const sobreMiEnd    = (SOBRE_MI_IDX + getSobreMiExtra()) * sectionH;
     // Mi Proceso enters right after, fully visible 1*sH later, horizontal zone ends at +MI_PROCESO_EXTRA*sH
-    const miProcesoEnd  = sobreMiEnd + sectionH + MI_PROCESO_EXTRA * sectionH; // 9*sH
+    const miProcesoEnd  = sobreMiEnd + sectionH + MI_PROCESO_EXTRA * sectionH;
 
     let adjustedSY: number;
     if (sy >= miProcesoEnd) {
       // Past both horizontal zones
-      adjustedSY = sy - (SOBRE_MI_EXTRA + MI_PROCESO_EXTRA) * sectionH;
+      adjustedSY = sy - (getSobreMiExtra() + MI_PROCESO_EXTRA) * sectionH;
     } else if (sy >= sobreMiEnd) {
       // Mi Proceso entering or scrolling horizontally
       adjustedSY = MI_PROCESO_IDX * sectionH;
@@ -59,7 +61,11 @@ function SideNav() {
   }, [isMainPage, updateActive]);
 
   const handleClick = (e: React.MouseEvent, sectionId: string) => {
-    if (!isMainPage) return;
+    if (!isMainPage) {
+      e.preventDefault();
+      navigate("/", { state: { scrollTo: sectionId } });
+      return;
+    }
     e.preventDefault();
     const sectionH = window.innerHeight - 40;
     const index = navItems.findIndex((n) => n.sectionId === sectionId);
@@ -67,9 +73,9 @@ function SideNav() {
     // Sections after a horizontal zone are offset by its extra scroll units
     const targetScroll =
       index > MI_PROCESO_IDX
-        ? (index + SOBRE_MI_EXTRA + MI_PROCESO_EXTRA) * sectionH
+        ? (index + getSobreMiExtra() + MI_PROCESO_EXTRA) * sectionH
         : index === MI_PROCESO_IDX
-          ? (index + SOBRE_MI_EXTRA) * sectionH
+          ? (index + getSobreMiExtra()) * sectionH
           : index * sectionH;
 
     window.scrollTo({ top: targetScroll, behavior: "smooth" });
