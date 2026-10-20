@@ -19,8 +19,8 @@ export default function NextProjectCard({ projectId }: { projectId: string }) {
   return (
     <motion.div
       // Same footprint as the open card on the home grid: there the row also holds
-      // three 72px pills (+12px gaps), and on mobile three 36px pills in a 60vh column.
-      className="mt-20 md:mt-28 md:w-[calc(100%-252px)] mx-auto"
+      // four 72px pills (+12px gaps), and on mobile four 36px pills in a 68vh column.
+      className="mt-20 md:mt-28 md:w-[calc(100%-336px)] mx-auto"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
@@ -30,7 +30,7 @@ export default function NextProjectCard({ projectId }: { projectId: string }) {
 
       <Link
         to={`/project/${projectId}`}
-        className="group relative block h-[calc(60vh-126px)] min-h-[300px] md:h-[58vh] rounded-[20px] md:rounded-[28px] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(201,188,63)] focus-visible:ring-offset-4"
+        className="group relative block h-[calc(68vh-168px)] min-h-[300px] md:h-[58vh] rounded-[20px] md:rounded-[28px] overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(201,188,63)] focus-visible:ring-offset-4"
         aria-label={`Ver proyecto: ${project.title}`}
       >
         <img

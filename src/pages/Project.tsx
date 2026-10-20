@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { motion, AnimatePresence, useInView, useScroll, useTransform, type Variants } from "framer-motion";
+import { motion, AnimatePresence, useInView, type Variants } from "framer-motion";
 import { useRef, useState, type ReactNode } from "react";
 import Header from "../components/Header";
-import { getProjectById, xconsImages, jodifyImages, puertaPuertaImages } from "../data/projects";
+import { FEATURED_PROJECT_IDS, getProjectById, xconsImages, jodifyImages, puertaPuertaImages } from "../data/projects";
 import { getProjectSections, themeForIndex } from "../data/projectSections";
 import BenchmarkTable from "../components/BenchmarkTable";
 import JodifyBenchmarkTable from "../components/JodifyBenchmarkTable";
@@ -14,8 +14,10 @@ import MvpFeatureCards from "../components/project/MvpFeatureCards";
 import ChallengeSketches from "../components/project/ChallengeSketches";
 import PricingFlowSketches from "../components/project/PricingFlowSketches";
 import { JODIFY_CHALLENGE_SKETCHES, JODIFY_SKETCH_FILL } from "../components/project/JodifySketches";
+import { BUILD3D_CHALLENGE_SKETCHES, BUILD3D_SKETCH_FILL } from "../components/project/Build3DSketches";
 import UIKitMosaic, { type KitBlock, type MobileSection } from "../components/project/UIKitMosaic";
 import NextProjectCard from "../components/project/NextProjectCard";
+import { Build3DIdentitySection, Build3DSystemSection, Build3DUIKitSection, Build3DWebSection } from "../components/project/Build3DSections";
 
 // Hoisted SVG icons - prevents recreation on each render
 const NextArrowIcon = (
@@ -32,6 +34,7 @@ const NextArrowIcon = (
 
 const GOLD = "rgb(201,188,63)";
 const JODIFY = "#7C16F5";
+const BUILD3D = "#C8302A";
 
 type ProjectInfo = NonNullable<ReturnType<typeof getProjectById>>;
 
@@ -40,11 +43,9 @@ function Project() {
   const project = getProjectById(projectId || "1");
 
   const getNextProjectId = (): string => {
-    // Only cycle through navigable projects: HR (1), XCONS (2), Jodify (3)
-    const navigableProjects = 3;
-    const currentId = parseInt(projectId || "1", 10);
-    const nextId = currentId >= navigableProjects ? 1 : currentId + 1;
-    return String(nextId);
+    // Cycle through the featured case studies in home-grid order
+    const idx = FEATURED_PROJECT_IDS.indexOf(projectId || "1");
+    return FEATURED_PROJECT_IDS[(idx + 1) % FEATURED_PROJECT_IDS.length];
   };
 
   // Animation variants
@@ -109,8 +110,9 @@ function Project() {
   const isXCONS = project.id === "2";
   const isJodify = project.id === "3";
   const isPuertaPuerta = project.id === "10";
-  const isHR = !isXCONS && !isJodify && !isPuertaPuerta;
-  const accent = isJodify ? JODIFY : GOLD;
+  const isBuild3D = project.id === "11";
+  const isHR = !isXCONS && !isJodify && !isPuertaPuerta && !isBuild3D;
+  const accent = isJodify ? JODIFY : isBuild3D ? BUILD3D : GOLD;
 
   const sections = getProjectSections(project.id);
   const num = (i: number) => String(i + 1).padStart(2, "0");
@@ -148,8 +150,16 @@ function Project() {
         return isPuertaPuerta ? (
           <PuertaPuertaDisenoSection n={n} {...shared} />
         ) : (
-          <ResultsSection project={project} n={n} {...shared} isXCONS={isXCONS} isHR={isHR} />
+          <ResultsSection project={project} n={n} {...shared} isXCONS={isXCONS} />
         );
+      case "project-identity":
+        return <Build3DIdentitySection />;
+      case "project-system":
+        return <Build3DSystemSection />;
+      case "project-uikit":
+        return <Build3DUIKitSection />;
+      case "project-web":
+        return <Build3DWebSection />;
       default:
         return null;
     }
@@ -256,13 +266,6 @@ interface SectionProps {
 // ─── Hero (inside the first section) ────────────────────────────────────────
 
 function HeroSection({ project }: { project: ProjectInfo }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-
   const meta = [
     { label: "Año", value: project.timeline },
     { label: "Tipo de Proyecto", value: project.projectType },
@@ -270,9 +273,9 @@ function HeroSection({ project }: { project: ProjectInfo }) {
   ];
 
   return (
-    <div ref={ref} className="relative mb-10 md:mb-24">
+    <div className="relative mb-10 md:mb-24">
       <motion.h1
-        className="type-h1 text-ink mb-6 md:mb-8 max-w-4xl"
+        className="type-h1 text-ink mb-6 md:mb-8"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -281,7 +284,7 @@ function HeroSection({ project }: { project: ProjectInfo }) {
       </motion.h1>
 
       <motion.dl
-        className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 py-4 md:py-6 border-t border-b border-line mb-6 md:mb-10"
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 py-4 md:py-6 border-t border-b border-line"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.6 }}
@@ -294,25 +297,22 @@ function HeroSection({ project }: { project: ProjectInfo }) {
         ))}
       </motion.dl>
 
-      <motion.div
-        className="rounded-2xl overflow-hidden"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {/* Short, full-width crop so the cover doesn't dominate the screen */}
-        <motion.div className="aspect-[2/1] sm:aspect-[3/1] overflow-hidden" style={{ y: imageY }}>
-          <img
-            src={project.images?.cover}
-            alt={project.title}
-            width={1200}
-            height={675}
-            loading="eager"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: project.coverPosition ?? "center 20%" }}
-          />
-        </motion.div>
-      </motion.div>
+      {project.liveUrl && (
+        <motion.a
+          href={project.liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 mt-6 md:mt-8 px-3 py-1 bg-[#1A1A1A] hover:bg-[#333] text-white text-[12px] font-medium rounded-md transition-colors duration-200"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+        >
+          Ver sitio web
+          <svg width="9" height="9" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 11L11 3M11 3H5M11 3V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </motion.a>
+      )}
     </div>
   );
 }
@@ -347,7 +347,13 @@ const XCONS_CHALLENGES = [
 function ProjectBriefSection({
   project, n, fadeIn, staggerContainer, isXCONS, accent,
 }: SectionProps & { project: ProjectInfo; isXCONS: boolean; accent: string }) {
-  const briefHighlights = isXCONS ? [
+  const briefHighlights = project.id === "11" ? [
+    "estudio de impresión 3D",
+    "identidad visual desde cero",
+    "sitio web",
+    "la pieza que no se consigue",
+    "presupuesto en 24 horas"
+  ] : isXCONS ? [
     "ecosistema e-commerce",
     "industria de la construcción",
     "experiencia de compra de materiales",
@@ -372,7 +378,7 @@ function ProjectBriefSection({
 
       {isXCONS ? (
         <motion.div variants={fadeIn} className="flex flex-col md:flex-row items-start gap-8 md:gap-16">
-          <p className="type-body-l text-ink-muted max-w-xl">
+          <p className="type-body-l text-ink-muted flex-1 min-w-0">
             {renderHighlightedText(project.conceptSummary, briefHighlights)}
           </p>
           <div className="w-full max-w-[280px] mx-auto md:mx-0 md:w-[260px] md:ml-auto flex-shrink-0">
@@ -434,6 +440,13 @@ function ProjectBriefSection({
         ) : (
           project.id === "1" ? (
             <ChallengeSketches challenges={project.challenges ?? []} />
+          ) : project.id === "11" ? (
+            <ChallengeSketches
+              challenges={project.challenges ?? []}
+              sketches={BUILD3D_CHALLENGE_SKETCHES}
+              circleColor={BUILD3D}
+              fill={BUILD3D_SKETCH_FILL}
+            />
           ) : project.id === "3" ? (
             <ChallengeSketches
               challenges={project.challenges ?? []}
@@ -598,7 +611,7 @@ function XCONSKeyFindingsSection({ n, fadeIn }: SectionProps) {
 
             <div className="flex flex-col md:flex-row gap-6 sm:gap-10 items-start">
               <div className="flex-1 min-w-0">
-                <h3 className="type-h2 text-ink mb-3" style={{ textWrap: "balance" } as React.CSSProperties}>
+                <h3 className="type-h2 text-ink mb-3">
                   {solution.title}
                 </h3>
                 <p className="type-body text-ink-muted mb-6">{solution.subtitle}</p>
@@ -646,9 +659,8 @@ function XCONSLogicSection({ n, fadeIn }: SectionProps) {
       <motion.div variants={fadeIn} className="flex flex-col gap-10">
         <div>
           <h3 className="type-subtitle text-ink mb-4">Arquitectura de Precios Dinámicos</h3>
-          <p className="type-body-l text-ink-muted max-w-3xl">
-            Como diseñador, tuve que estructurar cómo se le presenta el precio al usuario.
-            <span className="hidden sm:inline"><br /></span> No es un número estático; es una variable que cambia según múltiples factores:
+          <p className="type-body-l text-ink-muted">
+            Como diseñador, tuve que estructurar cómo se le presenta el precio al usuario. No es un número estático; es una variable que cambia según múltiples factores:
           </p>
         </div>
 
@@ -832,8 +844,8 @@ function DecisionArrow({ delay = 0 }: { delay?: number }) {
 }
 
 function ResultsSection({
-  project, n, fadeIn, staggerContainer, isXCONS, isHR,
-}: SectionProps & { project: ProjectInfo; isXCONS: boolean; isHR: boolean }) {
+  project, n, fadeIn, staggerContainer, isXCONS,
+}: SectionProps & { project: ProjectInfo; isXCONS: boolean }) {
   const xconsHighlights = [
     "modelo mental de la construcción",
     "Presupuesto > Carrito",
@@ -850,8 +862,18 @@ function ResultsSection({
     "usuarios realmente quieran usar"
   ];
 
-  const decisions = isHR ? project.results?.challengeDecisions : undefined;
-  const tasks = isHR ? project.results?.testTasks : undefined;
+  const build3dHighlights = [
+    "sistema de marca cerrado",
+    "bajar directo a una interfaz",
+    "la base de cada componente"
+  ];
+
+  const nextStepsHighlights =
+    project.id === "11" ? build3dHighlights : isXCONS ? xconsHighlights : hrHighlights;
+
+  // Only the case studies that define them (HR, BUILD.3D) show these blocks
+  const decisions = project.results?.challengeDecisions;
+  const tasks = project.results?.testTasks;
 
   return (
     <Reveal stagger={staggerContainer}>
@@ -861,7 +883,7 @@ function ResultsSection({
       {decisions && decisions.length > 0 && (
         <motion.div variants={fadeIn} className="mb-16 md:mb-20">
           <h3 className="type-subtitle text-ink mb-2">Del desafío a la decisión</h3>
-          <p className="type-body text-ink-muted mb-8 max-w-2xl">
+          <p className="type-body text-ink-muted mb-8">
             Cada pregunta del inicio tuvo una respuesta concreta en el diseño.
           </p>
           <ol className="border-t border-line">
@@ -900,7 +922,7 @@ function ResultsSection({
       {tasks && tasks.length > 0 && (
         <motion.div variants={fadeIn} className="mt-16 md:mt-20">
           <h3 className="type-subtitle text-ink mb-2">Tareas a testear y criterios de éxito</h3>
-          <p className="type-body text-ink-muted mb-8 max-w-2xl">
+          <p className="type-body text-ink-muted mb-8">
             Lo que se le pedirá a cada participante, cómo se mide y cuándo la consideramos superada.
           </p>
 
@@ -934,8 +956,8 @@ function ResultsSection({
 
       {project.results?.nextSteps && (
         <motion.div variants={fadeIn} className={`mt-16 pt-10 ${tasks?.length ? "" : "border-t border-line"}`}>
-          <p className="type-body-l text-ink-muted text-center max-w-3xl mx-auto">
-            "{renderHighlightedText(project.results.nextSteps, isXCONS ? xconsHighlights : hrHighlights)}"
+          <p className="type-body-l text-ink-muted text-center">
+            "{renderHighlightedText(project.results.nextSteps, nextStepsHighlights)}"
           </p>
         </motion.div>
       )}

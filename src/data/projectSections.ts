@@ -31,6 +31,16 @@ export function getProjectSections(projectId: string): ProjectSection[] {
       { id: "project-results",  label: "Resultados y Próximos Pasos" },
     ];
   }
+  if (projectId === "11") {
+    return [
+      { id: "project-brief",    label: "Resumen del Proyecto" },
+      { id: "project-identity", label: "Identidad de Marca" },
+      { id: "project-system",   label: "Sistema Visual" },
+      { id: "project-uikit",    label: "UI Kit" },
+      { id: "project-web",      label: "Del Manual a la Web" },
+      { id: "project-results",  label: "Resultados y Próximos Pasos" },
+    ];
+  }
   if (projectId === "10") {
     return [
       { id: "project-brief",    label: "Resumen del Proyecto" },

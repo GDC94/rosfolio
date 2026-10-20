@@ -103,7 +103,7 @@ function ProjectsGrid({ projects, showComingSoon = true }: ProjectsGridProps) {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const items = showComingSoon ? projects.slice(0, 3) : projects;
+  const items = showComingSoon ? projects.slice(0, 4) : projects;
   const allItems = showComingSoon ? [...items, COMING_SOON] : items;
 
   const collapsedSize = isMobile ? 36 : 72;

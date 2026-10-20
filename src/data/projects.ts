@@ -66,6 +66,61 @@ export const xconsImages = {
   contacto: xconsContacto,
 };
 
+// BUILD.3D assets (captured from build3d.ar and the brand book)
+import b3dCard from "../assets/build3d/portada-card.webp";
+import b3dCover from "../assets/build3d/portada-proyecto.webp";
+import b3dWebHero from "../assets/build3d/web-hero.webp";
+import b3dWebHeader from "../assets/build3d/web-header.webp";
+import b3dWebServicios from "../assets/build3d/web-servicios.webp";
+import b3dWebComoFunciona from "../assets/build3d/web-como-funciona.webp";
+import b3dWebCatalogo from "../assets/build3d/web-catalogo.webp";
+import b3dWebCtaFooter from "../assets/build3d/web-cta-footer.webp";
+import b3dPageCatalogo from "../assets/build3d/page-catalogo.webp";
+import b3dPageServicios from "../assets/build3d/page-servicios.webp";
+import b3dPageNosotros from "../assets/build3d/page-nosotros.webp";
+import b3dPagePresupuesto from "../assets/build3d/page-presupuesto.webp";
+import b3dMobileHero from "../assets/build3d/m-hero.webp";
+import b3dMobileServicios from "../assets/build3d/m-servicios.webp";
+import b3dMobileComoFunciona from "../assets/build3d/m-como-funciona.webp";
+import b3dMobileCatalogo from "../assets/build3d/m-page-catalogo.webp";
+import b3dMobileServiciosPage from "../assets/build3d/m-page-servicios.webp";
+import b3dManualNavbar from "../assets/build3d/manual-navbar.webp";
+import b3dManualHero from "../assets/build3d/manual-hero.webp";
+import b3dManualForm from "../assets/build3d/manual-form.webp";
+import b3dFooterVideo from "../assets/build3d/web-footer.webm";
+import b3dFooterPoster from "../assets/build3d/web-footer-poster.webp";
+import b3dPrinterVideo from "../assets/build3d/web-printer.webm";
+import b3dPrinterPoster from "../assets/build3d/web-printer-poster.webp";
+import b3dUiProductCard from "../assets/build3d/ui-product-card.webp";
+import b3dUiWhatsapp from "../assets/build3d/ui-whatsapp.webp";
+
+export const build3dImages = {
+  webHero: b3dWebHero,
+  webHeader: b3dWebHeader,
+  webServicios: b3dWebServicios,
+  webComoFunciona: b3dWebComoFunciona,
+  webCatalogo: b3dWebCatalogo,
+  webCtaFooter: b3dWebCtaFooter,
+  pageCatalogo: b3dPageCatalogo,
+  pageServicios: b3dPageServicios,
+  pageNosotros: b3dPageNosotros,
+  pagePresupuesto: b3dPagePresupuesto,
+  mobileHero: b3dMobileHero,
+  mobileServicios: b3dMobileServicios,
+  mobileComoFunciona: b3dMobileComoFunciona,
+  mobileCatalogo: b3dMobileCatalogo,
+  mobileServiciosPage: b3dMobileServiciosPage,
+  manualNavbar: b3dManualNavbar,
+  manualHero: b3dManualHero,
+  manualForm: b3dManualForm,
+  footerVideo: b3dFooterVideo,
+  footerPoster: b3dFooterPoster,
+  printerVideo: b3dPrinterVideo,
+  printerPoster: b3dPrinterPoster,
+  uiProductCard: b3dUiProductCard,
+  uiWhatsapp: b3dUiWhatsapp,
+};
+
 import hrCover from "../assets/hr/cover.webp";
 // Cropped to the browser window (no lilac backdrop), rounded corners transparent
 import hrScreen1 from "../assets/hr/screens-clean/screen-1.webp";
@@ -122,6 +177,8 @@ export interface ProjectData {
   role?: string;
   /** object-position for the short case-study cover crop (defaults to "center 20%"). */
   coverPosition?: string;
+  /** Link to the live product, shown as a button in the case-study header. */
+  liveUrl?: string;
 
   // Case study fields
   projectName?: string;
@@ -490,6 +547,81 @@ export const projects: ProjectData[] = [
     },
   },
   {
+    id: "11",
+    title: "BUILD.3D",
+    category: "Professional",
+    company: "Estudio de Impresión 3D",
+    year: "2026",
+    description: "Identidad de marca y sitio web para un estudio de impresión 3D",
+    image: b3dCard,
+    cardImagePosition: "55% 8%",
+    role: "Branding, Diseño UI y colaboración en Desarrollo",
+    liveUrl: "https://build3d.ar/",
+    coverPosition: "center 40%",
+    projectName: "BUILD.3D",
+    projectType: "Identidad de Marca + Sitio Web",
+    timeline: "2026",
+    contribution: [
+      "Branding",
+      "Manual de Marca",
+      "Diseño de Interfaz (UI)",
+      "Colaboración en Desarrollo",
+    ],
+    conceptSummary:
+      "BUILD.3D es un estudio de impresión 3D de Bahía Blanca que fabrica repuestos, piezas personalizadas y prototipos. El proyecto fue construir su identidad visual desde cero —logo, paleta, tipografía, tono de voz y aplicaciones— y llevarla a un sitio web donde cualquier persona pueda pedir la pieza que no se consigue, entender qué material necesita y recibir un presupuesto en 24 horas.",
+
+    challenges: [
+      {
+        number: "01",
+        question: "¿Cómo diferenciar un estudio de impresión 3D de un taller industrial genérico?",
+      },
+      {
+        number: "02",
+        question: "¿Cómo crear una identidad que funcione igual en un logo, una tarjeta y una interfaz web?",
+      },
+      {
+        number: "03",
+        question: "¿Cómo explicar un servicio técnico a alguien que solo necesita un repuesto?",
+      },
+    ],
+
+    results: {
+      challengeDecisions: [
+        {
+          question: "¿Cómo diferenciar un estudio de impresión 3D de un taller industrial genérico?",
+          decision:
+            "Un territorio claro: laboratorio de diseño, no fábrica. Cubo isométrico en primarios Bauhaus, blanco como fondo dominante y una tipografía display con carácter (Syne) que se aleja de la estética industrial.",
+        },
+        {
+          question: "¿Cómo crear una identidad que funcione igual en un logo, una tarjeta y una interfaz web?",
+          decision:
+            "Un sistema cerrado y fácil de aplicar: cinco colores, dos familias tipográficas, tres grosores de línea, sin sombras ni esquinas redondeadas. El manual incluye navbar, botones, hero y formulario, que pasaron casi sin cambios al sitio.",
+        },
+        {
+          question: "¿Cómo explicar un servicio técnico a alguien que solo necesita un repuesto?",
+          decision:
+            "IBM Plex Mono para los datos técnicos, un \"¿Cómo funciona?\" en tres pasos, materiales explicados por uso (calor, carga, desgaste) y un tono de voz directo que da datos concretos en lugar de adjetivos.",
+        },
+      ],
+      validationPlan: [
+        "Seguimiento de consultas por formulario y WhatsApp para entender qué servicios se piden más.",
+        "Test de usabilidad del formulario de presupuesto con clientes particulares y talleres mecánicos.",
+        "Revisión de consistencia: cada pieza nueva (redes, packaging, catálogo) se valida contra el manual.",
+      ],
+      metrics: [
+        "Consultas recibidas por canal (Formulario vs. WhatsApp)",
+        "Tasa de finalización del formulario de presupuesto",
+        "Visitas al catálogo que terminan en \"Pedir esta pieza\"",
+      ],
+      nextSteps:
+        "BUILD.3D muestra cómo un sistema de marca cerrado —cinco colores, dos tipografías y reglas claras— puede bajar directo a una interfaz: el manual no fue un entregable aparte, fue la base de cada componente del sitio.",
+    },
+
+    images: {
+      cover: b3dCover,
+    },
+  },
+  {
     id: "4",
     title: "Examine iPhone in 3D",
     category: "Professional",
@@ -592,8 +724,13 @@ export const getProjectById = (id: string): ProjectData | undefined => {
   return projects.find((project) => project.id === id);
 };
 
+/** Order of the featured case studies on the home grid (and the "next project" cycle). */
+export const FEATURED_PROJECT_IDS = ["2", "11", "1", "3"];
+
 export const getFeaturedProjects = (count: number = 4): ProjectData[] => {
-  return projects.slice(0, count);
+  return FEATURED_PROJECT_IDS.slice(0, count)
+    .map((id) => getProjectById(id))
+    .filter((p): p is ProjectData => Boolean(p));
 };
 
 export const TOTAL_PROJECTS = projects.length;

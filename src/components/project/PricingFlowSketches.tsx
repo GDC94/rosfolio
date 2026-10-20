@@ -101,7 +101,7 @@ export default function PricingFlowSketches() {
             >
               <SketchFrame className="max-w-[180px] mb-4">{layer.sketch}</SketchFrame>
               <h4 className="text-[17px] md:text-[18px] font-semibold leading-snug text-ink mb-1">{layer.name}</h4>
-              <p className="type-body-s text-ink-muted max-w-[16em]">{layer.description}</p>
+              <p className="type-body-s text-ink-muted">{layer.description}</p>
             </motion.li>
             {i < LAYERS.length - 1 && (
               <motion.li
