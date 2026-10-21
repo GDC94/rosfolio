@@ -87,9 +87,11 @@ import b3dMobileServiciosPage from "../assets/build3d/m-page-servicios.webp";
 import b3dManualNavbar from "../assets/build3d/manual-navbar.webp";
 import b3dManualHero from "../assets/build3d/manual-hero.webp";
 import b3dManualForm from "../assets/build3d/manual-form.webp";
-import b3dFooterVideo from "../assets/build3d/web-footer.webm";
+import b3dFooterVideo from "../assets/build3d/web-footer.mp4";
+import b3dFooterVideoWebm from "../assets/build3d/web-footer.webm";
 import b3dFooterPoster from "../assets/build3d/web-footer-poster.webp";
-import b3dPrinterVideo from "../assets/build3d/web-printer.webm";
+import b3dPrinterVideo from "../assets/build3d/web-printer.mp4";
+import b3dPrinterVideoWebm from "../assets/build3d/web-printer.webm";
 import b3dPrinterPoster from "../assets/build3d/web-printer-poster.webp";
 import b3dUiProductCard from "../assets/build3d/ui-product-card.webp";
 import b3dUiWhatsapp from "../assets/build3d/ui-whatsapp.webp";
@@ -114,8 +116,10 @@ export const build3dImages = {
   manualHero: b3dManualHero,
   manualForm: b3dManualForm,
   footerVideo: b3dFooterVideo,
+  footerVideoWebm: b3dFooterVideoWebm,
   footerPoster: b3dFooterPoster,
   printerVideo: b3dPrinterVideo,
+  printerVideoWebm: b3dPrinterVideoWebm,
   printerPoster: b3dPrinterPoster,
   uiProductCard: b3dUiProductCard,
   uiWhatsapp: b3dUiWhatsapp,
