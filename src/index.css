@@ -43,6 +43,36 @@
   50%       { opacity: 0.85; transform: scale(1.2); }
 }
 
+/* ─── Lab cards: GIF-like loops ─────────────────────────────────────────── */
+/* Logo turns 90° every 2.5s with the Terrene expo in-out curve, then holds */
+@keyframes lab-gif-turn {
+  0%, 15%   { transform: rotate(0deg); }
+  25%, 40%  { transform: rotate(90deg); }
+  50%, 65%  { transform: rotate(180deg); }
+  75%, 90%  { transform: rotate(270deg); }
+  100%      { transform: rotate(360deg); }
+}
+@keyframes lab-gif-ripple {
+  0%   { transform: scale(1);   opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+@keyframes lab-gif-sweep {
+  0%, 55% { transform: translateX(0) skewX(-12deg); }
+  100%    { transform: translateX(400%) skewX(-12deg); }
+}
+@keyframes lab-gif-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+.lab-gif-turn    { animation: lab-gif-turn 10s cubic-bezier(.65,0,.076,1) infinite; }
+.lab-gif-ripple  { animation: lab-gif-ripple 4.2s cubic-bezier(.075,.82,.165,1) infinite; opacity: 0; }
+.lab-gif-sweep   { animation: lab-gif-sweep 6s ease-in-out infinite; }
+.lab-gif-breathe { animation: lab-gif-breathe 5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .lab-gif-turn, .lab-gif-ripple, .lab-gif-sweep, .lab-gif-breathe { animation: none; }
+}
+
 .lab-spin-cw  { animation: lab-spin-cw  26s linear infinite;     transform-origin: 100px 100px; }
 .lab-spin-ccw { animation: lab-spin-ccw 18s linear infinite;     transform-origin: 100px 100px; }
 .lab-orbit-c  { animation: lab-spin-cw  11s linear infinite;     transform-origin: 100px 100px; }

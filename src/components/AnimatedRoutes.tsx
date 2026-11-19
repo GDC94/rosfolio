@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import MainPage from "../pages/MainPage";
 import PageTransition from "./PageTransition";
@@ -10,6 +10,7 @@ const Acerca = lazy(() => import("../pages/Acerca"));
 const Proyectos = lazy(() => import("../pages/Proyectos"));
 const Faqs = lazy(() => import("../pages/Faqs"));
 const UnderConstruction = lazy(() => import("../pages/UnderConstruction"));
+const LabExperiment = lazy(() => import("../pages/LabExperiment"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -75,7 +76,19 @@ function AnimatedRoutes() {
             </Suspense>
           }
         />
-        {["/casos-de-estudio", "/laboratorio"].map((path) => (
+        {/* Lab index lives on the home page; experiments have their own page */}
+        <Route path="/laboratorio" element={<Navigate to="/" state={{ scrollTo: "laboratorio" }} replace />} />
+        <Route
+          path="/laboratorio/:labId"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageTransition>
+                <LabExperiment />
+              </PageTransition>
+            </Suspense>
+          }
+        />
+        {["/casos-de-estudio"].map((path) => (
           <Route
             key={path}
             path={path}

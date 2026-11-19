@@ -7,7 +7,7 @@ import ProjectsGrid from "../components/ProjectsGrid";
 import FAQ from "../components/FAQ";
 import MiProcesoSection from "../components/MiProcesoSection";
 import SobreMiSection from "../components/SobreMiSection";
-import { Grid12Background } from "../components/Background";
+import LabSection from "../components/lab/LabSection";
 import { getFeaturedProjects } from "../data/projects";
 import { getSobreMiExtra, useSobreMiExtra } from "../data/homeScroll";
 import { behanceProjects } from "../components/ProjectsList";
@@ -50,183 +50,6 @@ function getSectionEnterStart(index: number, sectionH: number, sobreMiExtra: num
   if (index > MI_PROCESO_IDX) extra += MI_PROCESO_EXTRA * sectionH;
   if (index > SOBRE_MI_IDX)   extra += sobreMiExtra     * sectionH;
   return base + extra;
-}
-
-function UnderConstructionSection({ title: _title }: { title: string }) {
-  return (
-    <div className="h-full flex flex-col px-4 md:pl-[440px] md:pr-[60px] md:items-center md:justify-center">
-      <span className="md:hidden type-overline text-[#9A9A9A] pt-3 pb-2">Laboratorio</span>
-      <Grid12Background />
-      <div className="relative z-10 flex flex-col items-center text-center gap-8">
-        {/* Illustration */}
-        <svg style={{ width: "min(460px, 72vw)", height: "auto" }} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            {/* Glass sphere — lit from upper-left */}
-            <radialGradient id="g-sphere" cx="36%" cy="27%" r="74%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="rgba(255,255,255,0.54)"/>
-              <stop offset="20%"  stopColor="rgba(250,246,240,0.18)"/>
-              <stop offset="55%"  stopColor="rgba(201,188,63,0.07)"/>
-              <stop offset="100%" stopColor="rgba(100,90,6,0.2)"/>
-            </radialGradient>
-            {/* Golden liquid */}
-            <radialGradient id="g-liq" cx="44%" cy="66%" r="64%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="rgba(252,238,72,0.9)"/>
-              <stop offset="48%"  stopColor="rgba(201,188,63,0.76)"/>
-              <stop offset="100%" stopColor="rgba(132,120,14,0.54)"/>
-            </radialGradient>
-            {/* Rim / cool backlight */}
-            <radialGradient id="g-rim" cx="75%" cy="77%" r="35%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="rgba(180,210,255,0.28)"/>
-              <stop offset="100%" stopColor="rgba(180,210,255,0)"/>
-            </radialGradient>
-            {/* Ambient glow */}
-            <radialGradient id="g-glow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"   stopColor="rgba(201,188,63,0.2)"/>
-              <stop offset="55%"  stopColor="rgba(201,188,63,0.06)"/>
-              <stop offset="100%" stopColor="rgba(201,188,63,0)"/>
-            </radialGradient>
-            {/* Ground shadow */}
-            <radialGradient id="g-shadow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%"   stopColor="rgba(18,16,3,0.24)"/>
-              <stop offset="60%"  stopColor="rgba(18,16,3,0.08)"/>
-              <stop offset="100%" stopColor="rgba(18,16,3,0)"/>
-            </radialGradient>
-            {/* Particle — mini-sphere gradient */}
-            <radialGradient id="g-p1" cx="30%" cy="25%" r="70%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="rgba(255,255,255,0.96)"/>
-              <stop offset="38%"  stopColor="rgba(230,217,60,0.92)"/>
-              <stop offset="100%" stopColor="rgba(130,118,14,0.7)"/>
-            </radialGradient>
-            <radialGradient id="g-p2" cx="30%" cy="25%" r="70%" gradientUnits="objectBoundingBox">
-              <stop offset="0%"   stopColor="rgba(255,255,255,0.82)"/>
-              <stop offset="40%"  stopColor="rgba(201,188,63,0.72)"/>
-              <stop offset="100%" stopColor="rgba(120,108,12,0.52)"/>
-            </radialGradient>
-            {/* Sphere clip */}
-            <clipPath id="c-sph">
-              <circle cx="100" cy="100" r="51.5"/>
-            </clipPath>
-            {/* Drop shadow */}
-            <filter id="f-drop" x="-25%" y="-8%" width="150%" height="148%">
-              <feDropShadow dx="0" dy="11" stdDeviation="11" floodColor="#181600" floodOpacity="0.17"/>
-            </filter>
-            {/* Glow blur */}
-            <filter id="f-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="7"/>
-            </filter>
-            {/* Soft large highlight */}
-            <filter id="f-soft" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2.8" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-
-          {/* ── Ambient glow ── */}
-          <circle cx="100" cy="100" r="76" fill="url(#g-glow)" filter="url(#f-glow)"/>
-
-          {/* ── Ground shadow ── */}
-          <ellipse cx="100" cy="165" rx="42" ry="7" fill="url(#g-shadow)"/>
-
-          {/* ── Orbit rings — BACK arcs (appear behind sphere) ── */}
-          <path d="M 174 100 A 74 16 0 0 0 26 100"
-            stroke="rgba(201,188,63,0.22)" strokeWidth="0.85" fill="none" strokeLinecap="round"/>
-          <g transform="rotate(58, 100, 100)">
-            <path d="M 174 100 A 74 16 0 0 0 26 100"
-              stroke="rgba(201,188,63,0.17)" strokeWidth="0.85" fill="none" strokeLinecap="round"/>
-          </g>
-          <g transform="rotate(116, 100, 100)">
-            <path d="M 174 100 A 74 16 0 0 0 26 100"
-              stroke="rgba(201,188,63,0.13)" strokeWidth="0.85" fill="none" strokeLinecap="round"/>
-          </g>
-
-          {/* ── Sphere ── */}
-          <circle cx="100" cy="100" r="52" fill="rgba(248,244,234,0.1)" filter="url(#f-drop)"/>
-
-          {/* Liquid — clipped & oscillating */}
-          <g clipPath="url(#c-sph)">
-            <g className="lab-liquid">
-              <rect x="47" y="114" width="106" height="52" fill="url(#g-liq)"/>
-              <ellipse cx="100" cy="115" rx="52" ry="8" fill="rgba(248,236,76,0.22)"/>
-              <ellipse cx="80" cy="132" rx="15" ry="6" fill="rgba(255,255,255,0.09)" transform="rotate(-18,80,132)"/>
-            </g>
-            <g className="lab-liquid">
-              <path d="M 49 116 Q 74 108 100 107 Q 126 108 151 116"
-                stroke="rgba(248,236,76,0.52)" strokeWidth="1.1" fill="none"/>
-            </g>
-          </g>
-
-          {/* Glass gradient */}
-          <circle cx="100" cy="100" r="52" fill="url(#g-sphere)"/>
-          {/* Rim light */}
-          <circle cx="100" cy="100" r="52" fill="url(#g-rim)"/>
-          {/* Edge */}
-          <circle cx="100" cy="100" r="52" stroke="rgba(196,183,52,0.3)" strokeWidth="0.7" fill="none"/>
-
-          {/* Primary highlight — large, soft */}
-          <ellipse cx="80" cy="77" rx="19" ry="11.5" fill="white" opacity="0.16"
-            transform="rotate(-30,80,77)" filter="url(#f-soft)"/>
-          {/* Specular lobe */}
-          <ellipse cx="74" cy="70" rx="7" ry="4.2" fill="white" opacity="0.52"
-            transform="rotate(-28,74,70)"/>
-          {/* Specular point */}
-          <circle cx="71" cy="68" r="1.9" fill="white" opacity="0.88"/>
-
-          {/* ── Orbit rings — FRONT arcs (appear in front of sphere) ── */}
-          <path d="M 174 100 A 74 16 0 0 1 26 100"
-            stroke="rgba(201,188,63,0.54)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-          <g transform="rotate(58, 100, 100)">
-            <path d="M 174 100 A 74 16 0 0 1 26 100"
-              stroke="rgba(201,188,63,0.43)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-          </g>
-          <g transform="rotate(116, 100, 100)">
-            <path d="M 174 100 A 74 16 0 0 1 26 100"
-              stroke="rgba(201,188,63,0.34)" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-          </g>
-
-          {/* ── Orbiting particles ── */}
-          {/* Group A — CW, starts right */}
-          <g className="lab-spin-cw">
-            <circle cx="173" cy="100" r="5.8" fill="url(#g-p1)"/>
-            <circle cx="27"  cy="100" r="3.8" fill="url(#g-p2)" opacity="0.72"/>
-          </g>
-          {/* Group B — CCW, starts lower-right quadrant */}
-          <g className="lab-spin-ccw">
-            <circle cx="138" cy="163" r="4.8" fill="url(#g-p1)"/>
-            <circle cx="62"  cy="37"  r="3.2" fill="url(#g-p2)" opacity="0.65"/>
-          </g>
-          {/* Group C — CW fast, starts lower-left */}
-          <g className="lab-orbit-c">
-            <circle cx="62"  cy="163" r="4.2" fill="url(#g-p2)"/>
-            <circle cx="138" cy="37"  r="2.8" fill="url(#g-p2)" opacity="0.58"/>
-          </g>
-
-          {/* ── Outer decorative ring (slow CCW) ── */}
-          <g className="lab-spin-ccw">
-            <circle cx="12"  cy="100" r="2.1" fill="rgba(201,188,63,0.52)"/>
-            <circle cx="188" cy="100" r="1.6" fill="rgba(201,188,63,0.36)"/>
-            <circle cx="100" cy="12"  r="2.4" fill="rgba(201,188,63,0.3)"/>
-            <circle cx="100" cy="188" r="1.7" fill="rgba(201,188,63,0.24)"/>
-          </g>
-
-
-          {/* Dot cluster top-left */}
-          <circle cx="27" cy="36" r="2.1" fill="rgba(201,188,63,0.44)"/>
-          <circle cx="34" cy="29" r="1.3" fill="rgba(201,188,63,0.28)"/>
-          <circle cx="21" cy="29" r="0.9" fill="rgba(175,164,42,0.22)"/>
-
-          {/* Square accent bottom-left */}
-          <rect x="22" y="148" width="7.5" height="7.5" rx="1"
-            fill="none" stroke="rgba(201,188,63,0.4)" strokeWidth="0.8"
-            transform="rotate(18,25.75,151.75)"/>
-        </svg>
-
-        <div className="space-y-1">
-          <p className="text-base text-[#6B6B6B]">Esta sección está siendo construida.</p>
-          <p className="text-base text-[#9A9A9A]">Pronto vas a poder verla.</p>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 function StackedSection({
@@ -366,7 +189,7 @@ export default function MainPage() {
       enterScroll={miProcesoEnterScroll}
     />,
 
-    <UnderConstructionSection key="lab" title="Laboratorio" />,
+    <LabSection key="lab" />,
 
     <div key="faqs" className="h-full flex flex-col overflow-hidden">
       {/* Scrollable FAQ content — scrollbar oculto */}

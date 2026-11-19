@@ -33,7 +33,13 @@ function ContentWrapper({ children }: { children: React.ReactNode }) {
   const isProjectPage = pathname.startsWith("/project/");
   // Right padding mirrors the side nav only on wide screens; below that it would
   // squeeze the content column (e.g. 144px wide at 1024px).
-  const paddingClass = isMainPage || isProjectPage ? "" : " md:pl-[440px] md:pr-[60px] xl:pr-[440px]";
+  // Lab experiments show wide screenshots, so they skip the extra right padding.
+  const isLabPage = pathname.startsWith("/laboratorio/");
+  const paddingClass = isMainPage || isProjectPage
+    ? ""
+    : isLabPage
+      ? " md:pl-[440px] md:pr-[60px]"
+      : " md:pl-[440px] md:pr-[60px] xl:pr-[440px]";
   return (
     <div style={{ overflowX: "clip" }} className={`pt-10${paddingClass}`}>
       {children}

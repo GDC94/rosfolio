@@ -16,10 +16,12 @@ export const themeForIndex = (index: number): SectionTheme =>
 export function getProjectSections(projectId: string): ProjectSection[] {
   if (projectId === "2") {
     return [
-      { id: "project-brief",    label: "Resumen del Proyecto" },
-      { id: "project-findings", label: "Hallazgos Clave y Soluciones" },
-      { id: "project-personas", label: "Lógica y Sistemas" },
-      { id: "project-results",  label: "Resumen" },
+      { id: "project-brief",      label: "Resumen del Proyecto" },
+      { id: "project-ai",         label: "Cómo trabajo" },
+      { id: "project-journey",    label: "La vida de una venta" },
+      { id: "project-assistant",  label: "Un producto con IA" },
+      { id: "project-backoffice", label: "Detrás del mostrador" },
+      { id: "project-system",     label: "El sistema" },
     ];
   }
   if (projectId === "3") {

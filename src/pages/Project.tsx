@@ -18,6 +18,10 @@ import { BUILD3D_CHALLENGE_SKETCHES, BUILD3D_SKETCH_FILL } from "../components/p
 import UIKitMosaic, { type KitBlock, type MobileSection } from "../components/project/UIKitMosaic";
 import NextProjectCard from "../components/project/NextProjectCard";
 import { Build3DIdentitySection, Build3DSystemSection, Build3DUIKitSection, Build3DWebSection } from "../components/project/Build3DSections";
+import {
+  XconsBriefSection, XconsAISection, XconsJourneySection, XconsAssistantSection,
+  XconsBackofficeSection, XconsSystemSection,
+} from "../components/project/XconsSections";
 
 // Hoisted SVG icons - prevents recreation on each render
 const NextArrowIcon = (
@@ -120,6 +124,23 @@ function Project() {
 
   const renderSection = (id: string, i: number): ReactNode => {
     const n = num(i);
+    if (isXCONS) {
+      switch (id) {
+        case "project-brief":
+          return (
+            <>
+              <HeroSection project={project} showMeta={false} />
+              <XconsBriefSection />
+            </>
+          );
+        case "project-ai": return <XconsAISection />;
+        case "project-journey": return <XconsJourneySection />;
+        case "project-assistant": return <XconsAssistantSection />;
+        case "project-backoffice": return <XconsBackofficeSection />;
+        case "project-system": return <XconsSystemSection />;
+        default: return null;
+      }
+    }
     switch (id) {
       case "project-brief":
         return (
@@ -265,7 +286,7 @@ interface SectionProps {
 
 // ─── Hero (inside the first section) ────────────────────────────────────────
 
-function HeroSection({ project }: { project: ProjectInfo }) {
+function HeroSection({ project, showMeta = true }: { project: ProjectInfo; showMeta?: boolean }) {
   const meta = [
     { label: "Año", value: project.timeline },
     { label: "Tipo de Proyecto", value: project.projectType },
@@ -283,6 +304,7 @@ function HeroSection({ project }: { project: ProjectInfo }) {
         {project.projectName || project.title}
       </motion.h1>
 
+      {showMeta && (
       <motion.dl
         className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 py-4 md:py-6 border-t border-b border-line"
         initial={{ opacity: 0, y: 20 }}
@@ -296,6 +318,7 @@ function HeroSection({ project }: { project: ProjectInfo }) {
           </div>
         ))}
       </motion.dl>
+      )}
 
       {project.liveUrl && (
         <motion.a
