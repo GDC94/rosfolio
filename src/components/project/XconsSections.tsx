@@ -1,5 +1,7 @@
 import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { useLenis } from "@studio-freight/react-lenis";
 import { adminShots as shot } from "../../data/xconsAdmin";
 import { xconsImages } from "../../data/projects";
 import PricingFlowSketches from "./PricingFlowSketches";
@@ -71,20 +73,31 @@ interface ShotProps {
 }
 
 function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
+  const lenis = useLenis();
+
+  // Freeze the page behind the modal: Lenis drives the scroll, so overflow alone doesn't stop it.
+  useEffect(() => {
+    lenis?.stop();
+    const html = document.documentElement;
+    const prev = { html: html.style.overflow, body: document.body.style.overflow };
+    html.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = prev.html;
+      document.body.style.overflow = prev.body;
+      lenis?.start();
+    };
+  }, [lenis]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
+    return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-8"
+      className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 md:p-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -94,25 +107,25 @@ function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: ()
       aria-label={alt}
     >
       <motion.div
-        className="relative w-full max-w-[1200px] max-h-[92vh] flex flex-col rounded-2xl overflow-hidden bg-card border border-line shadow-2xl"
+        className="relative w-full max-w-[1200px] max-h-[92vh] flex flex-col rounded-2xl overflow-hidden bg-white border border-black/10 shadow-2xl"
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 12, scale: 0.98 }}
         transition={{ duration: 0.3, ease }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-line">
-          <p className="type-body-s text-ink flex-1 min-w-0 truncate">{alt}</p>
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-black/10 bg-white flex-shrink-0">
+          <p className="type-body-s text-black flex-1 min-w-0 truncate">{alt}</p>
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 flex-shrink-0 rounded-full border border-line text-ink text-xl leading-none hover:bg-black/5"
+            className="w-9 h-9 flex-shrink-0 rounded-full border border-black/15 text-black text-xl leading-none hover:bg-black/5"
             aria-label="Cerrar"
           >
             ×
           </button>
         </div>
-        <div className="overflow-y-auto overscroll-contain">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain" data-lenis-prevent>
           <img src={src} alt={alt} className="w-full h-auto block" />
         </div>
       </motion.div>
@@ -146,7 +159,10 @@ function Shot({ src, alt, caption, tall = false, className = "" }: ShotProps) {
         </div>
       </button>
       {caption && <figcaption className="type-caption text-ink-subtle mt-2.5">{caption}</figcaption>}
-      <AnimatePresence>{open && <Lightbox src={src} alt={alt} onClose={() => setOpen(false)} />}</AnimatePresence>
+      {createPortal(
+        <AnimatePresence>{open && <Lightbox src={src} alt={alt} onClose={() => setOpen(false)} />}</AnimatePresence>,
+        document.body,
+      )}
     </figure>
   );
 }
