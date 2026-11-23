@@ -828,7 +828,7 @@ export function XconsSystemSection() {
       <FadeUp className="mt-12 md:mt-16">
         <p className="type-caption text-ink-subtle">
           Las capturas son del ambiente de desarrollo. Todas las personas, teléfonos, emails, empresas y tiendas que aparecen son ficticios:
-          los datos se reemplazaron en el navegador antes de mostrarse, sin tocar la base real.
+          los datos se reemplazaron en el navegador antes de mostrarse.
         </p>
       </FadeUp>
     </div>
