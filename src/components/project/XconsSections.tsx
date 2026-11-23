@@ -3,14 +3,13 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useLenis } from "@studio-freight/react-lenis";
 import { adminShots as shot } from "../../data/xconsAdmin";
-import { xconsImages } from "../../data/projects";
 import PricingFlowSketches from "./PricingFlowSketches";
 import { SketchFillContext, SketchFrame, XCONS_GREEN } from "./sketchKit";
 import { XCONS_CHALLENGE_SKETCHES } from "./XconsChallengeSketches";
 
 /**
  * XCONS Admin case study — the B2B back office for selling building materials.
- * Story: how I design, document and build with AI, following the life of one sale.
+ * Story: how I design (Figma, lately Figma Make / Claude Design) and, in recent months, build the front, following the life of one sale.
  * All captures use fictional people and companies (see data/xconsAdmin.ts).
  */
 
@@ -291,6 +290,13 @@ const SCALE = [
   { n: "3.000", label: "contactos en un solo store", every: 1700 },
 ];
 
+const MY_ROLE = [
+  { title: "Investigación y diseño", body: "entiendo cómo vende cada equipo, defino flujos y diseño la UI de cada módulo en Figma." },
+  { title: "Documentación", body: "escribo las specs y los criterios generales que usa todo el equipo." },
+  { title: "Front-end (últimos meses)", body: "exploro las nuevas funcionalidades con Figma Make o Claude Design y después las llevo a código en React." },
+  { title: "QA y capacitación", body: "pruebo cada estado y hago los videotutoriales con los que aprenden los equipos." },
+];
+
 const CHALLENGES = [
   {
     n: "01",
@@ -325,8 +331,7 @@ export function XconsBriefSection() {
         <p className="type-body-l text-ink-muted mt-5">
           Una obra se cotiza, se negocia por WhatsApp, se paga en partes y llega en varios camiones durante semanas. Diseñé de punta a punta
           el <span className="text-ink font-medium">admin de XCONS</span>: el backoffice B2B con el que los vendedores de corralones y
-          distribuidoras llevan todo ese recorrido, del primer "hola" a la última entrega. Y además{" "}
-          <span className="text-ink font-medium">lo construí con IA</span>.
+          distribuidoras llevan todo ese recorrido, del primer "hola" a la última entrega.
         </p>
       </FadeUp>
 
@@ -334,38 +339,26 @@ export function XconsBriefSection() {
         <Shot src={shot.chat} alt="Conversación de WhatsApp en el admin: el cliente manda una lista escrita a mano y el asistente de IA la carga en el presupuesto" caption="Un cliente manda la foto de una lista escrita a mano y el asistente de IA la carga en el presupuesto, dentro del mismo chat. Todos los datos son ficticios." />
       </FadeUp>
 
-      {/* Left: Contexto + La escala · Right: purchase-flow diagram, vertically centered.
-          Mobile: Contexto → diagram → La escala. */}
-      <div className="grid md:grid-cols-2 gap-x-12 gap-y-10 md:gap-y-14 mt-14 md:mt-20">
-        <FadeUp className="md:col-start-1 md:row-start-1">
-          <Subtitle>Contexto</Subtitle>
+      {/* Mi rol + La escala side by side on desktop, stacked on mobile. */}
+      <div className="grid md:grid-cols-2 gap-x-12 gap-y-10 mt-14 md:mt-20">
+        <FadeUp>
+          <Subtitle>Mi rol</Subtitle>
           <p className="type-body text-ink-muted">
-            XCONS es un software de comercio unificado para materiales de construcción. Tiene dos actores que se asocian entre sí:
+            Product Designer del admin desde 2024. Trabajo con el PM y el equipo de desarrollo, y llevo cada módulo de la idea a producción:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
-            <div className="rounded-xl border border-line bg-card p-4">
-              <Label color={GOLD}>Store</Label>
-              <p className="type-body-s text-ink mt-1.5">El showroom digital: exhibe, asesora y arma presupuestos. Es el dueño de la venta.</p>
-            </div>
-            <div className="rounded-xl border border-line bg-card p-4">
-              <Label color={GOLD}>Seller</Label>
-              <p className="type-body-s text-ink mt-1.5">La empresa que factura y entrega: precios, stock, envíos y pagos.</p>
-            </div>
-          </div>
+          <ul className="space-y-3 mt-5">
+            {MY_ROLE.map((r) => (
+              <li key={r.title} className="flex gap-3">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: GOLD }} aria-hidden="true" />
+                <p className="type-body-s text-ink-muted">
+                  <span className="text-ink font-medium">{r.title}:</span> {r.body}
+                </p>
+              </li>
+            ))}
+          </ul>
         </FadeUp>
 
-        <FadeUp delay={0.1} className="md:col-start-2 md:row-start-1 md:row-span-2 md:self-center">
-          <img
-            src={xconsImages.flujoCompra}
-            alt="Flujo de compra de XCONS"
-            width={260}
-            height={159}
-            loading="lazy"
-            className="block w-full max-w-[260px] md:max-w-[420px] mx-auto rounded-lg"
-          />
-        </FadeUp>
-
-        <FadeUp className="md:col-start-1 md:row-start-2">
+        <FadeUp delay={0.1}>
           <Subtitle>La escala</Subtitle>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-6">
             {SCALE.map((s) => (
@@ -413,18 +406,18 @@ export function XconsBriefSection() {
   );
 }
 
-// ─── 02 · Cómo diseño y construyo con IA ────────────────────────────────────
+// ─── 02 · Cómo trabajo ──────────────────────────────────────────────────────
 
 const PIPELINE = [
   {
     step: "Entender",
     me: "Defino el problema con el PM y los devs, y decido qué preguntas hay que responder.",
-    ai: "Me ayuda a encontrar decisiones previas en la documentación y a analizar datos reales, como 13.237 teléfonos para diseñar un campo.",
+    ai: "Me ayuda a encontrar decisiones previas en la documentación y a analizar datos reales.",
   },
   {
     step: "Explorar",
-    me: "Elijo la dirección y el criterio. A veces prefiero hacerlo a mano en Figma.",
-    ai: "Variantes rápidas y prototipos que corren sobre el admin real.",
+    me: "Elijo la dirección y el criterio. Durante la mayor parte del proyecto diseñé en Figma.",
+    ai: "Hoy exploro variantes y prototipos con Figma Make o Claude Design antes de pasar a código.",
   },
   {
     step: "Especificar",
@@ -433,7 +426,7 @@ const PIPELINE = [
   },
   {
     step: "Construir",
-    me: "Hago el front, reviso cada cambio y pruebo en desarrollo.",
+    me: "En las últimas funcionalidades hago yo el front, reviso cada cambio y pruebo en desarrollo.",
     ai: "Implementa conmigo en React + Ant Design, siguiendo las reglas de la documentación.",
   },
   {
@@ -496,14 +489,14 @@ function StagePanel({ stage: s, n }: { stage: Stage; n: number }) {
         <p className="type-h2 text-ink mt-3">{s.hook}</p>
         <p className="type-body text-ink-muted mt-4">{s.problem}</p>
         {/* Mobile: light list with a gold rule · Desktop: three cards */}
-        <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-3 mt-6 md:mt-8">
+        {s.decisions.length > 0 && <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-3 mt-6 md:mt-8">
           {s.decisions.map((d) => (
             <li key={d.title} className="border-l-2 border-l-[rgb(201,188,63)] pl-3 md:border md:border-line md:rounded-xl md:bg-card md:p-5">
               <p className="type-body text-ink font-medium">{d.title}</p>
               <p className="type-body-s text-ink-muted mt-1 md:mt-2">{d.why}</p>
             </li>
           ))}
-        </ul>
+        </ul>}
         <ShotGroup shots={s.shots} className="mt-8 md:mt-10" />
       </article>
     </FadeUp>
@@ -569,38 +562,30 @@ interface Stage {
 const STAGES: Stage[] = [
   {
     tab: "Panel de control",
-    hook: "Un panel que no te miente: cada número se puede reproducir, y cuando no sabe, lo dice.",
+    hook: "Las métricas de venta y las tareas pendientes del vendedor, en una pantalla.",
     problem: "El vendedor necesita saber en segundos qué tiene que hacer hoy y cómo viene el negocio. Lo definí así: \"No es un panel de BI. Es una superficie operativa.\"",
-    decisions: [
-      { title: "Se compara contra el mismo tramo", why: "El 18 de septiembre se compara con el 1 al 18 de agosto, no con el mes entero, \"que haría ver una caída que no existe\"." },
-      { title: "Nunca un cero falso", why: "Un widget sin datos confiables se oculta: un 0 se leería como \"contestamos al instante\"." },
-      { title: "El ranking personal es anónimo", why: "El vendedor ve \"#2 de 5\", sin nombres: \"sabe cómo está parado, no quién lo supera\"." },
-    ],
+    decisions: [],
     shots: [{ src: shot.panelCompleto, alt: "Panel de control con métricas de presupuestos, pedidos, conversión, pipeline y tareas pendientes", tall: true }],
   },
   {
     tab: "Conversaciones",
-    hook: "Cuatro canales, una sola bandeja, y el presupuesto a un clic.",
+    hook: "Todos los chats con clientes en una bandeja que comparte el equipo.",
     problem: "Los vendedores hablaban por WhatsApp personal, el de la empresa, email y Messenger. No quedaba registro, no se podía pasar una charla a un compañero y para ver un presupuesto había que salir del chat.",
     decisions: [
       { title: "La conversación es del canal, no del vendedor", why: "Cualquiera con permiso la puede tomar: el equipo trabaja en conjunto sin perder el hilo." },
-      { title: "Las notas internas viven dentro del chat, en amarillo", why: "Antes ese contexto se resolvía por Slack o por WhatsApp personal, y se perdía." },
+      { title: "Las notas internas viven dentro del chat, en amarillo", why: "Antes ese contexto se resolvía por email o por WhatsApp personal, y se perdía." },
       { title: "La regla de las 24 h de WhatsApp se ve antes de que falle", why: "Debajo de la caja dice cuánto tiempo queda para responder. Cuando vence, ofrece mandar una plantilla." },
     ],
     shots: [
-      { src: shot.chatAsistente, alt: "Un chat con todo: audio transcrito, el asistente que pregunta qué cumbrera agregar, PDF del cliente, notas con respuesta, un mensaje programado y una tarea programada del asistente", tall: true },
+      { src: shot.chatAsistente, alt: "La bandeja de entrada y una conversación: notas internas, un mensaje programado, una tarea programada del asistente y el campo para responder" },
       { src: shot.notificaciones, alt: "Centro de notificaciones con menciones agrupadas por día" },
     ],
   },
   {
     tab: "Contactos",
-    hook: "Diseñar para el error humano real: el duplicado aparece donde el operador ya está mirando.",
-    problem: "Es el CRM del equipo comercial. La idea: \"cuando un operador abre la ficha de un contacto, llega preparado\", sin cruzar pedidos, presupuestos y conversaciones por separado.",
-    decisions: [
-      { title: "No hay botón \"Unificar\"", why: "\"Un botón exige que ya sepas que el duplicado existe.\" El duplicado se descubre al editar, con un \"¿Son la misma persona?\"." },
-      { title: "El nombre es del store; el email y el WhatsApp, de la persona", why: "\"Es de la persona exactamente lo que es credencial de login.\"" },
-      { title: "Sin acceso, un mensaje y no una ficha vacía", why: "\"Este contacto no está en tu alcance\", y a quién pedírselo." },
-    ],
+    hook: "La ficha de cada cliente: quién es, qué cotizó, qué compró y qué se habló.",
+    problem: "Es el CRM del equipo comercial. El problema era que la información de un cliente estaba repartida entre presupuestos, pedidos y chats, y cada vendedor tenía que reconstruirla antes de responder. Definí qué tiene que estar a la vista: cómo contactarlo (email y WhatsApp), los datos que cambian cómo se le vende (rubro, obra actual, condición de IVA y cómo llegó), sus presupuestos agrupados por etapa, sus pedidos y el historial de todo lo que se habló. Así, cualquier vendedor que abre la ficha sabe en qué está ese cliente antes de escribirle.",
+    decisions: [],
     shots: [
       { src: shot.contactoFicha, alt: "Ficha de contacto con embudo de presupuestos, pedidos, historial y relaciones", tall: true },
       { src: shot.contactos, alt: "Tabla de contactos" },
@@ -608,12 +593,12 @@ const STAGES: Stage[] = [
   },
   {
     tab: "Presupuestos",
-    hook: "Un proyecto se cotiza, se negocia y se reparte en camiones durante semanas.",
-    problem: "Dos escenarios: la venta en mostrador, con el cliente enfrente, y la asistencia online, cuando el vendedor toma un presupuesto que el cliente empezó en la tienda y cierra la compra por él.",
+    hook: "Un presupuesto que se arma por entregas.",
+    problem: "En materiales de construcción una compra casi nunca llega junta: una parte va a la obra esta semana, otra cuando avanza y otra se retira del depósito. Y no todo viaja igual: una placa de yeso, un balde de 32 kg y un perfil de 2,60 m tienen pesos y medidas distintos, y la distancia a la obra cambia qué envíos se pueden ofrecer y cuánto cuestan. El presupuesto tenía que resolver eso antes de la compra, tanto en el mostrador como cuando el vendedor retoma online un presupuesto que empezó el cliente.",
     decisions: [
-      { title: "Los campos no tienen tope en pantalla", why: "Un tope \"impediría tipear justamente el valor que se quiere ajustar\": se acepta, se ajusta al máximo y se avisa." },
-      { title: "El recargo es un precio más alto, no un descuento negativo", why: "El cliente ve un precio normal, \"sin señal de que fue aumentado\"." },
-      { title: "El orden de los productos se guarda", why: "\"Un presupuesto con 30 productos no se puede leer\" si está desordenado." },
+      { title: "Las entregas se arman dentro del presupuesto", why: "Cada entrega agrupa sus productos y su método de envío, así el cliente aprueba el precio y la logística al mismo tiempo." },
+      { title: "Los productos se pasan de una entrega a otra", why: "Si cambian los tiempos de la obra, se reorganiza sin volver a cargar nada. Un interruptor marca a qué entrega van los productos nuevos." },
+      { title: "El envío depende de lo que lleva cada entrega", why: "El peso, las medidas y la distancia definen qué opciones aparecen (camión, retiro en depósito) y cuánto cuestan." },
     ],
     shots: [
       { src: shot.kanban, alt: "Vista Kanban de presupuestos por estado" },
@@ -622,13 +607,9 @@ const STAGES: Stage[] = [
   },
   {
     tab: "Pedidos y entregas",
-    hook: "Después del \"sí\" empieza lo difícil: cobrar, facturar y entregar en varios camiones sin perder un peso.",
+    hook: "El seguimiento del pago, la factura y cada entrega después de la compra.",
     problem: "Con la compra confirmada hay que coordinar pago, factura, entregas con distintas logísticas y cancelaciones parciales, con trazabilidad para responder cualquier reclamo.",
-    decisions: [
-      { title: "Las entregas se habilitan solas al facturar", why: "Así no se despacha mercadería sin cobrar." },
-      { title: "Un pedido cancelado sigue \"En curso\" hasta que el cliente recibe su plata", why: "No está terminado mientras la nota de crédito no esté verificada." },
-      { title: "Lo que mueven los sistemas externos sólo avanza", why: "Nunca retrocede y lo firma un usuario de integración, para distinguirlo de un cambio a mano." },
-    ],
+    decisions: [],
     shots: [
       { src: shot.pedidoDetalle, alt: "Un pedido completo: productos, pago con Mercado Pago, factura y dos entregas (una entregada con remito y conformidad, otra en camino)", tall: true },
       { src: shot.pedidos, alt: "Listado de pedidos con estado, total y balance" },
@@ -636,13 +617,9 @@ const STAGES: Stage[] = [
   },
   {
     tab: "Historial",
-    hook: "La memoria del negocio, en una sola línea de tiempo.",
+    hook: "Todo lo que pasó en un contacto, presupuesto o pedido, en orden.",
     problem: "La venta es larga y pasan varios vendedores. Cuando alguien toma un caso ajeno, la pregunta es siempre \"¿qué pasó hasta acá?\". El historial está en contactos, presupuestos, pedidos y conversaciones, con notas, menciones y respuestas.",
-    decisions: [
-      { title: "Las acciones seguidas se agrupan", why: "\"Cambió estado ×3\" se despliega: así no satura la vista." },
-      { title: "Dos formas de fijar que no se pisan", why: "El pin manual es permanente; la nota programada se fija sola hasta su fecha y después vuelve a su lugar." },
-      { title: "El historial sigue a la ficha", why: "Quien no puede abrir un contacto tampoco ve su historial." },
-    ],
+    decisions: [],
     shots: [{ src: shot.historial, alt: "Historial de un pedido: cambios de estado de cada entrega, factura, notas con menciones y una nota fijada" }],
   },
 ];
@@ -728,7 +705,7 @@ export function XconsAssistantSection() {
 const BACKOFFICE: Stage[] = [
   {
     tab: "Asociador de productos",
-    hook: "Miles de productos de cada seller, uno solo en el catálogo.",
+    hook: "Vincular los productos de cada seller con el catálogo único.",
     problem: "Cada seller carga sus productos con sus propios códigos y nombres, por Excel o desde su ERP. Para venderse, cada uno tiene que quedar asociado a su ficha única del catálogo. Un seller grande tiene miles.",
     decisions: [
       { title: "Sugerencias con % de compatibilidad y un semáforo", why: "Cerca de un corte, el porcentaje muestra un decimal \"para que el número no contradiga al color\" (79,5% en amarillo)." },
@@ -744,7 +721,7 @@ const BACKOFFICE: Stage[] = [
   },
   {
     tab: "Catálogo (PIM)",
-    hook: "Editar un producto sin dejar de venderlo.",
+    hook: "Alta y edición de productos, con revisión antes de publicar.",
     problem: "El alta de productos vivía en Magento, donde \"cualquiera edita cualquier producto\", no quedaba rastro y \"todo sale publicado al instante\". Con 49.000 productos, un error se multiplica.",
     decisions: [
       { title: "Lo publicado no cambia mientras se edita", why: "\"Un activo se sigue vendiendo como estaba\": editarlo crea una versión que pasa por revisión." },
@@ -758,7 +735,7 @@ const BACKOFFICE: Stage[] = [
   },
   {
     tab: "Canales",
-    hook: "Configurar un canal no es pegar una contraseña: es decidir quién habla en nombre de la tienda.",
+    hook: "Conectar los WhatsApp de la tienda y definir quién puede usarlos.",
     problem: "El administrador del store conecta los WhatsApp reales, decide quién puede usarlos (No, Lector o Editor) y crea las plantillas que Meta tiene que aprobar.",
     decisions: [
       { title: "\"Restringido\" es un estado propio", why: "Se arregla distinto que \"desconectado\": un día se gastaron tres dispositivos vinculados en trece minutos reintentando." },
@@ -772,7 +749,7 @@ const BACKOFFICE: Stage[] = [
   },
   {
     tab: "Stores y categorías",
-    hook: "Cada store decide con quién vende y bajo qué reglas.",
+    hook: "Alta de tiendas y sellers, equipos, permisos y categorías.",
     problem: "Desde acá se dan de alta stores y sellers, se vinculan entre sí, se arman los equipos con sus permisos y se ordena el menú de cada tienda.",
     decisions: [
       { title: "El acceso depende de la relación con cada registro", why: "\"La participación es la condición de visibilidad\", como en Google Docs. Ver no genera relación; editar, sí." },
